@@ -19,17 +19,13 @@
 
     Template for a an assigned user in the kanban board.
 
-    Classes required for JS:
-    * none
-
-    Data attributes required for JS:
-    * none
-
-    Context variables required for this template:
-    * none
-
     Example context (json):
     {
+        "id": 4,
+        "cardid": 18,
+        "assignself": true,
+        "selfassigned": true,
+        "assignothers": true
     }
 }}
 <button id="mod_kanban_assignee-{{cardid}}-{{id}}" class="mod_kanban_assigned_user btn btn-icon icon-no-margin p-0" data-action="unassign_user" data-id="{{cardid}}" data-userid="{{id}}">
