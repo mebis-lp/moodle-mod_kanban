@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/kanban/db" VERSION="20230515" COMMENT="XMLDB file for Moodle mod/kanban"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="kanban" COMMENT="Kanban instances">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="1" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="kanban_board" COMMENT="Kanban boards">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sequence" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="template" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="kanban_instance" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="kanban_column" COMMENT="Default comment for the table, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kanban_board" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="sequence" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="options" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="board" UNIQUE="false" FIELDS="kanban_board"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="kanban_card" COMMENT="Default comment for the table, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="kanban_column" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="kanban_board" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="options" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="duedate" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="reminderdate" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="kanban_column" UNIQUE="false" FIELDS="kanban_column"/>
+        <INDEX NAME="kanban_board" UNIQUE="false" FIELDS="kanban_board"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="kanban_assignee" COMMENT="Default comment for the table, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kanban_card" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="card" UNIQUE="false" FIELDS="kanban_card"/>
+        <INDEX NAME="user" UNIQUE="false" FIELDS="user"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

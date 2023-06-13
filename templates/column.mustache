@@ -1,0 +1,65 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_kanban/column
+
+    Template for a column in the kanban board.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * none
+
+    Example context (json):
+    {
+    }
+}}
+<li class="mod_kanban_column col card" id="mod_kanban_column-{{id}}" data-id="{{id}}">
+    <h5 class="mod_kanban_column_title card-title">
+    <span class="inplaceeditable inplaceeditable-text"{{#managecolumns}} data-inplaceeditable="1" data-component="mod_kanban" data-itemtype="column" data-itemid="{{id}}"
+    data-value="{{title}}" data-type="text"{{/managecolumns}}>
+        <a href="#" class="quickeditlink aalink"{{#managecolumns}} data-inplaceeditablelink="1"{{/managecolumns}}>
+            {{title}}
+        </a>
+    </span>
+    </h5>
+    <div class="mod_kanban_action_menu">
+        <button class="btn btn-icon icon-no-margin p-0{{^managecolumns}} hidden{{/managecolumns}}" data-action="delete_column" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deletecolumn, mod_kanban {{/str}} {{/pix}}</button>
+    </div>
+    <ul class="mod_kanban_column_inner card-body p-0" data-id="{{id}}">
+        <li class="mod_kanban_addcard_first">
+            {{>mod_kanban/addcard}}
+        </li>
+        {{#hascards}}
+            {{#cards}}
+                {{>mod_kanban/card}}
+            {{/cards}}
+        {{/hascards}}
+    </ul>
+    {{>mod_kanban/addcolumn}}
+</li>
+
+{{#js}}
+{{#managecolumns}}require(['core/inplace_editable']);{{/managecolumns}}
+require(['mod_kanban/column'], function(component) {
+    component.init('mod_kanban_column-{{id}}');
+});
+{{/js}}
