@@ -28,4 +28,6 @@ require_once('lib.php');
 
 $id = required_param('id', PARAM_INT);
 
+require_login();
+
 redirect($CFG->wwwroot . '/mod/kanban/view.php?id=' . $id);
