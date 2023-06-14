@@ -30,6 +30,14 @@ use core_privacy\local\request\helper;
 use core_privacy\local\request\writer;
 use stdClass;
 
+/**
+ * Privacy provider for mod_kanban.
+ *
+ * @package    mod_kanban
+ * @copyright  2023 ISB Bayern
+ * @author     Stefan Hanauska
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements
     \core_privacy\local\request\plugin\provider {
 
