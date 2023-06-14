@@ -3,6 +3,7 @@
  */
 export default {
     ADDCARD: `[data-action="add_card"]`,
+    ADDCARDCONTAINER: `.mod_kanban_addcard_container`,
     ADDCARDFIRST: `.mod_kanban_addcard_first`,
     ADDCOLUMN: `[data-action="add_column"]`,
     ADDCOLUMNFIRST: `.mod_kanban_addcolumn_first`,

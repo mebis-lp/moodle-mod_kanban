@@ -39,8 +39,13 @@
 
 .mod_kanban_addcard_container:hover,
 .mod_kanban_addcard_container:focus,
+.mod_kanban_addcard_container:focus-within,
+.dragover > .mod_kanban_addcard_container,
+.mod_kanban_addcard_container.mod_kanban_insert,
 .mod_kanban_addcolumn_container:hover,
-.mod_kanban_addcolumn_container:focus {
+.mod_kanban_addcolumn_container:focus,
+.mod_kanban_addcolumn_container:focus-within,
+.mod_kanban_addcolumn_container.mod_kanban_insert {
     background-color: darkgray;
 }
 
@@ -106,6 +111,11 @@
     opacity: 1;
 }
 
+.mod_kanban_addcard_container.mod_kanban_insert {
+    animation: none;
+    opacity: 1;
+}
+
 .mod_kanban_column.card {
     min-width: 20rem;
     max-width: 20rem;
@@ -115,6 +125,7 @@
 .mod_kanban_card.card {
     margin-bottom: 10px;
     width: 18rem;
+    transition: margin 0.5s;
 }
 
 .mod_kanban_card > .mod_kanban_addcard_container.row {

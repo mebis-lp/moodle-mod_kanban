@@ -90,10 +90,18 @@ export default class extends BaseComponent {
     /**
      * Executed when a valid dropdata is dropped over the drop-zone.
      * @param {object} dropdata
+     * @param {object} event
      */
-    drop(dropdata) {
+    drop(dropdata, event) {
         if (dropdata.type == 'card') {
-            this.reactive.dispatch('moveCard', dropdata.id, this.id, 0);
+            let cards = this.getElements(selectors.CARD);
+            let aftercard = 0;
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].offsetTop + cards[i].clientHeight / 2 <= event.layerY) {
+                    aftercard = cards[i].dataset.id;
+                }
+            }
+            this.reactive.dispatch('moveCard', dropdata.id, this.id, aftercard);
         }
         if (dropdata.type == 'column') {
             if (dropdata.id != this.id) {
@@ -104,16 +112,32 @@ export default class extends BaseComponent {
 
     /**
      * Optional method to show some visual hints to the user.
+     * @param {object} dropdata
+     * @param {object} event
      */
-    showDropZone() {
-        this.element.classList.add('mod_kanban_dropzone');
+    showDropZone(dropdata, event) {
+        let cards = this.getElements(selectors.CARD);
+        let aftercard = 0;
+        for (let i = 0; i < cards.length; i++) {
+            if (cards[i].offsetTop + cards[i].clientHeight / 2 <= event.layerY) {
+                aftercard = cards[i].dataset.id;
+            }
+        }
+        if (aftercard == 0) {
+            this.getElement(selectors.ADDCARDCONTAINER).classList.add('mod_kanban_insert');
+        } else {
+            this.getElement(selectors.ADDCARDCONTAINER, aftercard).classList.add('mod_kanban_insert');
+        }
     }
 
     /**
      * Optional method to remove visual hints to the user.
      */
     hideDropZone() {
-        this.element.classList.remove('mod_kanban_dropzone');
+        let addcard = this.getElements(selectors.ADDCARDCONTAINER);
+        addcard.forEach((e) => {
+            e.classList.remove('mod_kanban_insert');
+        });
     }
 
     /**

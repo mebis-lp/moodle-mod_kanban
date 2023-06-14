@@ -161,7 +161,11 @@ export default class extends BaseComponent {
      * @returns {Object} the draggable data.
      */
     getDraggableData() {
-        return {id: this.id, type: 'card'};
+        return {
+            id: this.id,
+            type: 'card',
+            height: this.getElement().clientHeight
+        };
     }
 
     /**
@@ -180,22 +184,9 @@ export default class extends BaseComponent {
     drop(dropdata) {
         if (dropdata.id != this.id) {
             let newcolumn = this.getElement(selectors.ADDCARD, this.id).dataset.columnid;
-            this.reactive.dispatch('moveCard', dropdata.id, newcolumn, this.id);
+            let aftercard = this.id;
+            this.reactive.dispatch('moveCard', dropdata.id, newcolumn, aftercard);
         }
+        this.getElement().removeAttribute('style');
     }
-
-    /**
-     * Optional method to show some visual hints to the user.
-     */
-    showDropZone() {
-        this.element.classList.add('mod_kanban_dropzone');
-    }
-
-    /**
-     * Optional method to remove visual hints to the user.
-     */
-    hideDropZone() {
-        this.element.classList.remove('mod_kanban_dropzone');
-    }
-
 }
