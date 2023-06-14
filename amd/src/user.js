@@ -36,7 +36,8 @@ export default class extends BaseComponent {
      * @param {*} state
      */
     stateReady(state) {
-        if ((state.capabilities.get('assignself') && this.userid == state.board.userid) || state.capabilities.get('assignothers')) {
+        if ((state.capabilities.get('assignself').value && this.userid == state.board.userid) ||
+            state.capabilities.get('assignothers').value) {
             this.addEventListener(
                 this.getElement(),
                 'click',

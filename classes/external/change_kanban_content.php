@@ -450,11 +450,15 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        require_capability('mod/kanban:moveallcards', $context);
-        // ToDo: Check moveassignedcards.
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancard = $DB->get_record('kanban_card', ['kanban_board' => $boardid, 'id' => $cardid], '*', MUST_EXIST);
+        $kanbanassignees = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $kanbancard->id], );
+        if (in_array($USER->id, $kanbanassignees)) {
+            require_capability('mod/kanban:moveassignedcards', $context);
+        } else {
+            require_capability('mod/kanban:moveallcards', $context);
+        }
         $kanbancolumn = $DB->get_record(
             'kanban_column',
             ['kanban_board' => $boardid, 'id' => $kanbancard->kanban_column],
@@ -838,6 +842,9 @@ class change_kanban_content extends external_api {
         $success1 = $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]);
         $success2 = $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
         $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
+        $userids = array_map(function ($v) {
+            return intval($v);
+        }, $userids);
         $update = [];
         $update[] = [
             'name' => 'cards',
@@ -936,6 +943,9 @@ class change_kanban_content extends external_api {
         $success = $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]) &&
             $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
         $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
+        $userids = array_map(function ($v) {
+            return intval($v);
+        }, $userids);
 
         $update = [];
         $update[] = [

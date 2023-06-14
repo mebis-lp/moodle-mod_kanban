@@ -39,8 +39,9 @@ export default class extends BaseComponent {
 
     /**
      * Called once when state is ready, attaching event listeners and initializing drag and drop.
+     * @param {object} state
      */
-    stateReady() {
+    stateReady(state) {
         this.addEventListener(
             this.getElement(selectors.DELETECOLUMN, this.id),
             'click',
@@ -56,7 +57,9 @@ export default class extends BaseComponent {
             'click',
             this._addColumn
         );
+        this.draggable = false;
         this.dragdrop = new DragDrop(this);
+        this.checkDragging(state);
     }
 
     /**
@@ -75,6 +78,22 @@ export default class extends BaseComponent {
      */
     getDraggableData() {
         return {id: this.id, type: 'column'};
+    }
+
+    /**
+     * Conditionally enable / disable dragging.
+     * @param {*} state
+     */
+    checkDragging(state) {
+        if (state === undefined) {
+            state = this.reactive.stateManager.state;
+        }
+
+        if (state.capabilities.get('managecolumns').value) {
+            this.dragdrop.setDraggable(true);
+        } else {
+            this.dragdrop.setDraggable(false);
+        }
     }
 
     /**

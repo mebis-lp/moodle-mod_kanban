@@ -59,7 +59,9 @@ export default class extends BaseComponent {
         if (state.cards.get(this.id).assignees.length > 0) {
             this.getElement(selectors.ASSIGNUSER, this.id).classList.add('mod_kanban_hidden');
         }
+        this.draggable = false;
         this.dragdrop = new DragDrop(this);
+        this.checkDragging(state);
     }
 
     /**
@@ -125,6 +127,7 @@ export default class extends BaseComponent {
         } else {
             this.getElement(selectors.ASSIGNUSER, this.id).classList.remove('mod_kanban_hidden');
         }
+        this.checkDragging();
     }
 
     /**
@@ -157,15 +160,33 @@ export default class extends BaseComponent {
 
     /**
      * Get the draggable data of this component.
-     *
-     * @returns {Object} the draggable data.
+     * @returns {object}
      */
     getDraggableData() {
         return {
             id: this.id,
             type: 'card',
-            height: this.getElement().clientHeight
         };
+    }
+
+    /**
+     * Conditionally enable / disable dragging.
+     * @param {*} state
+     */
+    checkDragging(state) {
+        if (state === undefined) {
+            state = this.reactive.stateManager.state;
+        }
+        if (state.capabilities.get('moveallcards').value ||
+            (state.capabilities.get('moveassignedcards').value &&
+            state.cards.get(this.id).assignees.includes(state.board.userid))) {
+            this.draggable = true;
+            this.dragdrop.setDraggable(true);
+
+        } else {
+            this.draggable = false;
+            this.dragdrop.setDraggable(false);
+        }
     }
 
     /**
@@ -187,6 +208,5 @@ export default class extends BaseComponent {
             let aftercard = this.id;
             this.reactive.dispatch('moveCard', dropdata.id, newcolumn, aftercard);
         }
-        this.getElement().removeAttribute('style');
     }
 }
