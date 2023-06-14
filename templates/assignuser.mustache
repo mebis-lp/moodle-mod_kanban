@@ -21,10 +21,10 @@
 
     Example context (json):
     {
-        id: 8,
-        assignself: true,
-        assignothers: false,
-        selfassigned: false
+        "id": 8,
+        "assignself": true,
+        "assignothers": false,
+        "selfassigned": false
     }
 }}
 <button class="btn btn-icon icon-no-margin p-0 {{^assignself}}{{^assignothers}} hidden{{/assignothers}}{{/assignself}}{{#assignself}}{{#selfassigned}}{{^assignothers}} hidden{{/assignothers}}{{/selfassigned}}{{/assignself}}" data-action="assign_user" data-id="{{id}}">{{#pix}} t/user, core, {{#str}} assignme, mod_kanban{{/str}} {{/pix}}</button>
