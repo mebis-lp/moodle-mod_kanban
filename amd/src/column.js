@@ -116,17 +116,22 @@ export default class extends BaseComponent {
      * @param {object} event
      */
     showDropZone(dropdata, event) {
-        let cards = this.getElements(selectors.CARD);
-        let aftercard = 0;
-        for (let i = 0; i < cards.length; i++) {
-            if (cards[i].offsetTop + cards[i].clientHeight / 2 <= event.layerY) {
-                aftercard = cards[i].dataset.id;
+        if (dropdata.type == 'card') {
+            let cards = this.getElements(selectors.CARD);
+            let aftercard = 0;
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].offsetTop + cards[i].clientHeight / 2 <= event.layerY) {
+                    aftercard = cards[i].dataset.id;
+                }
+            }
+            if (aftercard == 0) {
+                this.getElement(selectors.ADDCARDCONTAINER).classList.add('mod_kanban_insert');
+            } else {
+                this.getElement(selectors.ADDCARDCONTAINER, aftercard).classList.add('mod_kanban_insert');
             }
         }
-        if (aftercard == 0) {
-            this.getElement(selectors.ADDCARDCONTAINER).classList.add('mod_kanban_insert');
-        } else {
-            this.getElement(selectors.ADDCARDCONTAINER, aftercard).classList.add('mod_kanban_insert');
+        if (dropdata.type == 'column') {
+            this.getElement(selectors.ADDCOLUMNCONTAINER).classList.add('mod_kanban_insert');
         }
     }
 
@@ -134,8 +139,8 @@ export default class extends BaseComponent {
      * Optional method to remove visual hints to the user.
      */
     hideDropZone() {
-        let addcard = this.getElements(selectors.ADDCARDCONTAINER);
-        addcard.forEach((e) => {
+        this.getElement(selectors.ADDCOLUMNCONTAINER).classList.remove('mod_kanban_insert');
+        this.getElements(selectors.ADDCARDCONTAINER).forEach((e) => {
             e.classList.remove('mod_kanban_insert');
         });
     }

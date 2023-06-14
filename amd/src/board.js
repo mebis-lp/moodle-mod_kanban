@@ -1,4 +1,4 @@
-import {BaseComponent} from 'core/reactive';
+import {BaseComponent, DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 /**
@@ -30,6 +30,16 @@ export default class extends BaseComponent {
             'click',
             this._addColumn
         );
+        this.dragdrop = new DragDrop(this);
+    }
+
+    /**
+     * Remove all subcomponents dependencies.
+     */
+    destroy() {
+        if (this.dragdrop !== undefined) {
+            this.dragdrop.unregister();
+        }
     }
 
     _boardUpdated({element}) {
@@ -57,5 +67,37 @@ export default class extends BaseComponent {
 
     _addColumn() {
         this.reactive.dispatch('addColumn', 0);
+    }
+
+    /**
+     * Validate draggable data.
+     * @param {object} dropdata
+     * @returns {boolean} if the data is valid for this drop-zone.
+     */
+    validateDropData(dropdata) {
+        let type = dropdata?.type;
+        return type == 'column';
+    }
+
+    /**
+     * Executed when a valid dropdata is dropped over the drop-zone.
+     * @param {object} dropdata
+     */
+    drop(dropdata) {
+        this.reactive.dispatch('moveColumn', dropdata.id, 0);
+    }
+
+    /**
+     * Optional method to show some visual hints to the user.
+     */
+    showDropZone() {
+        this.getElement(selectors.ADDCOLUMNCONTAINER).classList.add('mod_kanban_insert');
+    }
+
+    /**
+     * Optional method to remove visual hints to the user.
+     */
+    hideDropZone() {
+        this.getElement(selectors.ADDCOLUMNCONTAINER).classList.remove('mod_kanban_insert');
     }
 }
