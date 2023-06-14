@@ -453,7 +453,12 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancard = $DB->get_record('kanban_card', ['kanban_board' => $boardid, 'id' => $cardid], '*', MUST_EXIST);
-        $kanbanassignees = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $kanbancard->id], );
+        $kanbanassignees = $DB->get_fieldset_select(
+            'kanban_assignee',
+            'user',
+            'kanban_card = :cardid',
+            ['cardid' => $kanbancard->id]
+        );
         if (in_array($USER->id, $kanbanassignees)) {
             require_capability('mod/kanban:moveassignedcards', $context);
         } else {
