@@ -165,7 +165,7 @@ class get_kanban_content extends external_api {
     public static function get_kanban_content_update_parameters(): external_function_parameters {
         return self::get_kanban_content_init_parameters();
     }
-    
+
     /**
      * Definition of return values of the get_kanban_content_update webservice function.
      *

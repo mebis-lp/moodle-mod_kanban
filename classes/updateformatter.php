@@ -33,6 +33,11 @@ namespace mod_kanban;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class updateformatter {
+    /**
+     * Stored update messages.
+     *
+     * @var array
+     */
     private $updates = [];
     /**
      * Put a new value.
@@ -53,6 +58,7 @@ class updateformatter {
     }
 
     /**
+     * Return update JSON.
      * @return string JSON encoded update string
      */
     public function format() {
