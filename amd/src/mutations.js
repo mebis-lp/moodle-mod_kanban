@@ -95,4 +95,19 @@ export default class {
         let updates = JSON.parse(result.update);
         stateManager.processUpdates(updates);
     }
+
+    async getUpdates(stateManager) {
+        const state = stateManager.state;
+        const result = await Ajax.call([{
+            methodname: 'mod_kanban_get_kanban_content',
+            args: {
+                cmid: state.board.cmid,
+                boardid: state.board.id,
+                timestamp: state.board.timestamp,
+            },
+        }])[0];
+
+        let updates = JSON.parse(result.update);
+        stateManager.processUpdates(updates);
+    } 
 }

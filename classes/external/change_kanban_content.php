@@ -40,6 +40,7 @@ use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
 use mod_kanban\helper;
+use mod_kanban\updateformatter;
 
 /**
  * Class for modifying kanban content
@@ -143,32 +144,16 @@ class change_kanban_content extends external_api {
 
         $seq = helper::sequence_add_after($kanbanboard->sequence, $aftercol, $kanbancolumnid);
 
-        $update = [];
-        $update[] = [
-            'name' => 'columns',
-            'action' => 'create',
-            'fields' => [
-                'id' => $kanbancolumnid,
-                'title' => $title,
-                'options' => $options,
-                'sequence' => $sequence,
-            ]
-        ];
-        $update[] = [
-            'name' => 'board',
-            'action' => 'put',
-            'fields' => [
-                'id' => $kanbanboard->id,
-                'sequence' => $seq,
-            ]
-        ];
+        $formatter = new updateformatter();
+        $formatter->put('columns', ['id' => $kanbancolumnid, 'title' => $title, 'options' => $options, 'sequence' => $sequence]);
+        $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
         return [
             'success' => $DB->update_record(
                 'kanban_board',
                 ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
             ),
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 
@@ -266,33 +251,22 @@ class change_kanban_content extends external_api {
 
         $seq = helper::sequence_add_after($kanbancolumn->sequence, $aftercard, $kanbancardid);
 
-        $update = [];
-        $update[] = [
-            'name' => 'cards',
-            'action' => 'create',
-            'fields' => [
-                'id' => $kanbancardid,
-                'options' => $options,
-                'title' => $title,
-                'kanban_column' => $kanbancolumn->id,
-                'assignees' => [],
-            ]
-        ];
-        $update[] = [
-            'name' => 'columns',
-            'action' => 'put',
-            'fields' => [
-                'id' => $kanbancolumn->id,
-                'sequence' => $seq,
-            ]
-        ];
+        $formatter = new updateformatter();
+        $formatter->put('cards', [
+            'id' => $kanbancardid,
+            'options' => $options,
+            'title' => $title,
+            'kanban_column' => $kanbancolumn->id,
+            'assignees' => [],
+        ]);
+        $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
 
         return [
             'success' => $DB->update_record(
                 'kanban_column',
                 ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]
             ),
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 
@@ -371,22 +345,15 @@ class change_kanban_content extends external_api {
 
         $seq = helper::sequence_move_after($kanbanboard->sequence, $aftercol, $columnid);
 
-        $update = [];
-        $update[] = [
-            'name' => 'board',
-            'action' => 'put',
-            'fields' => [
-                'id' => $kanbanboard->id,
-                'sequence' => $seq,
-            ]
-        ];
+        $formatter = new updateformatter();
+        $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
         return [
             'success' => $DB->update_record(
                 'kanban_board',
                 ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
             ),
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 
@@ -485,21 +452,14 @@ class change_kanban_content extends external_api {
 
         if ($kanbancard->kanban_column == $columnid) {
             $seq = helper::sequence_move_after($kanbancolumn->sequence, $aftercard, $cardid);
-            $update = [];
-            $update[] = [
-                'name' => 'columns',
-                'action' => 'put',
-                'fields' => [
-                    'id' => $kanbancolumn->id,
-                    'sequence' => $seq,
-                ]
-            ];
+            $formatter = new updateformatter();
+            $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
             return [
                 'success' => $DB->update_record(
                     'kanban_column',
                     ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]
                 ),
-                'update' => json_encode($update)
+                'update' => $formatter->format()
             ];
         } else {
             $seq = helper::sequence_remove($kanbancolumn->sequence, $cardid);
@@ -510,31 +470,10 @@ class change_kanban_content extends external_api {
                 MUST_EXIST
             );
             $seqtarget = helper::sequence_add_after($kanbancolumntarget->sequence, $aftercard, $cardid);
-            $update = [];
-            $update[] = [
-                'name' => 'columns',
-                'action' => 'put',
-                'fields' => [
-                    'id' => $kanbancolumn->id,
-                    'sequence' => $seq,
-                ]
-            ];
-            $update[] = [
-                'name' => 'columns',
-                'action' => 'put',
-                'fields' => [
-                    'id' => $columnid,
-                    'sequence' => $seqtarget,
-                ]
-            ];
-            $update[] = [
-                'name' => 'cards',
-                'action' => 'put',
-                'fields' => [
-                    'id' => $cardid,
-                    'kanban_column' => $columnid,
-                ]
-            ];
+            $formatter = new updateformatter();
+            $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
+            $formatter->put('columns', ['id' => $columnid, 'sequence' => $seqtarget]);
+            $formatter->put('cards', ['id' => $cardid, 'kanban_column' => $columnid]);
             return [
                 'success' =>
                     $DB->update_record(
@@ -543,7 +482,7 @@ class change_kanban_content extends external_api {
                     ) &&
                     $DB->update_record('kanban_column', ['id' => $columnid, 'sequence' => $seqtarget, 'timemodified' => time()]) &&
                     $DB->update_record('kanban_card', ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()]),
-                'update' => json_encode($update)
+                'update' => $formatter->format(),
             ];
         }
     }
@@ -629,28 +568,15 @@ class change_kanban_content extends external_api {
 
         $seq = helper::sequence_remove($kanbancolumn->sequence, $cardid);
 
-        $update = [];
-        $update[] = [
-            'name' => 'cards',
-            'action' => 'delete',
-            'fields' => [
-                'id' => $cardid
-            ]
-        ];
-        $update[] = [
-            'name' => 'columns',
-            'action' => 'put',
-            'fields' => [
-                'id' => $kanbancolumn->id,
-                'sequence' => $seq,
-            ]
-        ];
+        $formatter = new updateformatter();
+        $formatter->delete('cards', ['id' => $cardid]);
+        $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
 
         return [
             'success' =>
                 $DB->update_record('kanban_column', ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]) &&
                 $DB->delete_records('kanban_card', ['id' => $cardid]),
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 
@@ -729,38 +655,19 @@ class change_kanban_content extends external_api {
 
         $seq = helper::sequence_remove($kanbanboard->sequence, $columnid);
 
-        $update = [];
+        $formatter = new updateformatter();
         foreach ($kanbancolumn->sequence as $kanbancardid) {
-            $update[] = [
-                'name' => 'cards',
-                'action' => 'delete',
-                'fields' => [
-                    'id' => $kanbancardid
-                ]
-            ];
+            $formatter->delete('cards', ['id' => $kanbancardid]);
         }
-        $update[] = [
-            'name' => 'columns',
-            'action' => 'delete',
-            'fields' => [
-                'id' => $kanbancolumn->id
-            ]
-        ];
-        $update[] = [
-            'name' => 'board',
-            'action' => 'put',
-            'fields' => [
-                'id' => $kanbanboard->id,
-                'sequence' => $seq,
-            ]
-        ];
+        $formatter->delete('columns', ['id' => $kanbancolumn->id]);
+        $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
         return [
             'success' =>
                 $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => $seq, 'timemodified' => time()]) &&
                 $DB->delete_records('kanban_column', ['id' => $columnid]) &&
                 $DB->delete_records('kanban_card', ['kanban_column' => $columnid]),
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 
@@ -850,19 +757,12 @@ class change_kanban_content extends external_api {
         $userids = array_map(function ($v) {
             return intval($v);
         }, $userids);
-        $update = [];
-        $update[] = [
-            'name' => 'cards',
-            'action' => 'put',
-            'fields' => [
-                'id' => $cardid,
-                'assignees' => $userids
-            ]
-        ];
+        $formatter = new updateformatter();
+        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids]);
 
         return [
             'success' => $success1 && $success2,
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 
@@ -952,19 +852,12 @@ class change_kanban_content extends external_api {
             return intval($v);
         }, $userids);
 
-        $update = [];
-        $update[] = [
-            'name' => 'cards',
-            'action' => 'put',
-            'fields' => [
-                'id' => $cardid,
-                'assignees' => $userids,
-            ]
-        ];
+        $formatter = new updateformatter();
+        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids]);
 
         return [
             'success' => $success,
-            'update' => json_encode($update)
+            'update' => $formatter->format()
         ];
     }
 }

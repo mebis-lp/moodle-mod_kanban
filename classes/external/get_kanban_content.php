@@ -56,7 +56,7 @@ class get_kanban_content extends external_api {
      *
      * @return external_function_parameters
      */
-    public static function execute_parameters(): external_function_parameters {
+    public static function get_kanban_content_parameters(): external_function_parameters {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
@@ -69,7 +69,7 @@ class get_kanban_content extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_single_structure {
+    public static function get_kanban_content_returns(): external_single_structure {
         return
             new external_single_structure(
                 [
@@ -146,9 +146,8 @@ class get_kanban_content extends external_api {
      * @throws restricted_context_exception
      * @throws moodle_exception
      */
-    public static function execute(int $cmid, int $boardid, int $timestamp = 0): array {
-        global $DB, $OUTPUT, $USER;
-        $params = self::validate_parameters(self::execute_parameters(), [
+    public static function get_kanban_content(int $cmid, int $boardid, int $timestamp = 0): array {
+        $params = self::validate_parameters(self::get_kanban_content_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
             'timestamp' => $timestamp
@@ -156,6 +155,25 @@ class get_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $timestamp = $params['timestamp'];
+        return self::execute($cmid, $boardid, $timestamp);
+    }
+
+    /**
+     * Get kanban content from database.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @param int $timestamp the timestamp of the state present in the frontend
+     * @param bool $asupdate whether to format content as update for StateMananger
+     * @return array The requested content, divided into board, columns and cards
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function execute(int $cmid, int $boardid, int $timestamp = 0, bool $asupdate = false): array {
+        global $DB, $OUTPUT, $USER;
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
@@ -241,6 +259,9 @@ class get_kanban_content extends external_api {
             $caps[] = ['id' => $k, 'value' => $v];
         }
 
+        if ($asupdate) {
+            
+        }
         return [
             'board' => $kanbanboard,
             'columns' => $kanbancolumns,
