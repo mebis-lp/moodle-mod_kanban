@@ -41,6 +41,7 @@ use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
 use mod_kanban\helper;
+use mod_kanban\updateformatter;
 
 /**
  * Class for delivering kanban content
@@ -260,7 +261,21 @@ class get_kanban_content extends external_api {
         }
 
         if ($asupdate) {
-            
+            $formatter = new updateformatter();
+            foreach ($kanbancolumns as $column) {
+                $formatter->put('columns', $column);
+            }
+            foreach ($kanbancards as $card) {
+                $formatter->put('cards', $card);
+            }
+            foreach ($kanbanusers as $user) {
+                $formatter->put('users', $user);
+            }
+            foreach ($caps as $cap) {
+                $formatter->put('capabilities', $cap);
+            }
+            $formatter->put('board', $kanbanboard);
+
         }
         return [
             'board' => $kanbanboard,
