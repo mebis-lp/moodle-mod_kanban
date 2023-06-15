@@ -40,7 +40,6 @@ use invalid_parameter_exception;
 use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
-use mod_kanban\helper;
 use mod_kanban\updateformatter;
 
 /**
@@ -57,7 +56,7 @@ class get_kanban_content extends external_api {
      *
      * @return external_function_parameters
      */
-    public static function get_kanban_content_parameters(): external_function_parameters {
+    public static function get_kanban_content_init_parameters(): external_function_parameters {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
@@ -70,7 +69,7 @@ class get_kanban_content extends external_api {
      *
      * @return external_single_structure
      */
-    public static function get_kanban_content_returns(): external_single_structure {
+    public static function get_kanban_content_init_returns(): external_single_structure {
         return
             new external_single_structure(
                 [
@@ -147,8 +146,8 @@ class get_kanban_content extends external_api {
      * @throws restricted_context_exception
      * @throws moodle_exception
      */
-    public static function get_kanban_content(int $cmid, int $boardid, int $timestamp = 0): array {
-        $params = self::validate_parameters(self::get_kanban_content_parameters(), [
+    public static function get_kanban_content_init(int $cmid, int $boardid, int $timestamp = 0): array {
+        $params = self::validate_parameters(self::get_kanban_content_init_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
             'timestamp' => $timestamp
@@ -157,6 +156,27 @@ class get_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $timestamp = $params['timestamp'];
         return self::execute($cmid, $boardid, $timestamp);
+    }
+
+    /**
+     * Same as for get_kanban_content_init().
+     * @return external_function_parameters
+     */
+    public static function get_kanban_content_update_parameters(): external_function_parameters {
+        return self::get_kanban_content_init_parameters();
+    }
+    
+    /**
+     * Definition of return values of the get_kanban_content_update webservice function.
+     *
+     * @return external_single_structure
+     */
+    public static function get_kanban_content_update_returns(): external_single_structure {
+        return new external_single_structure(
+            [
+                'update' => new external_value(PARAM_RAW, 'board id'),
+            ]
+        );
     }
 
     /**

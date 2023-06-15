@@ -96,6 +96,10 @@ export default class {
         stateManager.processUpdates(updates);
     }
 
+    /**
+     * Update state.
+     * @param {*} stateManager
+     */
     async getUpdates(stateManager) {
         const state = stateManager.state;
         const result = await Ajax.call([{
@@ -109,5 +113,5 @@ export default class {
 
         let updates = JSON.parse(result.update);
         stateManager.processUpdates(updates);
-    } 
+    }
 }

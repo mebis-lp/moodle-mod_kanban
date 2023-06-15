@@ -26,9 +26,17 @@
 defined('MOODLE_INTERNAL') || die;
 
 $functions = [
-    'mod_kanban_get_kanban_content' => [
+    'mod_kanban_get_kanban_content_init' => [
         'classname'   => 'mod_kanban\external\get_kanban_content',
-        'methodname'  => 'execute',
+        'methodname'  => 'get_kanban_content_init',
+        'description' => 'Retrieves the content of the kanban board',
+        'type'        => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:view',
+    ],
+    'mod_kanban_get_kanban_content_update' => [
+        'classname'   => 'mod_kanban\external\get_kanban_content',
+        'methodname'  => 'get_kanban_content_update',
         'description' => 'Retrieves the content of the kanban board',
         'type'        => 'read',
         'ajax' => true,
