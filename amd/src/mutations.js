@@ -103,7 +103,7 @@ export default class {
     async getUpdates(stateManager) {
         const state = stateManager.state;
         const result = await Ajax.call([{
-            methodname: 'mod_kanban_get_kanban_content',
+            methodname: 'mod_kanban_get_kanban_content_init',
             args: {
                 cmid: state.board.cmid,
                 boardid: state.board.id,
