@@ -14,7 +14,7 @@ export default class extends Reactive {
         const initialData = await Ajax.call(
             [
                 {
-                    methodname: 'mod_kanban_get_kanban_content',
+                    methodname: 'mod_kanban_get_kanban_content_init',
                     args: {
                         'cmid': cmid,
                         'boardid': boardid,
