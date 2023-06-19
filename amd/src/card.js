@@ -2,7 +2,7 @@ import {BaseComponent, DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
-import {get_string} from 'core/str';
+import {get_string as getString} from 'core/str';
 
 /**
  * Component representing a card in a kanban board.
@@ -72,9 +72,9 @@ export default class extends BaseComponent {
      */
     _removeConfirm(event) {
         saveCancel(
-            get_string('deletecard', 'mod_kanban'),
-            get_string('deletecardconfirm', 'mod_kanban'),
-            get_string('delete', 'core'),
+            getString('deletecard', 'mod_kanban'),
+            getString('deletecardconfirm', 'mod_kanban'),
+            getString('delete', 'core'),
             () => {
                 this._removeCard(event);
             }

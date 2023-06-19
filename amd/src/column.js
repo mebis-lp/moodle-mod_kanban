@@ -2,7 +2,7 @@ import {BaseComponent, DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
-import {get_string} from 'core/str';
+import {get_string as getString} from 'core/str';
 
 /**
  * Component representing a column in a kanban board.
@@ -70,9 +70,9 @@ export default class extends BaseComponent {
      */
     _removeConfirm(event) {
         saveCancel(
-            get_string('deletecolumn', 'mod_kanban'),
-            get_string('deletecolumnconfirm', 'mod_kanban'),
-            get_string('delete', 'core'),
+            getString('deletecolumn', 'mod_kanban'),
+            getString('deletecolumnconfirm', 'mod_kanban'),
+            getString('delete', 'core'),
             () => {
                 this._removeColumn(event);
             }
