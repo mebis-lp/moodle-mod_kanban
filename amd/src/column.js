@@ -1,6 +1,8 @@
 import {BaseComponent, DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
+import {saveCancel} from 'core/notification';
+import {get_string} from 'core/str';
 
 /**
  * Component representing a column in a kanban board.
@@ -45,7 +47,7 @@ export default class extends BaseComponent {
         this.addEventListener(
             this.getElement(selectors.DELETECOLUMN, this.id),
             'click',
-            this._removeColumn
+            this._removeConfirm
         );
         this.addEventListener(
             this.getElement(selectors.ADDCARDFIRST),
@@ -60,6 +62,21 @@ export default class extends BaseComponent {
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
+    }
+
+    /**
+     * Display confirmation modal for deleting a card.
+     * @param {*} event
+     */
+    _removeConfirm(event) {
+        saveCancel(
+            get_string('deletecolumn', 'mod_kanban'),
+            get_string('deletecolumnconfirm', 'mod_kanban'),
+            get_string('delete', 'core'),
+            () => {
+                this._removeColumn(event);
+            }
+        );
     }
 
     /**
