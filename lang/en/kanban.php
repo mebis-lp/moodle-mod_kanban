@@ -37,6 +37,7 @@ $string['deletecolumnconfirm'] = 'Do you really want to delete this column?';
 $string['doing'] = 'Doing';
 $string['done'] = 'Done';
 $string['editcard'] = 'Edit card';
+$string['editcolumn'] = 'Edit column';
 $string['kanban:addcard'] = 'Add a card to a Kanban board';
 $string['kanban:addinstance'] = 'Add a Kanban board';
 $string['kanban:assignothers'] = 'Assign others to a card';

@@ -64,22 +64,6 @@
     top: 0;
 }
 
-.mod_kanban_addcolumn_container.col:first-child:not(:hover):not(:focus):not(:focus-within) * {
-    animation: 20s infinite alternate blink;
-}
-
-@keyframes blink {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
 .mod_kanban_addcolumn_container.col {
     list-style: none;
     max-width: 10px;
