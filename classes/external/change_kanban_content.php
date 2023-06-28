@@ -412,13 +412,11 @@ class change_kanban_content extends external_api {
 
         if ($kanbancard->kanban_column == $columnid) {
             $seq = helper::sequence_move_after($kanbancolumn->sequence, $aftercard, $cardid);
+            $update = ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()];
             $formatter = new updateformatter();
-            $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
+            $formatter->put('columns', $update);
             return [
-                'success' => $DB->update_record(
-                    'kanban_column',
-                    ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]
-                ),
+                'success' => $DB->update_record('kanban_column', $update),
                 'update' => $formatter->format()
             ];
         } else {
@@ -430,18 +428,23 @@ class change_kanban_content extends external_api {
                 MUST_EXIST
             );
             $seqtarget = helper::sequence_add_after($kanbancolumntarget->sequence, $aftercard, $cardid);
+            $updatesourcecol = ['id' => $columnid, 'sequence' => $seqtarget, 'timemodified' => time()];
+            $updatetargetcol = ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()];
+            $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
+            // If target column has autoclose option set, update card to be completed.
+            $options = json_decode($kanbancolumntarget->options);
+            if (!empty($options->autoclose)) {
+                $updatecard['complete'] = 1;
+            }
             $formatter = new updateformatter();
-            $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
-            $formatter->put('columns', ['id' => $columnid, 'sequence' => $seqtarget]);
-            $formatter->put('cards', ['id' => $cardid, 'kanban_column' => $columnid]);
+            $formatter->put('columns', $updatesourcecol);
+            $formatter->put('columns', $updatetargetcol);
+            $formatter->put('cards', $updatecard);
             return [
                 'success' =>
-                    $DB->update_record(
-                        'kanban_column',
-                        ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]
-                    ) &&
-                    $DB->update_record('kanban_column', ['id' => $columnid, 'sequence' => $seqtarget, 'timemodified' => time()]) &&
-                    $DB->update_record('kanban_card', ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()]),
+                    $DB->update_record('kanban_column', $updatetargetcol) &&
+                    $DB->update_record('kanban_column', $updatesourcecol) &&
+                    $DB->update_record('kanban_card', $updatecard),
                 'update' => $formatter->format(),
             ];
         }

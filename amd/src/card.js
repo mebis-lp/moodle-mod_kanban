@@ -233,10 +233,9 @@ export default class extends BaseComponent {
         if (state === undefined) {
             state = this.reactive.stateManager.state;
         }
-        if (state.cards.get(this.id).complete == 0 && (
-            state.capabilities.get('moveallcards').value ||
+        if (state.capabilities.get('moveallcards').value ||
             (state.capabilities.get('moveassignedcards').value &&
-            state.cards.get(this.id).assignees.includes(state.board.userid)))) {
+            state.cards.get(this.id).assignees.includes(state.board.userid))) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);
         } else {
