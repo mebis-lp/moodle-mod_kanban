@@ -151,21 +151,27 @@ export default class extends BaseComponent {
                 assignees.replaceChild(newelement, placeholder);
             });
         }
-        if (element.selfassigned !== undefined && element.selfassigned) {
-            this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.add('hidden');
-            this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.remove('hidden');
-        } else {
-            this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.remove('hidden');
-            this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.add('hidden');
+        if (element.selfassigned !== undefined) {
+            if (element.selfassigned) {
+                this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.add('hidden');
+                this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.remove('hidden');
+            } else {
+                this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.remove('hidden');
+                this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.add('hidden');
+            }
         }
-        if (element.complete !== undefined && element.selfassigned) {
-            this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('hidden');
-            this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');
-            this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
-        } else {
-            this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('hidden');
-            this.getElement(selectors.COMPLETE).parentNode.classList.remove('hidden');
-            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
+        if (element.completed !== undefined) {
+            if (element.completed) {
+                this.getElement(selectors.COMPLETIONSTATE).classList.remove('hidden');
+                this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('hidden');
+                this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');
+                this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
+            } else {
+                this.getElement(selectors.COMPLETIONSTATE).classList.add('hidden');
+                this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('hidden');
+                this.getElement(selectors.COMPLETE).parentNode.classList.remove('hidden');
+                this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
+            }
         }
         this.checkDragging();
     }

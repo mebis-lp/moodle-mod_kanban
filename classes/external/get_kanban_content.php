@@ -109,6 +109,12 @@ class get_kanban_content extends external_api {
                                     VALUE_OPTIONAL,
                                     false
                                 ),
+                                'completed' => new external_value(
+                                    PARAM_BOOL,
+                                    'is card completed?',
+                                    VALUE_OPTIONAL,
+                                    false
+                                ),
                             ],
                             '',
                             VALUE_OPTIONAL

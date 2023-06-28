@@ -434,7 +434,7 @@ class change_kanban_content extends external_api {
             // If target column has autoclose option set, update card to be completed.
             $options = json_decode($kanbancolumntarget->options);
             if (!empty($options->autoclose)) {
-                $updatecard['complete'] = 1;
+                $updatecard['completed'] = 1;
             }
             $formatter = new updateformatter();
             $formatter->put('columns', $updatesourcecol);
@@ -857,6 +857,7 @@ class change_kanban_content extends external_api {
             'kanban_card = :cardid',
             ['cardid' => $kanbancard->id]
         );
+
         if (in_array($USER->id, $kanbanassignees)) {
             require_capability('mod/kanban:moveassignedcards', $context);
         } else {
@@ -866,10 +867,10 @@ class change_kanban_content extends external_api {
         self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $formatter = new updateformatter();
-        $update = ['id' => $cardid, 'complete' => $state, 'timemodified' => time()];
+        $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
         $formatter->put('cards', $update);
         return [
-            'success' => $DB->update_record('kanban_column', $update),
+            'success' => $DB->update_record('kanban_card', $update),
             'update' => $formatter->format()
         ];
     }

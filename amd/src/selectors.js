@@ -17,6 +17,7 @@ export default {
     COLUMN: `.mod_kanban_column`,
     COLUMNINNER: `.mod_kanban_column_inner`,
     COMPLETE: `[data-action="complete_card"]`,
+    COMPLETIONSTATE: `.mod_kanban_card_completion`,
     CONTAINER: `.mod_kanban_render_container`,
     DELETECARD: `[data-action="delete_card"]`,
     DELETECOLUMN: `[data-action="delete_column"]`,

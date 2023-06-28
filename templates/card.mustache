@@ -39,6 +39,9 @@
                 </a>
             </span>
         </div>
+        <div class="mod_kanban_card_completion{{^completed}} hidden{{/completed}} text-success">
+            {{#pix}} t/check, core, {{#str}} completed, core {{/str}} {{/pix}}
+        </div>
         {{>mod_kanban/actionmenucard}}
         <div class="mod_kanban_tags">
         </div>

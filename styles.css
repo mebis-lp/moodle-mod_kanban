@@ -163,6 +163,12 @@
     right: 10px;
 }
 
+.mod_kanban_card_completion {
+    position: absolute;
+    top: 12px;
+    right: 45px;
+}
+
 .mod_kanban_action_menu span i {
     transform: translateY(50%);
 }
