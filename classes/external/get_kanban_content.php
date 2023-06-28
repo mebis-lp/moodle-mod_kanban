@@ -29,7 +29,6 @@ namespace mod_kanban\external;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-use block_recentlyaccesseditems\external;
 use coding_exception;
 use context_module;
 use external_api;
@@ -120,6 +119,12 @@ class get_kanban_content extends external_api {
                                     'has a description?',
                                     VALUE_OPTIONAL,
                                     false
+                                ),
+                                'description' => new external_value(
+                                    PARAM_RAW,
+                                    'description',
+                                    VALUE_OPTIONAL,
+                                    ''
                                 ),
                                 'hasattachment' => new external_value(
                                     PARAM_BOOL,
@@ -290,8 +295,8 @@ class get_kanban_content extends external_api {
                 }
                 $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
                 $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
+                $kanbancards[$key]->hasdescription = !empty($kanbancards[$key]->description);
                 // Spare until feature is implemented.
-                $kanbancards[$key]->hasdescription = false;
                 $kanbancards[$key]->hasattachment = false;
             }
             $users = get_enrolled_users($context, '', $kanbanboard->groupid);

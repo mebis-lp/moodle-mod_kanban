@@ -107,4 +107,26 @@ class helper {
 
         return $newseq;
     }
+
+    /**
+     * This function checks permissions if a board is a user or a group board.
+     *
+     * @param object $kanbanboard The record from the board table
+     * @param \context $context The context of the course module
+     * @param \cm_info $cminfo The course module info
+     */
+    public static function check_permissions_for_user_or_group(object $kanbanboard, \context $context, \cm_info $cminfo): void {
+        global $USER;
+        if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
+            if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
+                require_capability('mod/kanban:editallboards', $context);
+
+            }
+            if (!empty($kanbanboard->groupid) && $kanbanboard->groupid != groups_get_activity_group($cminfo)) {
+                if ($cminfo->groupmode == SEPARATEGROUPS) {
+                    require_capability('mod/kanban:editallboards', $context);
+                }
+            }
+        }
+    }
 }

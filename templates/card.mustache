@@ -54,9 +54,24 @@
         </div>
         {{#hasdescription}}
         <div class="mod_kanban_description">
-            <button class="mod_kanban_description_trigger btn btn-icon icon-no-margin p-0">
+            <button class="mod_kanban_description_trigger btn btn-icon icon-no-margin p-0" data-toggle="modal" data-target="#mod_kanban_description_modal_{{id}}">
             {{#pix}} e/file-text, core, {{#str}} showdescription, mod_kanban {{/str}} {{/pix}}
             </button>
+        </div>
+        <div class="modal fade" id="mod_kanban_description_modal_{{id}}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{title}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{{description}}}
+                    </div>
+                </div>
+            </div>
         </div>
         {{/hasdescription}}
         {{#hasattachment}}

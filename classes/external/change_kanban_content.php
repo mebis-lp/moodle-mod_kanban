@@ -39,8 +39,8 @@ use invalid_parameter_exception;
 use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
-use mod_kanban\helper;
-use mod_kanban\updateformatter;
+use \mod_kanban\helper;
+use \mod_kanban\updateformatter;
 
 /**
  * Class for modifying kanban content
@@ -117,7 +117,7 @@ class change_kanban_content extends external_api {
         require_capability('mod/kanban:managecolumns', $context);
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $aftercol = intval($aftercol);
         $options = '{}';
@@ -216,7 +216,7 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancolumn = $DB->get_record('kanban_column', ['id' => $columnid, 'kanban_board' => $boardid], '*', MUST_EXIST);
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $options = '{}';
 
@@ -295,7 +295,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function move_column(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $DB;
         $params = self::validate_parameters(self::move_column_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -311,7 +311,7 @@ class change_kanban_content extends external_api {
         require_capability('mod/kanban:managecolumns', $context);
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $seq = helper::sequence_move_after($kanbanboard->sequence, $aftercol, $columnid);
 
@@ -408,7 +408,7 @@ class change_kanban_content extends external_api {
             MUST_EXIST
         );
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         if ($kanbancard->kanban_column == $columnid) {
             $seq = helper::sequence_move_after($kanbancolumn->sequence, $aftercard, $cardid);
@@ -517,7 +517,7 @@ class change_kanban_content extends external_api {
             MUST_EXIST
         );
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $seq = helper::sequence_remove($kanbancolumn->sequence, $cardid);
 
@@ -594,7 +594,7 @@ class change_kanban_content extends external_api {
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancolumn = $DB->get_record('kanban_column', ['kanban_board' => $boardid, 'id' => $columnid], '*', MUST_EXIST);
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $seq = helper::sequence_remove($kanbanboard->sequence, $columnid);
 
@@ -682,7 +682,7 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $success1 = $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]);
         $success2 = $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
@@ -772,7 +772,7 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $success = $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]) &&
             $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
@@ -864,7 +864,7 @@ class change_kanban_content extends external_api {
             require_capability('mod/kanban:moveallcards', $context);
         }
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $formatter = new updateformatter();
         $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
@@ -939,7 +939,7 @@ class change_kanban_content extends external_api {
 
         require_capability('mod/kanban:managecolumns', $context);
 
-        self::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $formatter = new updateformatter();
         $update = ['id' => $columnid, 'locked' => $state, 'timemodified' => time()];
@@ -948,28 +948,5 @@ class change_kanban_content extends external_api {
             'success' => $DB->update_record('kanban_column', $update),
             'update' => $formatter->format()
         ];
-    }
-
-
-    /**
-     * This function checks permissions if a board is a user or a group board.
-     *
-     * @param object $kanbanboard The record from the board table
-     * @param \context $context The context of the course module
-     * @param \cm_info $cminfo The course module info
-     */
-    public static function check_permissions_for_user_or_group(object $kanbanboard, \context $context, \cm_info $cminfo): void {
-        global $USER;
-        if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
-            if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
-                require_capability('mod/kanban:editallboards', $context);
-
-            }
-            if (!empty($kanbanboard->groupid) && $kanbanboard->groupid != groups_get_activity_group($cminfo)) {
-                if ($cminfo->groupmode == SEPARATEGROUPS) {
-                    require_capability('mod/kanban:editallboards', $context);
-                }
-            }
-        }
     }
 }

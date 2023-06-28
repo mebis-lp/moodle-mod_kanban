@@ -186,3 +186,48 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
 
     return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, $newtitle, $newtitle, null, '');
 }
+
+/**
+ * Delivers the attachment files for cards
+ *
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - justsend the file
+ */
+function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=[]) : ?bool {
+    global $DB;
+    require_course_login($course, true, $cm);
+
+    // $args consists of:
+    // - board id
+    // - card id
+    // - subfolders / filename
+
+    if (count($args) < 3) {
+        return false;
+    }
+
+    $boardid = intval($args[0]);
+
+    // Check, whether the user is allowed to access this board.
+
+    require_capability('mod/kanban:view', $context);
+
+    $kanban_board = $DB->get_record('kanban_board', ['id' => $boardid, 'kanban_instance' => $cm->instance], '*', MUST_EXIST);
+
+    mod_kanban\helper::check_permissions_for_user_or_group($kanban_board, $context, cm_info::create($cm));
+
+    $fullpath = "/$context->id/mod_kanban/$filearea/" . implode('/', $args);
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, false, $options);
+}
