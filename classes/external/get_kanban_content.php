@@ -115,6 +115,18 @@ class get_kanban_content extends external_api {
                                     VALUE_OPTIONAL,
                                     false
                                 ),
+                                'hasdescription' => new external_value(
+                                    PARAM_BOOL,
+                                    'has a description?',
+                                    VALUE_OPTIONAL,
+                                    false
+                                ),
+                                'hasattachment' => new external_value(
+                                    PARAM_BOOL,
+                                    'has an attachment?',
+                                    VALUE_OPTIONAL,
+                                    false
+                                ),
                             ],
                             '',
                             VALUE_OPTIONAL
@@ -278,6 +290,9 @@ class get_kanban_content extends external_api {
                 }
                 $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
                 $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
+                // Spare until feature is implemented.
+                $kanbancards[$key]->hasdescription = false;
+                $kanbancards[$key]->hasattachment = false;
             }
             $users = get_enrolled_users($context, '', $kanbanboard->groupid);
             foreach ($users as $user) {

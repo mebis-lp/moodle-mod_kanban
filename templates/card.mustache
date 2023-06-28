@@ -52,6 +52,21 @@
                 {{/assignees}}
             {{/hasassignees}}
         </div>
+        {{#hasdescription}}
+        <div class="mod_kanban_description">
+            <button class="mod_kanban_description_trigger btn btn-icon icon-no-margin p-0">
+            {{#pix}} e/file-text, core, {{#str}} showdescription, mod_kanban {{/str}} {{/pix}}
+            </button>
+        </div>
+        {{/hasdescription}}
+        {{#hasattachment}}
+        <div class="mod_kanban_attachment">
+            <button class="mod_kanban_attachment_trigger btn btn-icon icon-no-margin p-0">
+            <i class="icon fa fa-paperclip fa-fw " title="{{#str}} showattachment, mod_kanban {{/str}}" role="img" aria-label="{{#str}} showattachment, mod_kanban {{/str}}"></i>
+            </button>
+        </div>
+        {{/hasattachment}}
+
     </div>
     {{>mod_kanban/addcard}}
 </li>

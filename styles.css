@@ -153,6 +153,22 @@
     right: 45px;
 }
 
+.mod_kanban_description {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.mod_kanban_attachment {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.mod_kanban_description ~ .mod_kanban_attachment {
+    right: 50px;
+}
+
 .mod_kanban_action_menu span i {
     transform: translateY(50%);
 }
