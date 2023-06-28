@@ -157,16 +157,9 @@
 }
 
 .mod_kanban_action_menu {
-    opacity: 0;
     position: absolute;
     top: 10px;
     right: 10px;
-}
-
-.mod_kanban_action_menu:hover,
-.mod_kanban_action_menu:focus,
-.mod_kanban_action_menu:focus-within {
-    opacity: 1;
 }
 
 .mod_kanban_action_menu span i {
@@ -177,6 +170,10 @@
 .mod_kanban_column_title input {
     max-width: 100%;
     z-index: 3;
+    height: 1.7rem;
+    padding: 0;
+    border-width: 0;
+    border-style: none;
 }
 
 .mod_kanban_card_title {
@@ -250,7 +247,16 @@
 .mod_kanban_column_title {
     margin-top: .5rem;
     overflow-x: hidden;
+    overflow-y: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 80%;
+}
+
+:not([data-action="unassign_user"]) > .mod_kanban_unassign {
+    display: none;
+}
+
+.mod_kanban_action_menu_trigger.dropdown-toggle::after {
+    content: none;
 }

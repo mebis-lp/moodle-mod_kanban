@@ -59,6 +59,16 @@ export default class extends BaseComponent {
             'click',
             this._addColumn
         );
+        this.addEventListener(
+            this.getElement(selectors.LOCKCOLUMN, this.id),
+            'click',
+            this._lockColumn
+        );
+        this.addEventListener(
+            this.getElement(selectors.UNLOCKCOLUMN, this.id),
+            'click',
+            this._unlockColumn
+        );
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
@@ -106,7 +116,7 @@ export default class extends BaseComponent {
             state = this.reactive.stateManager.state;
         }
 
-        if (state.capabilities.get('managecolumns').value) {
+        if (state.capabilities.get('managecolumns').value && state.columns.get(this.id).locked == 0) {
             this.dragdrop.setDraggable(true);
         } else {
             this.dragdrop.setDraggable(false);
@@ -234,6 +244,16 @@ export default class extends BaseComponent {
         [...el.children]
         .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
         .forEach(node=>el.appendChild(node));
+        if (element.locked) {
+            this.getElement(selectors.UNLOCKCOLUMN).parentNode.classList.remove('hidden');
+            this.getElement(selectors.LOCKCOLUMN).parentNode.classList.add('hidden');
+            this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
+        } else {
+            this.getElement(selectors.UNLOCKCOLUMN).parentNode.classList.add('hidden');
+            this.getElement(selectors.LOCKCOLUMN).parentNode.classList.remove('hidden');
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
+        }
+        this.checkDragging();
     }
 
     /**
@@ -250,8 +270,28 @@ export default class extends BaseComponent {
      * @param {*} event
      */
     _removeColumn(event) {
-        let target = event.target.closest('[data-action="delete_column"]');
+        let target = event.target.closest(selectors.DELETECOLUMN);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('deleteColumn', data.id);
+    }
+
+    /**
+     * Dispatch event to lock this column.
+     * @param {*} event
+     */
+    _lockColumn(event) {
+        let target = event.target.closest(selectors.LOCKCOLUMN);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('lockColumn', data.id);
+    }
+
+    /**
+     * Dispatch event to unlock this column.
+     * @param {*} event
+     */
+    _unlockColumn(event) {
+        let target = event.target.closest(selectors.UNLOCKCOLUMN);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('unlockColumn', data.id);
     }
 }

@@ -15,8 +15,13 @@ export default {
     CARD: `.mod_kanban_card`,
     COLUMN: `.mod_kanban_column`,
     COLUMNINNER: `.mod_kanban_column_inner`,
+    COMPLETE: `[data-action="complete_card"]`,
     CONTAINER: `.mod_kanban_render_container`,
     DELETECARD: `[data-action="delete_card"]`,
     DELETECOLUMN: `[data-action="delete_column"]`,
+    INPLACEEDITABLE: `.inplaceeditable`,
+    LOCKCOLUMN: `[data-action="lock_column"]`,
     UNASSIGNUSER: `[data-action="unassign_user"]`,
+    UNCOMPLETE: `[data-action="uncomplete_card"]`,
+    UNLOCKCOLUMN: `[data-action="unlock_column"]`,
 };

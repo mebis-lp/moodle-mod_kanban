@@ -29,16 +29,14 @@
 }}
 <li class="mod_kanban_column col card" id="mod_kanban_column-{{id}}" data-id="{{id}}">
     <h5 class="mod_kanban_column_title card-title">
-    <span class="inplaceeditable inplaceeditable-text"{{#managecolumns}} data-inplaceeditable="1" data-component="mod_kanban" data-itemtype="column" data-itemid="{{id}}"
+    <span class="inplaceeditable inplaceeditable-text"{{#managecolumns}} {{^locked}}data-inplaceeditable="1" {{/locked}}data-component="mod_kanban" data-itemtype="column" data-itemid="{{id}}"
     data-value="{{title}}" data-type="text"{{/managecolumns}}>
         <a href="#" class="quickeditlink aalink"{{#managecolumns}} data-inplaceeditablelink="1"{{/managecolumns}}>
             {{title}}
         </a>
     </span>
     </h5>
-    <div class="mod_kanban_action_menu">
-        <button class="btn btn-icon icon-no-margin p-0{{^managecolumns}} hidden{{/managecolumns}}" data-action="delete_column" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deletecolumn, mod_kanban {{/str}} {{/pix}}</button>
-    </div>
+    {{>mod_kanban/actionmenucolumn}}
     <ul class="mod_kanban_column_inner card-body p-0" data-id="{{id}}">
         <li class="mod_kanban_addcard_first">
             {{>mod_kanban/addcard}}

@@ -106,4 +106,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:assignself',
     ],
+    'mod_kanban_change_kanban_content_set_column_locked' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'set_column_locked',
+        'description' => 'Changes the lock state of a column',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:managecolumns',
+    ],
+    'mod_kanban_change_kanban_content_set_card_complete' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'set_card_complete',
+        'description' => 'Changes the completion state of a card',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:managecards',
+    ],
 ];

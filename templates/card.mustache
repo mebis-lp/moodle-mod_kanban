@@ -38,9 +38,7 @@
                 </a>
             </span>
         </div>
-        <div class="mod_kanban_action_menu">
-            <button class="btn btn-icon icon-no-margin p-0{{^managecards}} hidden{{/managecards}}" data-action="delete_card" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deletecard, mod_kanban {{/str}} {{/pix}}</button>
-        </div>
+        {{>mod_kanban/actionmenucard}}
         <div class="mod_kanban_tags">
         </div>
         <div class="mod_kanban_assignees" data-id="{{id}}">

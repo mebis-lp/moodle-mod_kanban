@@ -184,5 +184,5 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
     $newtitle = clean_param($newvalue, PARAM_TEXT);
     $DB->update_record('kanban_' . $itemtype, ['id' => $itemid, 'title' => $newtitle, 'timemodified' => time()]);
 
-    return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, $newtitle, null, null, '');
+    return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, $newtitle, $newtitle, null, '');
 }

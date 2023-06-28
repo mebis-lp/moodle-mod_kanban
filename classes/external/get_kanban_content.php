@@ -29,6 +29,7 @@ namespace mod_kanban\external;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/lib/externallib.php');
 
+use block_recentlyaccesseditems\external;
 use coding_exception;
 use context_module;
 use external_api;
@@ -86,6 +87,7 @@ class get_kanban_content extends external_api {
                                 'id' => new external_value(PARAM_INT, 'column id'),
                                 'title' => new external_value(PARAM_TEXT, 'column title'),
                                 'sequence' => new external_value(PARAM_TEXT, 'order of the cards in the column'),
+                                'locked' => new external_value(PARAM_BOOL, 'lock state of the column'),
                             ],
                             '',
                             VALUE_OPTIONAL

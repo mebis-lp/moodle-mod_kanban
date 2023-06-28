@@ -58,6 +58,16 @@ export default class extends BaseComponent {
             'click',
             this._assignUser
         );
+        this.addEventListener(
+            this.getElement(selectors.COMPLETE, this.id),
+            'click',
+            this._completeCard
+        );
+        this.addEventListener(
+            this.getElement(selectors.UNCOMPLETE, this.id),
+            'click',
+            this._uncompleteCard
+        );
         if (state.cards.get(this.id).assignees.length > 0) {
             this.getElement(selectors.ASSIGNUSER, this.id).classList.add('mod_kanban_hidden');
         }
@@ -144,6 +154,15 @@ export default class extends BaseComponent {
         } else {
             this.getElement(selectors.ASSIGNUSER, this.id).classList.remove('mod_kanban_hidden');
         }
+        if (element.complete) {
+            this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('hidden');
+            this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');
+            this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
+        } else {
+            this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('hidden');
+            this.getElement(selectors.COMPLETE).parentNode.classList.remove('hidden');
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
+        }
         this.checkDragging();
     }
 
@@ -164,6 +183,26 @@ export default class extends BaseComponent {
         let target = event.target.closest('[data-action="delete_card"]');
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('deleteCard', data.id);
+    }
+
+    /**
+     * Dispatch event to complete this card.
+     * @param {*} event
+     */
+    _completeCard(event) {
+        let target = event.target.closest(selectors.COMPLETE);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('completeCard', data.id);
+    }
+
+    /**
+     * Dispatch event to complete this card.
+     * @param {*} event
+     */
+    _uncompleteCard(event) {
+        let target = event.target.closest(selectors.UNCOMPLETE);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('uncompleteCard', data.id);
     }
 
     /**
@@ -194,12 +233,12 @@ export default class extends BaseComponent {
         if (state === undefined) {
             state = this.reactive.stateManager.state;
         }
-        if (state.capabilities.get('moveallcards').value ||
+        if (state.cards.get(this.id).complete == 0 && (
+            state.capabilities.get('moveallcards').value ||
             (state.capabilities.get('moveassignedcards').value &&
-            state.cards.get(this.id).assignees.includes(state.board.userid))) {
+            state.cards.get(this.id).assignees.includes(state.board.userid)))) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);
-
         } else {
             this.draggable = false;
             this.dragdrop.setDraggable(false);

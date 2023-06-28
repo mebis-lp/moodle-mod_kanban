@@ -12,6 +12,7 @@ export default class {
     async deleteCard(stateManager, cardId) {
         await this.sendChange('delete_card', stateManager, {cardid: cardId});
     }
+
     /**
      * Add a card after an existing one.
      * @param {*} stateManager StateManager instance
@@ -21,6 +22,7 @@ export default class {
     async addCard(stateManager, columnId, afterCard) {
         await this.sendChange('add_card', stateManager, {columnid: columnId, aftercard: afterCard});
     }
+
     /**
      * Move a card to another column.
      * @param {*} stateManager StateManager instance
@@ -31,6 +33,7 @@ export default class {
     async moveCard(stateManager, cardId, columnId, afterCard) {
         await this.sendChange('move_card', stateManager, {cardid: cardId, columnid: columnId, aftercard: afterCard});
     }
+
     /**
      * Deletes a column and all cards within.
      * @param {*} stateManager StateManager instance
@@ -39,6 +42,7 @@ export default class {
     async deleteColumn(stateManager, columnId) {
         await this.sendChange('delete_column', stateManager, {columnid: columnId});
     }
+
     /**
      * Adds a new column.
      * @param {*} stateManager StateManager instance
@@ -47,6 +51,7 @@ export default class {
     async addColumn(stateManager, afterColumn) {
         await this.sendChange('add_column', stateManager, {aftercol: afterColumn});
     }
+
     /**
      * Moves a column to a new place.
      * @param {*} stateManager StateManager instance
@@ -56,6 +61,7 @@ export default class {
     async moveColumn(stateManager, columnId, afterColumn) {
         await this.sendChange('move_column', stateManager, {columnid: columnId, aftercol: afterColumn});
     }
+
     /**
      * Assign a user to a card.
      * @param {*} stateManager StateManager instance.
@@ -65,6 +71,25 @@ export default class {
     async assignUser(stateManager, cardId, userId = 0) {
         await this.sendChange('assign_user', stateManager, {cardid: cardId, userid: userId});
     }
+
+    /**
+     * Mark a card as completed.
+     * @param {*} stateManager StateManager instance.
+     * @param {number} cardId Id of the card
+     */
+    async completeCard(stateManager, cardId) {
+        await this.sendChange('set_card_complete', stateManager, {cardid: cardId, state: 1});
+    }
+
+    /**
+     * Mark a card as not completed.
+     * @param {*} stateManager StateManager instance.
+     * @param {number} cardId Id of the card
+     */
+    async uncompleteCard(stateManager, cardId) {
+        await this.sendChange('uncomplete_card', stateManager, {cardid: cardId, state: 0});
+    }
+
     /**
      * Remove assignment for a user to a card.
      * @param {*} stateManager StateManager instance.
@@ -73,6 +98,24 @@ export default class {
      */
     async unassignUser(stateManager, cardId, userId) {
         await this.sendChange('unassign_user', stateManager, {cardid: cardId, userid: userId});
+    }
+
+    /**
+     * Locks a column.
+     * @param {*} stateManager StateManager instance
+     * @param {number} columnId Id of the column to lock
+     */
+    async lockColumn(stateManager, columnId) {
+        await this.sendChange('set_column_locked', stateManager, {columnid: columnId, state: 1});
+    }
+
+    /**
+     * Unlocks a column.
+     * @param {*} stateManager StateManager instance
+     * @param {number} columnId Id of the column to unlock
+     */
+    async unlockColumn(stateManager, columnId) {
+        await this.sendChange('set_column_locked', stateManager, {columnid: columnId, state: 0});
     }
 
     /**
