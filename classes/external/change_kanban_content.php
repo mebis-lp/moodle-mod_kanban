@@ -947,7 +947,7 @@ class change_kanban_content extends external_api {
 
     /**
      * This function checks permissions if a board is a user or a group board.
-     * 
+     *
      * @param object $kanbanboard The record from the board table
      * @param \context $context The context of the course module
      * @param \cm_info $cminfo The course module info
