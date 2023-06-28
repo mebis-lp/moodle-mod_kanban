@@ -87,7 +87,7 @@ export default class {
      * @param {number} cardId Id of the card
      */
     async uncompleteCard(stateManager, cardId) {
-        await this.sendChange('uncomplete_card', stateManager, {cardid: cardId, state: 0});
+        await this.sendChange('set_card_complete', stateManager, {cardid: cardId, state: 0});
     }
 
     /**
