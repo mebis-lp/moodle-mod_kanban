@@ -26,13 +26,23 @@
         "title": "Task",
         "managecards": true,
         "hasassignees": false,
-        "completed": true
+        "completed": true,
+        "selfassigned": false,
+        "assignself": true
     }
 }}
 {{#managecards}}
 <div class="mod_kanban_action_menu">
     <button class="mod_kanban_action_menu_trigger btn btn-icon icon-no-margin p-0 dropdown-toggle" data-toggle="dropdown">{{#pix}} i/menu, core, {{#str}} editcard, mod_kanban {{/str}} {{/pix}}</button>
     <ul class="dropdown-menu dropdown-menu-right">
+        {{#assignself}}
+        <li class="dropdown-item{{#selfassigned}} hidden{{/selfassigned}}">
+            <a href="#" data-action="assign_self" data-id="{{id}}">{{#pix}} t/user, core, {{#str}} assignme, mod_kanban{{/str}} {{/pix}}{{#str}} assignme, mod_kanban{{/str}}</a>
+        </li>
+        <li class="dropdown-item{{^selfassigned}} hidden{{/selfassigned}}">
+            <a href="#" data-action="unassign_self" data-id="{{id}}">{{#pix}} t/removecontact, core, {{#str}} unassignme, mod_kanban{{/str}} {{/pix}}{{#str}} unassignme, mod_kanban{{/str}}</a>
+        </li>
+        {{/assignself}}
         <li class="dropdown-item">
             <a href="#" data-action="delete_card" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}{{#str}} delete, core {{/str}}</a>
         </li>

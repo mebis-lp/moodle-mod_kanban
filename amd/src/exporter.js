@@ -52,13 +52,11 @@ export default class {
         let card = JSON.parse(JSON.stringify(state.cards.get(cardid)));
         card.cardid = card.id;
         card.hasassignees = card.assignees.length > 0;
-        card.selfassigned = false;
         if (card.hasassignees && typeof card.assignees[0] == 'number') {
             card.assignees = card.assignees.map((userid) => {
                 return state.users.get(userid);
             });
             card.assignees = [...new Set(card.assignees)];
-            card.selfassigned = card.assignees.includes(state.board.userid);
         }
         return card;
     }

@@ -690,8 +690,10 @@ class change_kanban_content extends external_api {
         $userids = array_map(function ($v) {
             return intval($v);
         }, $userids);
+        $userids = array_unique($userids);
+
         $formatter = new updateformatter();
-        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids]);
+        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids, 'selfassigned' => in_array($USER->id, $userids)]);
 
         return [
             'success' => $success1 && $success2,
@@ -711,7 +713,7 @@ class change_kanban_content extends external_api {
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'data' => new external_single_structure([
                 'cardid' => new external_value(PARAM_INT, 'id of the column', VALUE_REQUIRED),
-                'userid' => new external_value(PARAM_INT, 'user id', VALUE_REQUIRED)
+                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL, 0)
             ]),
         ]);
     }
@@ -755,6 +757,9 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $cardid = $params['data']['cardid'];
         $userid = $params['data']['userid'];
+        if (empty($userid)) {
+            $userid = $USER->id;
+        }
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
@@ -775,9 +780,9 @@ class change_kanban_content extends external_api {
         $userids = array_map(function ($v) {
             return intval($v);
         }, $userids);
-
+        $userids = array_unique($userids);
         $formatter = new updateformatter();
-        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids]);
+        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids, 'selfassigned' => in_array($USER->id, $userids)]);
 
         return [
             'success' => $success,

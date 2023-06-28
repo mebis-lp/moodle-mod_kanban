@@ -94,9 +94,9 @@ export default class {
      * Remove assignment for a user to a card.
      * @param {*} stateManager StateManager instance.
      * @param {number} cardId Id of the card
-     * @param {number} userId Id of the user to unassign
+     * @param {number} userId Id of the user to unassign, defaults to 0 (current user)
      */
-    async unassignUser(stateManager, cardId, userId) {
+    async unassignUser(stateManager, cardId, userId = 0) {
         await this.sendChange('unassign_user', stateManager, {cardid: cardId, userid: userId});
     }
 

@@ -63,5 +63,6 @@ $string['pluginadministration'] = 'Kanban administration';
 $string['pluginname'] = 'Kanban board';
 $string['todo'] = 'Todo';
 $string['unassign'] = 'Unassign this user';
+$string['unassignme'] = 'Unassign me';
 $string['uncomplete'] = 'Reopen';
 $string['unlock'] = 'Unlock';

@@ -28,10 +28,9 @@
         "assignothers": true
     }
 }}
-<button id="mod_kanban_assignee-{{cardid}}-{{id}}" class="mod_kanban_assigned_user btn btn-icon icon-no-margin p-0" {{#assignself}}{{#selfassigned}}data-action="unassign_user" {{/selfassigned}}{{/assignself}}{{#assignothers}}{{^selfassigned}}data-action="unassign_user" {{/selfassigned}}{{/assignothers}}data-id="{{cardid}}" data-userid="{{id}}">
+<div id="mod_kanban_assignee-{{cardid}}-{{id}}" class="mod_kanban_assigned_user btn btn-icon icon-no-margin p-0" data-id="{{cardid}}" data-userid="{{id}}" title="{{fullname}}">
     {{{userpicture}}}
-    <div class="mod_kanban_unassign">{{#pix}} t/switch_minus, core, {{#str}} unassign, mod_kanban{{/str}} {{/pix}}</div>
-</button>
+</div>
 {{#js}}
 require(['mod_kanban/user'], function(component) {
     component.init('mod_kanban_assignee-{{cardid}}-{{id}}');

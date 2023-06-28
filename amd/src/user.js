@@ -1,7 +1,7 @@
 import {BaseComponent} from 'core/reactive';
-import selectors from 'mod_kanban/selectors';
+
 /**
- * Component representing an assigned user.
+ * Component representing an assigned user. Kept as a stub for future use.
  */
 export default class extends BaseComponent {
     /**
@@ -33,27 +33,11 @@ export default class extends BaseComponent {
     }
     /**
      * Called once when state is ready, attaching event listeners.
-     * @param {*} state
      */
-    stateReady(state) {
-        if ((state.capabilities.get('assignself').value && this.userid == state.board.userid) ||
-            state.capabilities.get('assignothers').value) {
-            this.addEventListener(
-                this.getElement(),
-                'click',
-                this._unassignUser
-            );
-        }
+    stateReady() {
+        // This function does nothing for now but needs to exist.
     }
-    /**
-     * Dispatch event to unassign a user.
-     * @param {*} event
-     */
-    _unassignUser(event) {
-        let target = event.target.closest(selectors.UNASSIGNUSER);
-        let data = Object.assign({}, target.dataset);
-        this.reactive.dispatch('unassignUser', data.id, data.userid);
-    }
+
     /**
      * Called when card is deleted.
      */

@@ -54,11 +54,6 @@ export default class extends BaseComponent {
             this._addCard
         );
         this.addEventListener(
-            this.getElement(selectors.ASSIGNUSER, this.id),
-            'click',
-            this._assignUser
-        );
-        this.addEventListener(
             this.getElement(selectors.COMPLETE, this.id),
             'click',
             this._completeCard
@@ -68,9 +63,16 @@ export default class extends BaseComponent {
             'click',
             this._uncompleteCard
         );
-        if (state.cards.get(this.id).assignees.length > 0) {
-            this.getElement(selectors.ASSIGNUSER, this.id).classList.add('mod_kanban_hidden');
-        }
+        this.addEventListener(
+            this.getElement(selectors.ASSIGNSELF, this.id),
+            'click',
+            this._assignSelf
+        );
+        this.addEventListener(
+            this.getElement(selectors.UNASSIGNSELF, this.id),
+            'click',
+            this._unassignSelf
+        );
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
@@ -92,11 +94,11 @@ export default class extends BaseComponent {
     }
 
     /**
-     * Dispatch event to assign a user to the card.
+     * Dispatch event to assign the current user to the card.
      * @param {*} event
      */
-    _assignUser(event) {
-        let target = event.target.closest(selectors.ASSIGNUSER);
+    _assignSelf(event) {
+        let target = event.target.closest(selectors.ASSIGNSELF);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('assignUser', data.id);
     }
@@ -143,18 +145,20 @@ export default class extends BaseComponent {
                 let data = Object.assign({cardid: element.id}, userdata);
                 data = Object.assign(data, exporter.exportCapabilities(this.reactive.state));
                 placeholder.setAttribute('data-id', element.id);
-                placeholder.setAttribute('data-action', 'unassign_user');
                 assignees.appendChild(placeholder);
                 const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/user', data);
                 const newelement = newcomponent.getElement();
                 assignees.replaceChild(newelement, placeholder);
-                assignees.appendChild(this.getElement(selectors.ASSIGNUSER, this.id));
             });
-            this.getElement(selectors.ASSIGNUSER, this.id).classList.add('mod_kanban_hidden');
-        } else {
-            this.getElement(selectors.ASSIGNUSER, this.id).classList.remove('mod_kanban_hidden');
         }
-        if (element.complete) {
+        if (element.selfassigned !== undefined && element.selfassigned) {
+            this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.add('hidden');
+            this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.remove('hidden');
+        } else {
+            this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.remove('hidden');
+            this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.add('hidden');
+        }
+        if (element.complete !== undefined && element.selfassigned) {
             this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('hidden');
             this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');
             this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
@@ -263,5 +267,15 @@ export default class extends BaseComponent {
             let aftercard = this.id;
             this.reactive.dispatch('moveCard', dropdata.id, newcolumn, aftercard);
         }
+    }
+
+    /**
+     * Dispatch event to unassign the current user.
+     * @param {*} event
+     */
+    _unassignSelf(event) {
+        let target = event.target.closest(selectors.UNASSIGNSELF);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('unassignUser', data.id);
     }
 }

@@ -103,6 +103,12 @@ class get_kanban_content extends external_api {
                                         new external_value(PARAM_INT, 'user id'),
                                         VALUE_OPTIONAL
                                 ),
+                                'selfassigned' => new external_value(
+                                    PARAM_BOOL,
+                                    'is current user assigned to the card?',
+                                    VALUE_OPTIONAL,
+                                    false
+                                ),
                             ],
                             '',
                             VALUE_OPTIONAL
@@ -265,6 +271,7 @@ class get_kanban_content extends external_api {
                     $kanbanassignees[$card->id] = [];
                 }
                 $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
+                $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
             }
             $users = get_enrolled_users($context, '', $kanbanboard->groupid);
             foreach ($users as $user) {
