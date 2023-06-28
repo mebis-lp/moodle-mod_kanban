@@ -154,6 +154,7 @@
     overflow-y: visible;
     min-height: 300px;
     max-width: none;
+    margin-bottom: 100px;
 }
 
 .mod_kanban_action_menu {
