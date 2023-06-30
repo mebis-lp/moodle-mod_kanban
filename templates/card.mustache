@@ -52,13 +52,12 @@
                 {{/assignees}}
             {{/hasassignees}}
         </div>
-        {{#hasdescription}}
-        <div class="mod_kanban_description">
+        <div class="mod_kanban_description{{^hasdescription}} hidden{{/hasdescription}}">
             <button class="mod_kanban_description_trigger btn btn-icon icon-no-margin p-0" data-toggle="modal" data-target="#mod_kanban_description_modal_{{id}}">
             {{#pix}} e/file-text, core, {{#str}} showdescription, mod_kanban {{/str}} {{/pix}}
             </button>
         </div>
-        <div class="modal fade" id="mod_kanban_description_modal_{{id}}" aria-hidden="true">
+        <div class="mod_kanban_description_modal modal fade" id="mod_kanban_description_modal_{{id}}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -72,21 +71,12 @@
                     </div>
                     <div class="modal-footer">
                         {{#hasattachment}}
-                            
+
                         {{/hasattachment}}
                     </div>
                 </div>
             </div>
         </div>
-        {{/hasdescription}}
-        {{#hasattachment}}
-        <div class="mod_kanban_attachment">
-            <button class="mod_kanban_attachment_trigger btn btn-icon icon-no-margin p-0">
-            <i class="icon fa fa-paperclip fa-fw " title="{{#str}} showattachment, mod_kanban {{/str}}" role="img" aria-label="{{#str}} showattachment, mod_kanban {{/str}}"></i>
-            </button>
-        </div>
-        {{/hasattachment}}
-
     </div>
     {{>mod_kanban/addcard}}
 </li>

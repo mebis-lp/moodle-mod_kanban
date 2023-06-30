@@ -2,6 +2,7 @@ import {BaseComponent, DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
+import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
 
 /**
@@ -73,9 +74,16 @@ export default class extends BaseComponent {
             'click',
             this._unassignSelf
         );
+        this.addEventListener(
+            this.getElement(selectors.EDITDETAILS, this.id),
+            'click',
+            this._editDetails
+        );
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
+        this.boardid = state.board.id;
+        this.cmid = state.board.cmid;
     }
 
     /**
@@ -173,6 +181,22 @@ export default class extends BaseComponent {
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
             }
         }
+        if (element.title !== undefined) {
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
+            this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
+            this.getElement(selectors.DESCRIPTIONMODALTITLE).innerHTML = element.title;
+        }
+        if (element.description !== undefined) {
+            this.getElement(selectors.DESCRIPTIONMODALBODY).innerHTML = element.description;
+        }
+        if (element.hasdescription !== undefined) {
+            if (element.hasdescription) {
+                this.getElement(selectors.DESCRIPTIONTOGGLE).classList.remove('hidden');
+            } else {
+                this.getElement(selectors.DESCRIPTIONTOGGLE).classList.add('hidden');
+            }
+
+        }
         this.checkDragging();
     }
 
@@ -190,7 +214,7 @@ export default class extends BaseComponent {
      * @param {*} event
      */
     _removeCard(event) {
-        let target = event.target.closest('[data-action="delete_card"]');
+        let target = event.target.closest(selectors.DELETECARD);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('deleteCard', data.id);
     }
@@ -283,5 +307,34 @@ export default class extends BaseComponent {
         let target = event.target.closest(selectors.UNASSIGNSELF);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('unassignUser', data.id);
+    }
+
+    /**
+     * Show modal form to edit card details.
+     * @param {*} event
+     */
+    _editDetails(event) {
+        event.preventDefault();
+
+        const modalForm = new ModalForm({
+            formClass: "mod_kanban\\form\\edit_card_form",
+            args: {
+                id: this.id,
+                kanban_board: this.boardid,
+                cmid: this.cmid
+            },
+            modalConfig: {title: getString('editcard', 'mod_kanban')},
+            returnFocus: this.getElement(),
+        });
+        this.addEventListener(modalForm, modalForm.events.FORM_SUBMITTED, this._updateCard);
+        modalForm.show();
+    }
+
+    /**
+     * Dispatch an event to update card data from the detail modal.
+     * @param {*} event
+     */
+    _updateCard(event) {
+        this.reactive.dispatch('processUpdates', event.detail);
     }
 }

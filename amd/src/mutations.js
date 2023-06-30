@@ -135,8 +135,7 @@ export default class {
             },
         }])[0];
 
-        let updates = JSON.parse(result.update);
-        stateManager.processUpdates(updates);
+        this.processUpdates(stateManager, result);
     }
 
     /**
@@ -154,6 +153,16 @@ export default class {
             },
         }])[0];
 
+        this.processUpdates(stateManager, result);
+    }
+
+    /**
+     * Process updates.
+     *
+     * @param {*} stateManager
+     * @param {*} result
+     */
+    async processUpdates(stateManager, result) {
         let updates = JSON.parse(result.update);
         stateManager.processUpdates(updates);
     }

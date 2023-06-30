@@ -52,6 +52,9 @@
         <li class="dropdown-item {{^completed}}hidden{{/completed}}">
             <a href="#" data-action="uncomplete_card" data-id="{{id}}">{{#pix}} t/reload, core, {{#str}} uncomplete, mod_kanban {{/str}} {{/pix}}{{#str}} uncomplete, mod_kanban {{/str}}</a>
         </li>
+        <li class="dropdown-item">
+            <a href="#" data-action="edit_details" data-id="{{id}}">{{#pix}} t/edit, core, {{#str}} editdetails, mod_kanban {{/str}} {{/pix}}{{#str}} editdetails, mod_kanban {{/str}}</a>
+        </li>
     </ul>
 </div>
 {{/managecards}}

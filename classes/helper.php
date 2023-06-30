@@ -129,4 +129,57 @@ class helper {
             }
         }
     }
+
+    /**
+     * Creates a new board in the database. The board can be assigned to a certain user, group or can be marked as a template.
+     *
+     * @param int $instance id of the kanban instance
+     * @param int $user userid, if the board should be user specific (default 0 means no user specific board)
+     * @param int $group groupid, if the board should be group specific (default 0 means no group specific board)
+     * @param bool $template whether to create a new template board for this kanban instance (defaults to false)
+     * @return int the id of the new board
+     */
+    public static function create_new_board(int $instance, int $user = 0, int $group = 0, bool $template = false): int {
+        global $DB;
+        $kanban = $DB->get_record('kanban', ['id' => $instance]);
+        // Is there a template for this instance?
+        $template = $DB->get_record('kanban_board', [
+            'kanban_instance' => $instance,
+            'user' => 0,
+            'groupid' => 0,
+            'template' => 1
+        ]);
+        if ($template) {
+            // To be implemented later.
+        } else {
+            // This could be moved to a side wide template.
+            $boardid = $DB->insert_record('kanban_board', [
+                'sequence' => '',
+                'user' => 0,
+                'groupid' => 0,
+                'template' => 0,
+                'timecreated' => time(),
+                'timemodified' => time(),
+                'kanban_instance' => $instance
+            ]);
+            $columnnames = [
+                get_string('todo', 'kanban') => '{}',
+                get_string('doing', 'kanban') => '{}',
+                get_string('done', 'kanban') => '{"autoclose": true}',
+            ];
+            $columnids = [];
+            foreach ($columnnames as $columnname => $options) {
+                $columnids[] = $DB->insert_record('kanban_column', [
+                    'title' => $columnname,
+                    'sequence' => '',
+                    'kanban_board' => $boardid,
+                    'options' => $options,
+                    'timecreated' => time(),
+                    'timemodified' => time(),
+                ]);
+            }
+            $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => join(',', $columnids)]);
+        }
+        return $boardid;
+    }
 }

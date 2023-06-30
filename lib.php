@@ -32,32 +32,7 @@
 function kanban_add_instance($data) : int {
     global $DB;
     $kanbanid = $DB->insert_record("kanban", $data);
-    $boardid = $DB->insert_record("kanban_board", [
-        'sequence' => '',
-        'user' => 0,
-        'groupid' => 0,
-        'template' => 0,
-        'timecreated' => time(),
-        'timemodified' => time(),
-        'kanban_instance' => $kanbanid
-    ]);
-    $columnnames = [
-        get_string('todo', 'kanban') => '{}',
-        get_string('doing', 'kanban') => '{}',
-        get_string('done', 'kanban') => '{"autoclose": true}',
-    ];
-    $columnids = [];
-    foreach ($columnnames as $columnname => $options) {
-        $columnids[] = $DB->insert_record('kanban_column', [
-            'title' => $columnname,
-            'sequence' => '',
-            'kanban_board' => $boardid,
-            'options' => $options,
-            'timecreated' => time(),
-            'timemodified' => time(),
-        ]);
-    }
-    $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => join(',', $columnids)]);
+    mod_kanban\helper::create_new_board($kanbanid);
     return $kanbanid;
 }
 

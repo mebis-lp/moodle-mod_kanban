@@ -227,6 +227,7 @@ class change_kanban_content extends external_api {
             'timecreated' => time(),
             'timemodified' => time(),
             'options' => $options,
+            'description' => '',
         ]);
 
         $seq = helper::sequence_add_after($kanbancolumn->sequence, $aftercard, $kanbancardid);
