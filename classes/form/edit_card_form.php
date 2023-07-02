@@ -41,8 +41,8 @@ class edit_card_form extends dynamic_form {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('hidden', 'kanban_board');
-        $mform->setType('kanban_board', PARAM_INT);
+        $mform->addElement('hidden', 'boardid');
+        $mform->setType('boardid', PARAM_INT);
 
         $mform->addElement('hidden', 'cmid');
         $mform->setType('cmid', PARAM_INT);
@@ -100,8 +100,8 @@ class edit_card_form extends dynamic_form {
         global $COURSE, $DB;
         $context = $this->get_context_for_dynamic_submission();
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
-        $kanban_board = $this->optional_param('kanban_board', null, PARAM_INT);
-        $kanbanboard = $DB->get_record('kanban_board', ['id' => $kanban_board]);
+        $boardid = $this->optional_param('boardid', null, PARAM_INT);
+        $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
         $id = $this->optional_param('id', null, PARAM_INT);
         require_capability('mod/kanban:managecards', $context);
         $modinfo = get_fast_modinfo($COURSE);
@@ -208,7 +208,7 @@ class edit_card_form extends dynamic_form {
     protected function get_page_url_for_dynamic_submission(): moodle_url {
         $params = [
             'id' => $this->optional_param('id', null, PARAM_INT),
-            'kanban_board' => $this->optional_param('kanban_board', null, PARAM_INT),
+            'boardid' => $this->optional_param('boardid', null, PARAM_INT),
             'cmid' => $this->optional_param('cmid', null, PARAM_INT),
         ];
         return new moodle_url('/mod/kanban/view.php', $params);

@@ -352,7 +352,7 @@ export default class extends BaseComponent {
             formClass: "mod_kanban\\form\\edit_card_form",
             args: {
                 id: this.id,
-                kanban_board: this.boardid,
+                boardid: this.boardid,
                 cmid: this.cmid
             },
             modalConfig: {title: getString('editcard', 'mod_kanban')},

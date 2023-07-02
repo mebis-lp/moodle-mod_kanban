@@ -178,7 +178,7 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
     global $DB;
     require_course_login($course, true, $cm);
 
-    // $args[0] is the card id
+    // In $args[0] is the card id.
 
     $cardid = intval($args[0]);
     $boardid = $DB->get_field('kanban_card', 'kanban_board', ['id' => $cardid], MUST_EXIST);
@@ -187,9 +187,9 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
 
     require_capability('mod/kanban:view', $context);
 
-    $kanban_board = $DB->get_record('kanban_board', ['id' => $boardid, 'kanban_instance' => $cm->instance], '*', MUST_EXIST);
+    $board = $DB->get_record('kanban_board', ['id' => $boardid, 'kanban_instance' => $cm->instance], '*', MUST_EXIST);
 
-    mod_kanban\helper::check_permissions_for_user_or_group($kanban_board, $context, cm_info::create($cm));
+    mod_kanban\helper::check_permissions_for_user_or_group($board, $context, cm_info::create($cm));
 
     $fullpath = "/$context->id/mod_kanban/$filearea/" . implode('/', $args);
 

@@ -24,6 +24,8 @@
  */
 namespace mod_kanban;
 
+use context_module;
+
 /**
  * Helper class
  *
@@ -88,9 +90,9 @@ class helper {
         return self::sequence_add_after($seq, $afteritem, $item);
     }
     /**
-     * Removes items in a string sequence of integer values, divided by commas.
+     * Replaces items in a string sequence of integer values, divided by commas.
      * @param string $sequence The original sequence
-     * @param array $replace An array of $key => $value replacing rules ($key is replaced by $value)
+     * @param array $replace An array of $key => $value replacing rules ($key is replaced by $value or $value->id if $value is an object)
      * @return string The new sequence
      */
     public static function sequence_replace (string $sequence, array $replace) {
@@ -102,7 +104,11 @@ class helper {
         $newseq = [];
 
         foreach ($seq as $value) {
-            $newseq[] = $replace[$value];
+            if (is_object($replace[$value])) {
+                $newseq[] = $replace[$value]->id;
+            } else {
+                $newseq[] = $replace[$value];
+            }
         }
 
         return $newseq;
@@ -141,7 +147,9 @@ class helper {
      */
     public static function create_new_board(int $instance, int $user = 0, int $group = 0, bool $template = false): int {
         global $DB;
+        $fs = get_file_storage();
         $kanban = $DB->get_record('kanban', ['id' => $instance]);
+        $context = context_module::instance($instance);
         // Is there a template for this instance?
         $template = $DB->get_record('kanban_board', [
             'kanban_instance' => $instance,
@@ -150,7 +158,47 @@ class helper {
             'template' => 1
         ]);
         if ($template) {
-            // To be implemented later.
+            $newboard = $template;
+            $newboard->template = 0;
+            $newboard->timecreated = time();
+            $newboard->timemodified = time();
+            unset($newboard->id);
+            $newboard->id = $DB->insert_record('kanban_board', $newboard);
+            $columns = $DB->get_records('kanban_column', ['kanban_board' => $template->id]);
+            $cards = $DB->get_records('kanban_cards', ['kanban_board' => $template->id]);
+            $newcolumn = [];
+            $newcard = [];
+            foreach ($columns as $column) {
+                $newcolumn[$column->id] = $column;
+                $newcolumn[$column->id]->kanban_board = $newboard->id;
+                $newcolumn[$column->id]->timecreated = time();
+                $newcolumn[$column->id]->timemodified = time();
+                unset($newcolumn[$column->id]->id);
+                $newcolumn[$column->id] = $DB->insert_record('kanban_column', $newcolumn);
+            }
+            foreach ($cards as $card) {
+                $newcard = $card;
+                $newcard[$card->id]->kanban_board = $newboard->id;
+                $newcard[$card->id]->timecreated = time();
+                $newcard[$card->id]->timemodified = time();
+                $newcard[$card->id]->kanban_column = $newcolumn[$card->kanban_column]->id;
+                unset($newcard[$card->id]->id);
+                $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard);
+                // Copy attachment files.
+                $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
+                foreach ($attachments as $attachment) {
+                    $newfile = (array)$attachment;
+                    $newfile['itemid'] = $newcard[$card->id]->id;
+                    $fs->create_file_from_storedfile($newfile ,$attachment);
+                }
+            }
+            $newboard->sequence = self::sequence_replace($newboard->sequence, $newcolumn);
+            $DB->update_record('kanban_board', $newboard);
+            foreach ($newcolumn as $col) {
+                $col->sequence = self::sequence_replace($col->sequence, $newcard);
+                $DB->update_record('kanban_column', $col);
+            }
+
         } else {
             // This could be moved to a side wide template.
             $boardid = $DB->insert_record('kanban_board', [
@@ -186,8 +234,8 @@ class helper {
     /**
      * Get filename and url of all attachments to a card.
      *
-     * @param integer $contextid Context id of the board
-     * @param integer $cardid Id of the card
+     * @param int $contextid Context id of the board
+     * @param int $cardid Id of the card
      * @return array
      */
     public static function get_attachments(int $contextid, int $cardid): array {
