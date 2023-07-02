@@ -49,6 +49,27 @@ class edit_card_form extends dynamic_form {
         $mform->addElement('text', 'title', get_string('cardtitle', 'kanban'), ['size' => '50']);
         $mform->setType('text', PARAM_TEXT);
 
+        $userid = $this->optional_param('userid', 0, PARAM_INT);
+        $groupid = $this->optional_param('groupid', 0, PARAM_INT);
+
+        $context = $this->get_context_for_dynamic_submission();
+        $userlist = get_enrolled_users($context, '', $groupid);
+
+        $users = [];
+        foreach ($userlist as $user) {
+            if (!empty($userid) && $userid != $user->id) {
+                continue;
+            }
+            $users[$user->id] = fullname($user);
+        }
+        $mform->addElement(
+            'autocomplete',
+            'assignees',
+            get_string('assignees', 'mod_kanban'),
+            $users,
+            ['multiple' => true]
+        );
+
         $mform->addElement('editor', 'description', get_string('description'));
         /*
         Not used yet.
@@ -104,13 +125,20 @@ class edit_card_form extends dynamic_form {
             'timemodified' => time(),
         ];
         $result = $DB->update_record('kanban_card', $carddata);
+        $result2 = $DB->delete_records('kanban_assignee', ['kanban_card' => $formdata->id]);
+        $assignees = [];
+        foreach ($formdata->assignees as $assignee) {
+            $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
+        }
+        $result3 = $DB->insert_records('kanban_assignee', $assignees);
         $formatter = new updateformatter();
         $carddata['hasdescription'] = !empty(trim($carddata['description']));
+        $carddata['assignees'] = $formdata->assignees;
         $formatter->put('cards', $carddata);
         $updatestr = $formatter->format();
         // Handle attachment files.
         return [
-            'result' => $result,
+            'result' => $result && $result2 && $result3,
             'update' => $updatestr,
         ];
     }
@@ -123,6 +151,7 @@ class edit_card_form extends dynamic_form {
         $id = $this->optional_param('id', null, PARAM_INT);
         $card = $DB->get_record('kanban_card', ['id' => $id]);
         $card->cmid = $this->optional_param('cmid', null, PARAM_INT);
+        $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $id]);
         $this->set_data($card);
     }
 

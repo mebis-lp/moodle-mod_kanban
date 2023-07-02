@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['addcard'] = 'Add a card to this column';
 $string['addcolumn'] = 'Add a column to this board';
+$string['assignee'] = 'Assignee';
+$string['assignees'] = 'Assignees';
 $string['assignme'] = 'Assign me';
 $string['attachments'] = 'Attachments';
 $string['cardtitle'] = 'Card title';
