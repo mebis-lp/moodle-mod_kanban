@@ -309,7 +309,14 @@ class get_kanban_content extends external_api {
                 $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
                 $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
                 $kanbancards[$key]->hasdescription = !empty($kanbancards[$key]->description);
-
+                $kanbancards[$key]->description = file_rewrite_pluginfile_urls(
+                    $kanbancards[$key]->description,
+                    'pluginfile.php',
+                    $context->id,
+                    'mod_kanban',
+                    'attachments',
+                    $card->id
+                );
                 $kanbancards[$key]->attachments = helper::get_attachments($context->id, $card->id);
                 $kanbancards[$key]->hasattachment = count($kanbancards[$key]->attachments) > 0;
             }

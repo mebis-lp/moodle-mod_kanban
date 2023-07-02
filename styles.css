@@ -195,7 +195,7 @@
     left: 12px;
     max-width: 14rem;
     overflow: hidden;
-    max-height: 2rem;
+    max-height: 2.5rem;
 }
 
 .mod_kanban_assignees .mod_kanban_assigned_user:hover .mod_kanban_unassign,
@@ -264,6 +264,8 @@
     background-color: yellowgreen;
     padding-left: 10px;
     padding-right: 10px;
+    right: 10px;
+    position: relative;
 }
 
 .mod_kanban_duedate.mod_kanban_overdue {
@@ -277,4 +279,12 @@
 
 a.mod_kanban_attachment_item {
     margin: 0;
+}
+
+.mod_kanban_main {
+    margin-bottom: 100px;
+}
+
+.draggable {
+    cursor: move;
 }

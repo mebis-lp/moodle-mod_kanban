@@ -52,9 +52,9 @@ function kanban_update_instance($data) : int {
  * Deletes a kanban instance and all boards
  *
  * @param integer $id kanban record
- * @return int
+ * @return void
  */
-function kanban_delete_instance($id) : int {
+function kanban_delete_instance($id): void {
     global $DB;
     $transaction = $DB->start_delegated_transaction();
     $boards = $DB->get_records_menu('kanban_board', ['instance' => $id], '', 'id, id');
@@ -66,7 +66,7 @@ function kanban_delete_instance($id) : int {
     $DB->delete_records_select('kanban_column', 'kanban_board ' . $sql, $params);
     $DB->delete_records_select('kanban_card', 'kanban_board ' . $sql, $params);
 
-    return $transaction->allow_commit();
+    $transaction->allow_commit();
 }
 
 /**

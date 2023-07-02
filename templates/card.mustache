@@ -59,7 +59,7 @@
                 {{/assignees}}
             {{/hasassignees}}
         </div>
-        <div class="mod_kanban_description{{^hasdescription}} hidden{{/hasdescription}}">
+        <div class="mod_kanban_description{{^hasdescription}}{{^hasattachment}} hidden{{/hasattachment}}{{/hasdescription}}">
             <button class="mod_kanban_description_trigger btn btn-icon icon-no-margin p-0" data-toggle="modal" data-target="#mod_kanban_description_modal_{{id}}">
             {{#pix}} e/file-text, core, {{#str}} showdescription, mod_kanban {{/str}} {{/pix}}
             </button>
