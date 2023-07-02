@@ -10,6 +10,18 @@ import {get_string as getString} from 'core/str';
  */
 export default class extends BaseComponent {
     /**
+     * For relative time helper.
+     */
+    _units = {
+        year  : 24 * 60 * 60 * 1000 * 365,
+        month : 24 * 60 * 60 * 1000 * 365/12,
+        day   : 24 * 60 * 60 * 1000,
+        hour  : 60 * 60 * 1000,
+        minute: 60 * 1000,
+        second: 1000
+    };
+
+    /**
      * Function to initialize component, called by mustache template.
      * @param {*} target The id of the HTMLElement to attach to
      * @returns {BaseComponent} New component attached to the HTMLElement represented by target
@@ -44,6 +56,12 @@ export default class extends BaseComponent {
      * @param {*} state The initial state
      */
     stateReady(state) {
+        let lang = 'en';
+        if (state.board.lang !== undefined) {
+            lang = state.board.lang;
+        }
+        this.rtf = new Intl.RelativeTimeFormat(lang, {numeric: 'auto'});
+
         this.addEventListener(
             this.getElement(selectors.DELETECARD, this.id),
             'click',
@@ -84,6 +102,7 @@ export default class extends BaseComponent {
         this.checkDragging(state);
         this.boardid = state.board.id;
         this.cmid = state.board.cmid;
+        this._dueDateFormat();
     }
 
     /**
@@ -174,11 +193,13 @@ export default class extends BaseComponent {
                 this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('hidden');
                 this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');
                 this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
+                this.getElement(selectors.DUEDATE).classList.add('hidden');
             } else {
                 this.getElement(selectors.COMPLETIONSTATE).classList.add('hidden');
                 this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('hidden');
                 this.getElement(selectors.COMPLETE).parentNode.classList.remove('hidden');
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
+                this.getElement(selectors.DUEDATE).classList.remove('hidden');
             }
         }
         if (element.title !== undefined) {
@@ -196,6 +217,10 @@ export default class extends BaseComponent {
                 this.getElement(selectors.DESCRIPTIONTOGGLE).classList.add('hidden');
             }
 
+        }
+        if (element.duedate !== undefined) {
+            this.getElement(selectors.DUEDATE).setAttribute('data-date', element.duedate);
+            this._dueDateFormat();
         }
         this.checkDragging();
     }
@@ -336,5 +361,39 @@ export default class extends BaseComponent {
      */
     _updateCard(event) {
         this.reactive.dispatch('processUpdates', event.detail);
+    }
+
+    /**
+     * Update relative time.
+     * @param {int} timestamp
+     * @returns {string}
+     */
+    updateRelativeTime(timestamp) {
+        let elapsed = new Date(timestamp) - new Date();
+        for (var u in this._units) {
+            if (Math.abs(elapsed) > this._units[u] || u == 'second') {
+                return this.rtf.format(Math.round(elapsed / this._units[u]), u);
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Format due date.
+     */
+    _dueDateFormat() {
+        // Convert timestamp to ms.
+        let duedate = this.getElement(selectors.DUEDATE).dataset.date * 1000;
+        if (duedate > 0) {
+            let element = this.getElement(selectors.DUEDATE);
+            element.innerHTML = this.updateRelativeTime(duedate);
+            if (duedate < new Date().getTime()) {
+                element.classList.add('mod_kanban_overdue');
+            } else {
+                element.classList.remove('mod_kanban_overdue');
+            }
+        } else {
+            this.getElement(selectors.DUEDATE).innerHTML = '';
+        }
     }
 }

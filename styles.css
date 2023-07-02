@@ -49,8 +49,8 @@
     background-color: darkgray;
 }
 
-.mod_kanban_card .card-body:hover,
-.mod_kanban_card .card-body:focus {
+.mod_kanban_card:hover,
+.mod_kanban_card:focus {
     background-color: lightgray;
 }
 
@@ -189,6 +189,15 @@
     text-overflow: ellipsis;
 }
 
+.mod_kanban_assignees {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    max-width: 14rem;
+    overflow: hidden;
+    max-height: 2rem;
+}
+
 .mod_kanban_assignees .mod_kanban_assigned_user:hover .mod_kanban_unassign,
 .mod_kanban_assignees .mod_kanban_assigned_user:focus .mod_kanban_unassign {
     opacity: 1;
@@ -197,21 +206,6 @@
 .mod_kanban_assignees .mod_kanban_assigned_user:hover,
 .mod_kanban_assignees .mod_kanban_assigned_user:focus {
     z-index: 4;
-}
-
-.mod_kanban_unassign {
-    position: relative;
-    width: 16px;
-    right: 0;
-    bottom: 10px;
-    opacity: 0;
-    background-color: darkgray;
-    border-radius: 100%;
-    height: 16px;
-}
-
-.mod_kanban_unassign i {
-    transform: scale(.5, .5);
 }
 
 .mod_kanban_assigned_user:not(:first-of-type) {
@@ -260,10 +254,23 @@
     max-width: 80%;
 }
 
-:not([data-action="unassign_user"]) > .mod_kanban_unassign {
-    display: none;
-}
-
 .mod_kanban_action_menu_trigger.dropdown-toggle::after {
     content: none;
+}
+
+.mod_kanban_duedate {
+    border-radius: 5px;
+    width: fit-content;
+    background-color: yellowgreen;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.mod_kanban_duedate.mod_kanban_overdue {
+    background-color: orangered;
+}
+
+.card-footer.mod_kanban_card_footer {
+    background-color: transparent;
+    border-top: 0;
 }

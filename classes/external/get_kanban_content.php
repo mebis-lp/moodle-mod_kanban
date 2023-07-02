@@ -34,6 +34,7 @@ use context_module;
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
+use external_settings;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
@@ -79,6 +80,7 @@ class get_kanban_content extends external_api {
                         'timestamp' => new external_value(PARAM_INT, 'timestamp'),
                         'cmid' => new external_value(PARAM_INT, 'cmid'),
                         'userid' => new external_value(PARAM_INT, 'current user id'),
+                        'lang' => new external_value(PARAM_TEXT, 'language for the ui'),
                     ]),
                     'columns' => new external_multiple_structure(
                         new external_single_structure(
@@ -98,6 +100,7 @@ class get_kanban_content extends external_api {
                                 'id' => new external_value(PARAM_INT, 'card id'),
                                 'title' => new external_value(PARAM_TEXT, 'card title'),
                                 'kanban_column' => new external_value(PARAM_INT, 'column'),
+                                'duedate' => new external_value(PARAM_INT, 'due date'),
                                 'assignees' => new external_multiple_structure(
                                         new external_value(PARAM_INT, 'user id'),
                                         VALUE_OPTIONAL
@@ -332,6 +335,9 @@ class get_kanban_content extends external_api {
             $formatter->put('board', $kanbanboard);
 
         }
+
+        $kanbanboard->lang = current_language();
+
         return [
             'board' => $kanbanboard,
             'columns' => $kanbancolumns,

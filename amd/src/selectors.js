@@ -25,6 +25,7 @@ export default {
     DESCRIPTIONMODALBODY: `.mod_kanban_description_modal .modal-body`,
     DESCRIPTIONMODALTITLE: `.mod_kanban_description_modal .modal-title`,
     DESCRIPTIONTOGGLE: `.mod_kanban_description`,
+    DUEDATE: `.mod_kanban_duedate`,
     EDITDETAILS: `[data-action="edit_details"]`,
     INPLACEEDITABLE: `.inplaceeditable`,
     LOCKCOLUMN: `[data-action="lock_column"]`,

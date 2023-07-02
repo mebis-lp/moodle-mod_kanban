@@ -71,14 +71,10 @@ class edit_card_form extends dynamic_form {
         );
 
         $mform->addElement('editor', 'description', get_string('description'));
-        /*
-        Not used yet.
-        $mform->addElement('date_time_selector', 'duedate', get_string('duedate', 'kanban'));
 
-        $mform->addElement('date_time_selector', 'reminderdate', get_string('reminderdate', 'kanban'));
+        $mform->addElement('date_time_selector', 'duedate', get_string('duedate', 'kanban'), ['optional' => true]);
 
-        $mform->addElement('filemanager', 'attachments', get_string('attachments', 'kanban'));
-        */
+        $mform->addElement('date_time_selector', 'reminderdate', get_string('reminderdate', 'kanban'), ['optional' => true]);
     }
 
     /**
