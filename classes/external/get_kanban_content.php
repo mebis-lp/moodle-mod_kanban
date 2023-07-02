@@ -34,7 +34,6 @@ use context_module;
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
-use external_settings;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
@@ -42,6 +41,7 @@ use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
 use mod_kanban\updateformatter;
+use mod_kanban\helper;
 
 /**
  * Class for delivering kanban content
@@ -134,6 +134,15 @@ class get_kanban_content extends external_api {
                                     'has an attachment?',
                                     VALUE_OPTIONAL,
                                     false
+                                ),
+                                'attachments' => new external_multiple_structure(
+                                    new external_single_structure([
+                                        'url' => new external_value(PARAM_URL, 'attachment url', VALUE_REQUIRED),
+                                        'name' => new external_value(PARAM_TEXT, 'filename', VALUE_REQUIRED)
+                                    ]),
+                                    'attachments',
+                                    VALUE_OPTIONAL,
+                                    []
                                 ),
                             ],
                             '',
@@ -229,6 +238,7 @@ class get_kanban_content extends external_api {
      */
     public static function execute(int $cmid, int $boardid, int $timestamp = 0, bool $asupdate = false): array {
         global $DB, $OUTPUT, $USER;
+        $fs = get_file_storage();
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
@@ -299,8 +309,9 @@ class get_kanban_content extends external_api {
                 $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
                 $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
                 $kanbancards[$key]->hasdescription = !empty($kanbancards[$key]->description);
-                // Spare until feature is implemented.
-                $kanbancards[$key]->hasattachment = false;
+
+                $kanbancards[$key]->attachments = helper::get_attachments($context->id, $card->id);
+                $kanbancards[$key]->hasattachment = count($kanbancards[$key]->attachments) > 0;
             }
             $users = get_enrolled_users($context, '', $kanbanboard->groupid);
             foreach ($users as $user) {

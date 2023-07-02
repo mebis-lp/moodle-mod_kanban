@@ -21,6 +21,7 @@ use moodle_url;
 use context;
 use context_module;
 use mod_kanban\updateformatter;
+use mod_kanban\helper;
 
 /**
  * Class for delivering kanban content
@@ -70,11 +71,14 @@ class edit_card_form extends dynamic_form {
             ['multiple' => true]
         );
 
-        $mform->addElement('editor', 'description', get_string('description'));
+        $mform->addElement('editor', 'description_editor', get_string('description'));
+        $mform->setType('description_editor', PARAM_RAW);
 
         $mform->addElement('date_time_selector', 'duedate', get_string('duedate', 'kanban'), ['optional' => true]);
 
         $mform->addElement('date_time_selector', 'reminderdate', get_string('reminderdate', 'kanban'), ['optional' => true]);
+
+        $mform->addElement('filemanager', 'attachments', get_string('attachments', 'kanban'));
     }
 
     /**
@@ -110,12 +114,23 @@ class edit_card_form extends dynamic_form {
      */
     public function process_dynamic_submission(): array {
         global $DB;
+        $contextid = $this->get_context_for_dynamic_submission()->id;
         $formdata = $this->get_data();
+
+        $formdata = file_postupdate_standard_editor(
+            $formdata,
+            'description',
+            [],
+            $contextid,
+            'mod_kanban',
+            'attachments',
+            $formdata->id
+        );
 
         $carddata = [
             'id' => $formdata->id,
             'title' => $formdata->title,
-            'description' => $formdata->description['text'],
+            'description' => $formdata->description_editor['text'],
             'duedate' => $formdata->duedate,
             'reminderdate' => $formdata->reminderdate,
             'timemodified' => time(),
@@ -127,12 +142,22 @@ class edit_card_form extends dynamic_form {
             $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
         }
         $result3 = $DB->insert_records('kanban_assignee', $assignees);
+        $draftinfo = file_get_draft_area_info($formdata->attachments);
+        file_save_draft_area_files(
+            $formdata->attachments,
+            $contextid,
+            'mod_kanban',
+            'attachments',
+            $formdata->id
+        );
+
+        $carddata['attachments'] = helper::get_attachments($contextid, $formdata->id);
+        $carddata['hasattachment'] = count($carddata['attachments']) > 0;
         $formatter = new updateformatter();
-        $carddata['hasdescription'] = !empty(trim($carddata['description']));
+        $carddata['hasdescription'] = !empty(trim($carddata['description'])) || $draftinfo['filecount'] > 0;
         $carddata['assignees'] = $formdata->assignees;
         $formatter->put('cards', $carddata);
         $updatestr = $formatter->format();
-        // Handle attachment files.
         return [
             'result' => $result && $result2 && $result3,
             'update' => $updatestr,
@@ -144,10 +169,30 @@ class edit_card_form extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         global $DB;
+        $contextid = $this->get_context_for_dynamic_submission()->id;
         $id = $this->optional_param('id', null, PARAM_INT);
         $card = $DB->get_record('kanban_card', ['id' => $id]);
         $card->cmid = $this->optional_param('cmid', null, PARAM_INT);
         $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $id]);
+        $draftitemid = file_get_submitted_draft_itemid('attachments');
+        file_prepare_draft_area(
+            $draftitemid,
+            $contextid,
+            'mod_kanban',
+            'attachments',
+            $card->id
+        );
+        $card = file_prepare_standard_editor(
+            $card,
+            'description',
+            [],
+            $contextid,
+            'mod_kanban',
+            'attachments',
+            $card->id
+        );
+
+        $card->attachments = $draftitemid;
         $this->set_data($card);
     }
 

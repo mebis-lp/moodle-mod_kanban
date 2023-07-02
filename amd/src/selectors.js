@@ -23,6 +23,7 @@ export default {
     DELETECOLUMN: `[data-action="delete_column"]`,
     DESCRIPTIONMODAL: `.mod_kanban_description`,
     DESCRIPTIONMODALBODY: `.mod_kanban_description_modal .modal-body`,
+    DESCRIPTIONMODALFOOTER: `.mod_kanban_description_modal .modal-footer`,
     DESCRIPTIONMODALTITLE: `.mod_kanban_description_modal .modal-title`,
     DESCRIPTIONTOGGLE: `.mod_kanban_description`,
     DUEDATE: `.mod_kanban_duedate`,

@@ -4,6 +4,8 @@ import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
+import {exception as displayException} from 'core/notification';
+import Templates from 'core/templates';
 
 /**
  * Component representing a card in a kanban board.
@@ -13,10 +15,10 @@ export default class extends BaseComponent {
      * For relative time helper.
      */
     _units = {
-        year  : 24 * 60 * 60 * 1000 * 365,
-        month : 24 * 60 * 60 * 1000 * 365/12,
-        day   : 24 * 60 * 60 * 1000,
-        hour  : 60 * 60 * 1000,
+        year: 24 * 60 * 60 * 1000 * 365,
+        month: 24 * 60 * 60 * 1000 * 365 / 12,
+        day: 24 * 60 * 60 * 1000,
+        hour: 60 * 60 * 1000,
         minute: 60 * 1000,
         second: 1000
     };
@@ -210,13 +212,18 @@ export default class extends BaseComponent {
         if (element.description !== undefined) {
             this.getElement(selectors.DESCRIPTIONMODALBODY).innerHTML = element.description;
         }
-        if (element.hasdescription !== undefined) {
-            if (element.hasdescription) {
+        if (element.attachments !== undefined) {
+            Templates.renderForPromise('mod_kanban/attachmentitems', {attachments: element.attachments}).then(({html}) => {
+                this.getElement(selectors.DESCRIPTIONMODALFOOTER).innerHTML = html;
+                return true;
+            }).catch((error) => displayException(error));
+        }
+        if (element.hasdescription !== undefined || element.hasattachment !== undefined) {
+            if (element.hasdescription || element.hasattachment) {
                 this.getElement(selectors.DESCRIPTIONTOGGLE).classList.remove('hidden');
             } else {
                 this.getElement(selectors.DESCRIPTIONTOGGLE).classList.add('hidden');
             }
-
         }
         if (element.duedate !== undefined) {
             this.getElement(selectors.DUEDATE).setAttribute('data-date', element.duedate);

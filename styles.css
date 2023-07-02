@@ -274,3 +274,7 @@
     background-color: transparent;
     border-top: 0;
 }
+
+a.mod_kanban_attachment_item {
+    margin: 0;
+}

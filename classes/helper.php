@@ -182,4 +182,33 @@ class helper {
         }
         return $boardid;
     }
+
+    /**
+     * Get filename and url of all attachments to a card.
+     *
+     * @param integer $contextid Context id of the board
+     * @param integer $cardid Id of the card
+     * @return array
+     */
+    public static function get_attachments(int $contextid, int $cardid): array {
+        $fs = get_file_storage();
+        $attachments = $fs->get_area_files($contextid, 'mod_kanban', 'attachments', $cardid, 'filename', false);
+
+        $attachmentslist = [];
+        foreach ($attachments as $attachment) {
+            $attachmentslist[] = [
+                'url' => \moodle_url::make_pluginfile_url(
+                    $contextid,
+                    'mod_kanban',
+                    'attachments',
+                    $cardid,
+                    $attachment->get_filepath(),
+                    $attachment->get_filename()
+                )->out(),
+                'name' => $attachment->get_filename()
+            ];
+        }
+
+        return $attachmentslist;
+    }
 }

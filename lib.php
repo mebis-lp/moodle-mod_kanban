@@ -178,16 +178,10 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
     global $DB;
     require_course_login($course, true, $cm);
 
-    // $args consists of:
-    // - board id
-    // - card id
-    // - subfolders / filename
+    // $args[0] is the card id
 
-    if (count($args) < 3) {
-        return false;
-    }
-
-    $boardid = intval($args[0]);
+    $cardid = intval($args[0]);
+    $boardid = $DB->get_field('kanban_card', 'kanban_board', ['id' => $cardid], MUST_EXIST);
 
     // Check, whether the user is allowed to access this board.
 
