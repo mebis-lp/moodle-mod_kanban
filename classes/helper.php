@@ -92,7 +92,8 @@ class helper {
     /**
      * Replaces items in a string sequence of integer values, divided by commas.
      * @param string $sequence The original sequence
-     * @param array $replace An array of $key => $value replacing rules ($key is replaced by $value or $value->id if $value is an object)
+     * @param array $replace An array of $key => $value replacing rules ($key is replaced by $value or $value->id if $value is an
+     *                      object)
      * @return string The new sequence
      */
     public static function sequence_replace (string $sequence, array $replace) {
@@ -189,7 +190,7 @@ class helper {
                 foreach ($attachments as $attachment) {
                     $newfile = (array)$attachment;
                     $newfile['itemid'] = $newcard[$card->id]->id;
-                    $fs->create_file_from_storedfile($newfile ,$attachment);
+                    $fs->create_file_from_storedfile($newfile,$attachment);
                 }
             }
             $newboard->sequence = self::sequence_replace($newboard->sequence, $newcolumn);
