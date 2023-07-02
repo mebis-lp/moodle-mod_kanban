@@ -242,8 +242,14 @@ export default class extends BaseComponent {
         const el = this.getElement(selectors.COLUMNINNER, this.id);
         let sequence = element.sequence.split(',');
         [...el.children]
-        .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
-        .forEach(node=>el.appendChild(node));
+        .forEach((node) => {
+            if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
+                el.removeChild(node);
+            }
+        });
+        [...el.children]
+        .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
+        .forEach(node => el.appendChild(node));
         if (element.locked) {
             this.getElement(selectors.UNLOCKCOLUMN).parentNode.classList.remove('hidden');
             this.getElement(selectors.LOCKCOLUMN).parentNode.classList.add('hidden');

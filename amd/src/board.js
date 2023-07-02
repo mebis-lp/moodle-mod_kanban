@@ -54,6 +54,12 @@ export default class extends BaseComponent {
         const el = this.getElement();
         let sequence = element.sequence.split(',');
         [...el.children]
+        .forEach((node) => {
+            if (node.classList.contains('mod_kanban_column') && !sequence.includes(node.dataset.id)) {
+                el.removeChild(node);
+            }
+        });
+        [...el.children]
         .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
         .forEach(node=>el.appendChild(node));
     }
