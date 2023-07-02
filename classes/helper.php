@@ -190,7 +190,7 @@ class helper {
                 foreach ($attachments as $attachment) {
                     $newfile = (array)$attachment;
                     $newfile['itemid'] = $newcard[$card->id]->id;
-                    $fs->create_file_from_storedfile($newfile,$attachment);
+                    $fs->create_file_from_storedfile($newfile, $attachment);
                 }
             }
             $newboard->sequence = self::sequence_replace($newboard->sequence, $newcolumn);
