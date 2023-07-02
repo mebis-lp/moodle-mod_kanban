@@ -106,6 +106,10 @@
     margin: 3px;
 }
 
+.mod_kanban_addcolumn_first + .mod_kanban_column.card {
+    margin-left: 0;
+}
+
 .mod_kanban_card.card {
     margin-bottom: 10px;
     width: 18rem;
@@ -242,7 +246,8 @@
 }
 
 .mod_kanban_hidden {
-    visibility: hidden;
+    /* stylelint-disable-next-line */
+    display: none !important;
 }
 
 .mod_kanban_column_title {
@@ -281,8 +286,9 @@ a.mod_kanban_attachment_item {
     margin: 0;
 }
 
-.mod_kanban_main {
+.mod_kanban_main.row {
     margin-bottom: 100px;
+    margin-left: 5px;
 }
 
 .draggable {

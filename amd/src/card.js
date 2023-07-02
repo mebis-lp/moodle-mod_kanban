@@ -184,13 +184,21 @@ export default class extends BaseComponent {
             if (element.selfassigned) {
                 this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.add('hidden');
                 this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.remove('hidden');
+                if (this.reactive.state.capabilities.get('moveassignedcards')) {
+                        this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('mod_kanban_hidden');
+                        this.getElement(selectors.COMPLETE).parentNode.classList.remove('mod_kanban_hidden');
+                }
             } else {
                 this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.remove('hidden');
                 this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.add('hidden');
+                if (this.reactive.state.capabilities.get('moveallcards').value == false) {
+                    this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('mod_kanban_hidden');
+                    this.getElement(selectors.COMPLETE).parentNode.classList.add('mod_kanban_hidden');
+                }
             }
         }
         if (element.completed !== undefined) {
-            if (element.completed) {
+            if (element.completed == 1) {
                 this.getElement(selectors.COMPLETIONSTATE).classList.remove('hidden');
                 this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('hidden');
                 this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');

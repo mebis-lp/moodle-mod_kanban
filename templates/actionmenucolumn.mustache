@@ -27,8 +27,7 @@
         "locked": false
     }
 }}
-{{#managecolumns}}
-<div class="mod_kanban_action_menu">
+<div class="mod_kanban_action_menu{{^managecolumns}} hidden{{/managecolumns}}">
     <button class="mod_kanban_action_menu_trigger btn btn-icon icon-no-margin p-0 dropdown-toggle" data-toggle="dropdown">{{#pix}} i/menu, core, {{#str}} editcolumn, mod_kanban {{/str}} {{/pix}}</button>
     <ul class="dropdown-menu dropdown-menu-right">
         <li class="dropdown-item">
@@ -42,4 +41,3 @@
         </li>
     </ul>
 </div>
-{{/managecolumns}}

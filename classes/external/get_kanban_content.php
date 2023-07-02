@@ -202,6 +202,31 @@ class get_kanban_content extends external_api {
     }
 
     /**
+     * This method returns the requested data.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @param int $timestamp the timestamp of the state present in the frontend
+     * @return array The requested content, divided into board, columns and cards
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function get_kanban_content_update(int $cmid, int $boardid, int $timestamp = 0): array {
+        $params = self::validate_parameters(self::get_kanban_content_init_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+            'timestamp' => $timestamp
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        $timestamp = $params['timestamp'];
+        return self::execute($cmid, $boardid, $timestamp, true);
+    }
+
+    /**
      * Same as for get_kanban_content_init().
      * @return external_function_parameters
      */
@@ -339,19 +364,18 @@ class get_kanban_content extends external_api {
         if ($asupdate) {
             $formatter = new updateformatter();
             foreach ($kanbancolumns as $column) {
-                $formatter->put('columns', $column);
+                $formatter->put('columns', (array)$column);
             }
             foreach ($kanbancards as $card) {
-                $formatter->put('cards', $card);
+                $formatter->put('cards', (array)$card);
             }
             foreach ($kanbanusers as $user) {
-                $formatter->put('users', $user);
+                $formatter->put('users', (array)$user);
             }
-            foreach ($caps as $cap) {
-                $formatter->put('capabilities', $cap);
-            }
-            $formatter->put('board', $kanbanboard);
-
+            $formatter->put('board', (array)$kanbanboard);
+            return [
+                'update' => $formatter->format()
+            ];
         }
 
         $kanbanboard->lang = current_language();

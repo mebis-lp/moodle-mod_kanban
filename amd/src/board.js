@@ -31,6 +31,14 @@ export default class extends BaseComponent {
             this._addColumn
         );
         this.dragdrop = new DragDrop(this);
+        this._continuousUpdate();
+    }
+
+    _continuousUpdate() {
+        setTimeout(() => {
+            this.reactive.dispatch('getUpdates');
+            this._continuousUpdate();
+        }, 10000);
     }
 
     /**
