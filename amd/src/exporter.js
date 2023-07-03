@@ -33,7 +33,10 @@ export default class {
      */
     static exportCardsForColumn(state, columnid) {
         let col = JSON.parse(JSON.stringify(state.columns.get(columnid)));
+        let options = JSON.parse(col.options);
         col.hascards = col.sequence != '';
+        col.autoclose = options.autoclose;
+        col.autohide = options.autohide;
         if (col.hascards) {
             let cardOrder = col.sequence.split(',');
             col.cards = cardOrder.map((value) => {

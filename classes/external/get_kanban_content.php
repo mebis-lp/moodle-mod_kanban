@@ -89,6 +89,7 @@ class get_kanban_content extends external_api {
                                 'title' => new external_value(PARAM_TEXT, 'column title'),
                                 'sequence' => new external_value(PARAM_TEXT, 'order of the cards in the column'),
                                 'locked' => new external_value(PARAM_BOOL, 'lock state of the column'),
+                                'options' => new external_value(PARAM_TEXT, 'options for the column'),
                             ],
                             '',
                             VALUE_OPTIONAL

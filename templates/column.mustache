@@ -37,6 +37,10 @@
         </a>
     </span>
     </h5>
+    <div class="mod_kanban_hidden_actions">
+        <button data-action="show_hidden" class="btn btn-icon icon-no-margin p-0">{{#pix}} i/show, core, {{#str}} showhidden, mod_kanban {{/str}} {{/pix}}</button>
+        <button data-action="hide_hidden" class="btn btn-icon icon-no-margin p-0">{{#pix}} i/hide, core, {{#str}} hidehidden, mod_kanban {{/str}} {{/pix}}</button>
+    </div>
     {{>mod_kanban/actionmenucolumn}}
     <ul class="mod_kanban_column_inner card-body p-0" data-id="{{id}}">
         <li class="mod_kanban_addcard_first">

@@ -75,6 +75,16 @@ export default class extends BaseComponent {
             'click',
             this._editDetails
         );
+        this.addEventListener(
+            this.getElement(selectors.SHOWHIDDEN),
+            'click',
+            this._showHidden
+        );
+        this.addEventListener(
+            this.getElement(selectors.HIDEHIDDEN),
+            'click',
+            this._hideHidden
+        );
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
@@ -267,6 +277,11 @@ export default class extends BaseComponent {
             this.getElement(selectors.LOCKCOLUMN).parentNode.classList.remove('hidden');
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
         }
+        if (element.title !== undefined) {
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
+            this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
+            this.getElement(selectors.DESCRIPTIONMODALTITLE).innerHTML = element.title;
+        }
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
             if (options.autohide) {
@@ -344,5 +359,19 @@ export default class extends BaseComponent {
      */
     _updateColumn(event) {
         this.reactive.dispatch('processUpdates', event.detail);
+    }
+
+    /**
+     * Show hidden cards.
+     */
+    _showHidden() {
+        this.getElement().classList.add('mod_kanban_show_hidden');
+    }
+
+    /**
+     * Hide hidden cards.
+     */
+    _hideHidden() {
+        this.getElement().classList.remove('mod_kanban_show_hidden');
     }
 }

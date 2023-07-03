@@ -74,6 +74,7 @@ $string['pluginname'] = 'Kanban-Board';
 $string['reminderdate'] = 'Zeitpunkt für die Erinnerung';
 $string['showattachment'] = 'Anhänge anzeigen';
 $string['showdescription'] = 'Beschreibung anzeigen';
+$string['showhidden'] = 'Verborgene Karten anzeigen';
 $string['todo'] = 'Zu erledigen';
 $string['unassign'] = 'Zuweisung aufheben';
 $string['unassignme'] = 'Mir nicht mehr zuweisen';

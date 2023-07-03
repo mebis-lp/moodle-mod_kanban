@@ -74,6 +74,7 @@ $string['pluginname'] = 'Kanban board';
 $string['reminderdate'] = 'Reminder date';
 $string['showattachment'] = 'Show attachments';
 $string['showdescription'] = 'Show description';
+$string['showhidden'] = 'Show hidden cards';
 $string['todo'] = 'Todo';
 $string['unassign'] = 'Unassign this user';
 $string['unassignme'] = 'Unassign me';

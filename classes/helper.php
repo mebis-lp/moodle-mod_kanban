@@ -36,10 +36,16 @@ use context_module;
  */
 class helper {
     /**
-     * Constants.
+     * Type constant for editing permissions.
      */
     const MOD_KANBAN_EDIT = 1;
+    /**
+     * Type constant for viewing permissions.
+     */
     const MOD_KANBAN_VIEW = 2;
+    /**
+     * Mapping of the type constants to capabilities.
+     */
     const MOD_KANBAN_CAPABILITY = [
         self::MOD_KANBAN_EDIT => 'mod/kanban:editallboards',
         self::MOD_KANBAN_VIEW => 'mod/kanban:viewallboards',
