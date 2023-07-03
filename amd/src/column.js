@@ -3,6 +3,7 @@ import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import {get_string as getString} from 'core/str';
+import ModalForm from 'core_form/modalform';
 
 /**
  * Component representing a column in a kanban board.
@@ -69,9 +70,16 @@ export default class extends BaseComponent {
             'click',
             this._unlockColumn
         );
+        this.addEventListener(
+            this.getElement(selectors.EDITDETAILS, this.id),
+            'click',
+            this._editDetails
+        );
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
+        this.boardid = state.board.id;
+        this.cmid = state.board.cmid;
     }
 
     /**
@@ -259,6 +267,14 @@ export default class extends BaseComponent {
             this.getElement(selectors.LOCKCOLUMN).parentNode.classList.remove('hidden');
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
         }
+        if (element.options !== undefined) {
+            let options = JSON.parse(element.options);
+            if (options.autohide) {
+                this.getElement().classList.add('mod_kanban_autohide');
+            } else {
+                this.getElement().classList.remove('mod_kanban_autohide');
+            }
+        }
         this.checkDragging();
     }
 
@@ -299,5 +315,34 @@ export default class extends BaseComponent {
         let target = event.target.closest(selectors.UNLOCKCOLUMN);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('unlockColumn', data.id);
+    }
+
+    /**
+     * Show modal form to edit column details.
+     * @param {*} event
+     */
+    _editDetails(event) {
+        event.preventDefault();
+
+        const modalForm = new ModalForm({
+            formClass: "mod_kanban\\form\\edit_column_form",
+            args: {
+                id: this.id,
+                boardid: this.boardid,
+                cmid: this.cmid
+            },
+            modalConfig: {title: getString('editcolumn', 'mod_kanban')},
+            returnFocus: this.getElement(),
+        });
+        this.addEventListener(modalForm, modalForm.events.FORM_SUBMITTED, this._updateColumn);
+        modalForm.show();
+    }
+
+    /**
+     * Dispatch an event to update column data from the detail modal.
+     * @param {*} event
+     */
+    _updateColumn(event) {
+        this.reactive.dispatch('processUpdates', event.detail);
     }
 }

@@ -204,12 +204,14 @@ export default class extends BaseComponent {
                 this.getElement(selectors.COMPLETE).parentNode.classList.add('hidden');
                 this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
                 this.getElement(selectors.DUEDATE).classList.add('hidden');
+                this.getElement().classList.add('mod_kanban_closed');
             } else {
                 this.getElement(selectors.COMPLETIONSTATE).classList.add('hidden');
                 this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('hidden');
                 this.getElement(selectors.COMPLETE).parentNode.classList.remove('hidden');
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
                 this.getElement(selectors.DUEDATE).classList.remove('hidden');
+                this.getElement().classList.remove('mod_kanban_closed');
             }
         }
         if (element.title !== undefined) {

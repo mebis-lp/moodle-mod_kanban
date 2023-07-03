@@ -294,3 +294,7 @@ a.mod_kanban_attachment_item {
 .draggable {
     cursor: move;
 }
+
+.mod_kanban_column.mod_kanban_autohide .mod_kanban_card.mod_kanban_closed {
+    display: none;
+}

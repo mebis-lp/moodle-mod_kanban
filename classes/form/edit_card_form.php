@@ -24,7 +24,7 @@ use mod_kanban\updateformatter;
 use mod_kanban\helper;
 
 /**
- * Class for delivering kanban content
+ * From for editing a card.
  *
  * @package    mod_kanban
  * @copyright  2023 ISB Bayern
