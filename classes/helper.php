@@ -36,6 +36,16 @@ use context_module;
  */
 class helper {
     /**
+     * Constants.
+     */
+    const MOD_KANBAN_EDIT = 1;
+    const MOD_KANBAN_VIEW = 2;
+    const MOD_KANBAN_CAPABILITY = [
+        self::MOD_KANBAN_EDIT => 'mod/kanban:editallboards',
+        self::MOD_KANBAN_VIEW => 'mod/kanban:viewallboards',
+    ];
+
+    /**
      * Adds an item to a string sequence of integer values, divided by commas.
      * @param string $sequence The original sequence
      * @param int $afteritem The item to add after
@@ -121,17 +131,22 @@ class helper {
      * @param object $kanbanboard The record from the board table
      * @param \context $context The context of the course module
      * @param \cm_info $cminfo The course module info
+     * @param int $type Type of permission to check: MOD_KANBAN_EDIT(default) or MOD_KANBAN_VIEW
      */
-    public static function check_permissions_for_user_or_group(object $kanbanboard, \context $context, \cm_info $cminfo): void {
+    public static function check_permissions_for_user_or_group(
+        object $kanbanboard,
+        \context $context,
+        \cm_info $cminfo,
+        int $type = self::MOD_KANBAN_EDIT
+    ): void {
         global $USER;
         if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
             if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
-                require_capability('mod/kanban:editallboards', $context);
-
+                require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
             }
             if (!empty($kanbanboard->groupid) && $kanbanboard->groupid != groups_get_activity_group($cminfo)) {
                 if ($cminfo->groupmode == SEPARATEGROUPS) {
-                    require_capability('mod/kanban:editallboards', $context);
+                    require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
                 }
             }
         }

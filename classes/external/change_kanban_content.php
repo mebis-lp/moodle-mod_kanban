@@ -101,7 +101,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function add_column(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $DB;
         $params = self::validate_parameters(self::add_column_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,

@@ -144,17 +144,7 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
         require_capability('mod/kanban:managecolumns', $context);
     }
 
-    if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
-        if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
-            require_capability('mod/kanban:editallboards', $context);
-
-        }
-        if (!empty($kanbanboard->groupid) && $kanbanboard->groupid != groups_get_activity_group($cminfo)) {
-            if ($cminfo->groupmode == SEPARATEGROUPS) {
-                require_capability('mod/kanban:editallboards', $context);
-            }
-        }
-    }
+    \mod_kanban\helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
     $newtitle = clean_param($newvalue, PARAM_TEXT);
     $DB->update_record('kanban_' . $itemtype, ['id' => $itemid, 'title' => $newtitle, 'timemodified' => time()]);
