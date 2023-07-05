@@ -104,7 +104,7 @@ export default class extends BaseComponent {
         this.checkDragging(state);
         this.boardid = state.board.id;
         this.cmid = state.board.cmid;
-        this.userid = state.board.user;
+        this.user = state.board.user;
         this.groupid = state.board.groupid;
         this._dueDateFormat();
     }
