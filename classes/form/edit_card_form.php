@@ -140,17 +140,19 @@ class edit_card_form extends dynamic_form {
         );
 
         $result = $DB->update_record('kanban_card', $carddata);
-        if (has_capability('mod/kanban:assignothers', $context)) {
-            $result2 = $DB->delete_records('kanban_assignee', ['kanban_card' => $formdata->id]);
-        }
-        $assignees = [];
-        foreach ($formdata->assignees as $assignee) {
-            if (has_capability('mod/kanban:assignothers', $context) || $assignee == $USER->id) {
-                $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
+        if (isset($formdata->assignees)) {
+            if (has_capability('mod/kanban:assignothers', $context)) {
+                $result2 = $DB->delete_records('kanban_assignee', ['kanban_card' => $formdata->id]);
             }
+            $assignees = [];
+            foreach ($formdata->assignees as $assignee) {
+                if (has_capability('mod/kanban:assignothers', $context) || $assignee == $USER->id) {
+                    $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
+                }
+            }
+            $result3 = $DB->insert_records('kanban_assignee', $assignees);
+            $carddata['assignees'] = $formdata->assignees;
         }
-        $result3 = $DB->insert_records('kanban_assignee', $assignees);
-
         $carddata['description'] = file_rewrite_pluginfile_urls(
             $carddata['description'],
             'pluginfile.php',
@@ -164,7 +166,6 @@ class edit_card_form extends dynamic_form {
         $carddata['hasattachment'] = count($carddata['attachments']) > 0;
         $formatter = new updateformatter();
         $carddata['hasdescription'] = !empty(trim($carddata['description'])) || $draftinfo['filecount'] > 0;
-        $carddata['assignees'] = $formdata->assignees;
         $formatter->put('cards', $carddata);
         $updatestr = $formatter->format();
         return [

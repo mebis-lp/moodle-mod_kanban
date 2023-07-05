@@ -29,6 +29,7 @@ namespace mod_kanban\external;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/lib/externallib.php');
 
+use block_recentlyaccesseditems\external;
 use coding_exception;
 use context_module;
 use external_api;
@@ -81,6 +82,9 @@ class get_kanban_content extends external_api {
                         'cmid' => new external_value(PARAM_INT, 'cmid'),
                         'userid' => new external_value(PARAM_INT, 'current user id'),
                         'lang' => new external_value(PARAM_TEXT, 'language for the ui'),
+                        'locked' => new external_value(PARAM_INT, 'lock state'),
+                        'user' => new external_value(PARAM_INT, 'userboard for userid', VALUE_OPTIONAL, 0),
+                        'groupid' => new external_value(PARAM_INT, 'groupboard for groupid', VALUE_OPTIONAL, 0),
                     ]),
                     'columns' => new external_multiple_structure(
                         new external_single_structure(
@@ -280,23 +284,35 @@ class get_kanban_content extends external_api {
             'moveallcards' => has_capability('mod/kanban:moveallcards', $context),
             'managecolumns' => has_capability('mod/kanban:managecolumns', $context),
             'editallboards' => has_capability('mod/kanban:editallboards', $context),
+            'manageboard' => has_capability('mod/kanban:manageboard', $context)
         ];
 
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
+            $restrictcaps = false;
             if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
                 require_capability('mod/kanban:viewallboards', $context);
-                foreach ($capabilities as $cap => $value) {
-                    $capabilities[$cap] &= $value;
+                $restrictcaps = true;
+            }
+            if (!empty($kanbanboard->groupid)) {
+                $members = groups_get_members($kanbanboard->groupid, 'u.id');
+                $members = array_map(function ($v) {
+                    return intval($v->id);
+                }, $members);
+                $ismember = in_array($USER->id, $members);
+                if ($cminfo->groupmode == SEPARATEGROUPS && !$ismember) {
+                    require_capability('mod/kanban:viewallboards', $context);
+                    $restrictcaps = true;
+                }
+                if ($cminfo->groupmode == VISIBLEGROUPS && !$ismember) {
+                    $restrictcaps = true;
                 }
             }
-            if (!empty($kanbanboard->groupid) && $kanbanboard->groupid != groups_get_activity_group($cminfo)) {
-                if ($cminfo->groupmode == SEPARATEGROUPS) {
-                    require_capability('mod/kanban:viewallboards', $context);
-                    foreach ($capabilities as $cap => $value) {
-                        $capabilities[$cap] &= $value;
-                    }
+            if ($restrictcaps) {
+                $editcap = has_capability('mod/kanban:editallboards', $context);
+                foreach ($capabilities as $cap => $value) {
+                    $capabilities[$cap] &= $editcap;
                 }
             }
         }
@@ -319,14 +335,24 @@ class get_kanban_content extends external_api {
             return $v->id;
         }, $kanbancards);
         if (!empty($kanbancardids)) {
+            $users = get_enrolled_users($context, '');
+            foreach ($users as $user) {
+                $kanbanusers[$user->id] = [
+                    'id' => $user->id,
+                    'fullname' => fullname($user),
+                    'userpicture' => $OUTPUT->user_picture($user, ['link' => false]),
+                ];
+            }
             [$sql, $params] = $DB->get_in_or_equal($kanbancardids);
             $sql = 'kanban_card ' . $sql;
             $kanbanassigneesraw = $DB->get_records_select('kanban_assignee', $sql, $params);
             $kanbanassignees = [];
             $kanbanuserids = [];
             foreach ($kanbanassigneesraw as $assignee) {
-                $kanbanassignees[$assignee->kanban_card][] = $assignee->user;
-                $kanbanuserids[] = $assignee->user;
+                if (!empty($kanbanusers[$assignee->user])) {
+                    $kanbanassignees[$assignee->kanban_card][] = $assignee->user;
+                    $kanbanuserids[] = $assignee->user;
+                }
             }
             foreach ($kanbancards as $key => $card) {
                 if (empty($kanbanassignees[$card->id])) {
@@ -346,14 +372,6 @@ class get_kanban_content extends external_api {
                 $kanbancards[$key]->attachments = helper::get_attachments($context->id, $card->id);
                 $kanbancards[$key]->hasattachment = count($kanbancards[$key]->attachments) > 0;
             }
-            $users = get_enrolled_users($context, '', $kanbanboard->groupid);
-            foreach ($users as $user) {
-                $kanbanusers[] = [
-                    'id' => $user->id,
-                    'fullname' => fullname($user),
-                    'userpicture' => $OUTPUT->user_picture($user, ['link' => false]),
-                ];
-            }
         }
 
         $caps = [];
@@ -370,8 +388,8 @@ class get_kanban_content extends external_api {
             foreach ($kanbancards as $card) {
                 $formatter->put('cards', (array)$card);
             }
-            foreach ($kanbanusers as $user) {
-                $formatter->put('users', (array)$user);
+            foreach ($kanbanuserids as $userid) {
+                $formatter->put('users', (array)$kanbanusers[$userid]);
             }
             $formatter->put('board', (array)$kanbanboard);
             return [

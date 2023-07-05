@@ -150,8 +150,16 @@ class helper {
             if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
                 require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
             }
-            if (!empty($kanbanboard->groupid) && $kanbanboard->groupid != groups_get_activity_group($cminfo)) {
-                if ($cminfo->groupmode == SEPARATEGROUPS) {
+            if (!empty($kanbanboard->groupid)) {
+                $members = groups_get_members($kanbanboard->groupid, 'u.id');
+                $members = array_map(function ($v) {
+                    return intval($v->id);
+                }, $members);
+                $ismember = in_array($USER->id, $members);
+                if ($cminfo->groupmode == SEPARATEGROUPS && !$ismember) {
+                    require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
+                }
+                if ($cminfo->groupmode == VISIBLEGROUPS && !$ismember && $type == self::MOD_KANBAN_EDIT) {
                     require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
                 }
             }
@@ -171,6 +179,9 @@ class helper {
         global $DB;
         $fs = get_file_storage();
         $kanban = $DB->get_record('kanban', ['id' => $instance]);
+        if ($kanban->userboards == MOD_KANBAN_NOUSERBOARDS) {
+            $user = 0;
+        }
         $context = context_module::instance($instance);
         // Is there a template for this instance?
         $template = $DB->get_record('kanban_board', [
@@ -184,6 +195,8 @@ class helper {
             $newboard->template = 0;
             $newboard->timecreated = time();
             $newboard->timemodified = time();
+            $newboard->user = $user;
+            $newboard->group = $group;
             unset($newboard->id);
             $newboard->id = $DB->insert_record('kanban_board', $newboard);
             $columns = $DB->get_records('kanban_column', ['kanban_board' => $template->id]);
@@ -225,8 +238,8 @@ class helper {
             // This could be moved to a side wide template.
             $boardid = $DB->insert_record('kanban_board', [
                 'sequence' => '',
-                'user' => 0,
-                'groupid' => 0,
+                'user' => $user,
+                'groupid' => $group,
                 'template' => 0,
                 'timecreated' => time(),
                 'timemodified' => time(),

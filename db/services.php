@@ -122,4 +122,13 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:managecards',
     ],
+    'mod_kanban_change_kanban_content_set_board_columns_locked' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'set_board_columns_locked',
+        'description' => 'Changes the lock state of a whole board',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:manageboard',
+    ],
+
 ];

@@ -295,24 +295,31 @@ a.mod_kanban_attachment_item {
     cursor: move;
 }
 
-.mod_kanban_column.mod_kanban_autohide:not(.mod_kanban_show_hidden) .mod_kanban_card.mod_kanban_closed {
-    display: none;
-}
-
-.mod_kanban_column:not(.mod_kanban_autohide) .mod_kanban_hidden_actions {
-    display: none;
-}
-
 .mod_kanban_column.mod_kanban_autohide .mod_kanban_hidden_actions {
     position: absolute;
     right: 50px;
     top: 10px;
 }
 
-.mod_kanban_column.mod_kanban_autohide.mod_kanban_show_hidden [data-action="show_hidden"] {
+.mod_kanban_board_locked .mod_kanban_addcolumn_container,
+.mod_kanban_board_locked_columns .mod_kanban_addcolumn_container,
+.mod_kanban_board_locked .mod_kanban_lock_column,
+.mod_kanban_board_locked_columns .mod_kanban_lock_column,
+.mod_kanban_board_locked .mod_kanban_unlock_column,
+.mod_kanban_board_locked_columns .mod_kanban_unlock_column,
+.mod_kanban_board_locked_columns .mod_kanban_lock_board_columns,
+.mod_kanban_board:not(.mod_kanban_board_locked_columns) .mod_kanban_unlock_board_columns,
+.mod_kanban_board:not(.mod_kanban_addcard, .mod_kanban_moveassignedcards, .mod_kanban_moveallcards) .mod_kanban_addcard_container,
+.mod_kanban_board:not(.mod_kanban_managecolumns) .mod_kanban_addcolumn_container,
+.mod_kanban_column.mod_kanban_locked_column .mod_kanban_lock_column,
+.mod_kanban_column:not(.mod_kanban_locked_column) .mod_kanban_unlock_column,
+.mod_kanban_column.mod_kanban_autohide:not(.mod_kanban_show_hidden) [data-action="hide_hidden"],
+.mod_kanban_column.mod_kanban_autohide.mod_kanban_show_hidden [data-action="show_hidden"],
+.mod_kanban_column:not(.mod_kanban_autohide) .mod_kanban_hidden_actions,
+.mod_kanban_column.mod_kanban_autohide:not(.mod_kanban_show_hidden) .mod_kanban_card.mod_kanban_closed {
     display: none;
 }
 
-.mod_kanban_column.mod_kanban_autohide:not(.mod_kanban_show_hidden) [data-action="hide_hidden"] {
-    display: none;
+.mod_kanban_board_menu {
+    height: 50px;
 }

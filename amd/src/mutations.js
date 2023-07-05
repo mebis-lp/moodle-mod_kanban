@@ -119,6 +119,22 @@ export default class {
     }
 
     /**
+     * Locks all columns of the board.
+     * @param {*} stateManager StateManager instance
+     */
+    async lockColumns(stateManager) {
+        await this.sendChange('set_board_columns_locked', stateManager, {state: 1});
+    }
+
+    /**
+     * Unlocks all columns of the board.
+     * @param {*} stateManager StateManager instance
+     */
+    async unlockColumns(stateManager) {
+        await this.sendChange('set_board_columns_locked', stateManager, {state: 0});
+    }
+
+    /**
      * Send change request to webservice
      * @param {string} method Name of the method
      * @param {*} stateManager StateManager instance

@@ -23,6 +23,12 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+define('MOD_KANBAN_NOUSERBOARDS', 0);
+define('MOD_KANBAN_USERBOARDS_ENABLED', 1);
+define('MOD_KANBAN_USERBOARDS_ONLY', 2);
+
 /**
  * Adds a new kanban instance
  *

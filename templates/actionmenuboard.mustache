@@ -1,0 +1,38 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_kanban/actionmenuboard
+
+    Template for the action menu for boards.
+
+    Example context (json):
+    {
+        "id": 4,
+        "locked": false
+    }
+}}
+{{#manageboard}}
+<button class="mod_kanban_action_menu_trigger btn btn-icon icon-no-margin p-0 dropdown-toggle" data-toggle="dropdown">{{#pix}} i/menu, core, {{#str}} editboard, mod_kanban {{/str}} {{/pix}}</button>
+<ul class="dropdown-menu dropdown-menu-left">
+    <li class="dropdown-item mod_kanban_lock_board_columns">
+        <a href="#" data-action="lock_board_columns" data-id="{{id}}">{{#pix}} t/lock, core, {{#str}} lockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} lock, mod_kanban {{/str}}</a>
+    </li>
+    <li class="dropdown-item mod_kanban_unlock_board_columns">
+        <a href="#" data-action="unlock_board_columns" data-id="{{id}}">{{#pix}} t/unlock, core, {{#str}} unlockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} unlock, mod_kanban {{/str}}</a>
+    </li>
+</ul>
+{{/manageboard}}

@@ -23,6 +23,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use report_customsql\external\get_users;
+
 require('../../config.php');
 require_once('lib.php');
 
@@ -46,25 +48,94 @@ $completion->set_module_viewed($cm);
 
 echo $OUTPUT->header();
 
+$groupselector = '';
+$groupid = 0;
+
 if (!empty($cm->groupmode)) {
-    $OUTPUT->box(groups_print_activity_menu(
-        $cm,
-        new moodle_url('/mod/kanban/view.php', ['id' => $cm->id]),
-        true
-    ));
+    $groupid = groups_get_activity_group($cm, true);
+}
+
+$userid = optional_param('user', 0, PARAM_INT);
+if (
+    $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY &&
+    empty($groupid) &&
+    empty($userid)
+) {
+    $userid = $USER->id;
+}
+
+$heading = get_string('courseboard', 'mod_kanban');
+
+if (!empty($groupid)) {
+    $heading = get_string('groupboard', 'mod_kanban', groups_get_group_name($groupid));
+}
+
+if (!empty($userid)) {
+    $boarduser = core_user::get_user($userid);
+    $heading = get_string('userboard', 'mod_kanban', fullname($boarduser));
+    $groupid = 0;
 }
 
 if (empty($boardid)) {
     $board = $DB->get_record(
         'kanban_board',
-        ['kanban_instance' => $kanban->id, 'user' => 0, 'groupid' => 0, 'template' => 0],
-         '*',
-         MUST_EXIST
+        ['kanban_instance' => $kanban->id, 'user' => $userid, 'groupid' => $groupid, 'template' => 0],
+         '*'
     );
-    $boardid = $board->id;
+    if (!$board) {
+        $boardid = mod_kanban\helper::create_new_board($kanban->id, $userid, $groupid);
+        $board = $DB->get_record('kanban_board', ['id' => $boardid], '*');
+    } else {
+        $boardid = $board->id;
+    }
 }
 
-echo $OUTPUT->render_from_template('mod_kanban/container', ['cmid' => $cm->id, 'id' => $boardid]);
+if (!empty($cm->groupmode)) {
+    $groupselector = groups_print_activity_menu(
+        $cm,
+        new moodle_url('/mod/kanban/view.php', ['id' => $cm->id]),
+        true,
+        $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY
+    );
+    $allowedgroups = groups_get_activity_allowed_groups($cm);
+    if (!$allowedgroups) {
+        if ($kanban->userboards !== MOD_KANBAN_NOUSERBOARDS) {
+            $groupselector = '';
+        } else {
+            throw new \moodle_exception('nogroupavailable', 'mod_kanban');
+        }
+    } else if (count($allowedgroups) < 2) {
+        if (!empty($groupid)) {
+            $groupselector = '';
+        } else {
+            $group = array_pop($allowedgroups);
+            $groupselector = $OUTPUT->render_from_template(
+                'mod_kanban/groupbutton',
+                [
+                    'cmid' => $cm->id,
+                    'groupid' => $group->id,
+                    'groupname' => $group->name,
+                ]
+            );
+        }
+    }
+}
+
+echo $OUTPUT->render_from_template(
+    'mod_kanban/container',
+    [
+        'cmid' => $cm->id,
+        'id' => $boardid,
+        'userid' => $USER->id,
+        'groupselector' => $groupselector,
+        'groupmode' => $cm->groupmode != NOGROUPS && !empty($groupselector),
+        'userboards' => $kanban->userboards != MOD_KANBAN_NOUSERBOARDS,
+        'userboardsonly' => $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY,
+        'showallusers' => has_capability('mod/kanban:viewallboards', $context),
+        'ismyuserboard' => $board->user == $USER->id,
+        'heading' => $heading,
+    ]
+);
 
 $PAGE->requires->js_call_amd('mod_kanban/main', 'init', ['mod_kanban_render_container-' . $cm->id, $cm->id, $boardid]);
 

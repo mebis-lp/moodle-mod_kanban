@@ -23,27 +23,34 @@
     {
         "cmid": 12,
         "id": 2,
-        "hascolumns": false
+        "hascolumns": false,
+        "locked": 0,
+        "addcards": true,
+        "managecolumns": false,
+        "moveassignedcards": true,
+        "moveallcards": false
     }
 }}
-<div class="row mod_kanban_board_menu" data-id="{{id}}">
-    <div class="col mod_kanban_filter">
+<div class="container-fluid mod_kanban_board {{#locked}}mod_kanban_board_locked_columns{{/locked}} {{#addcard}}mod_kanban_addcard{{/addcard}} {{#managecolumns}}mod_kanban_managecolumns{{/managecolumns}} {{#moveassignedcards}}mod_kanban_moveassignedcards{{/moveassignedcards}} {{#moveallcards}}mod_kanban_moveallcards{{/moveallcards}}" id="mod_kanban_board-{{id}}" data-id="{{id}}" data-cmid="{{cmid}}">
+    <div class="row mod_kanban_board_menu" data-id="{{id}}">
+        <div class="col mod_kanban_action_menu">
+            {{>mod_kanban/actionmenuboard}}
+        </div>
+        <div class="col mod_kanban_filter">
+        </div>
     </div>
-    <div class="col mod_kanban_action_menu">
+    <div class="row mod_kanban_main">
+        <ul class="row mod_kanban_column_container" id="mod_kanban_board-{{id}}" data-id="{{id}}" data-cmid="{{cmid}}">
+            <li class="mod_kanban_addcolumn_first">
+                {{>mod_kanban/addcolumn}}
+            </li>
+            {{#hascolumns}}
+                {{#columns}}
+                    {{>mod_kanban/column}}
+                {{/columns}}
+            {{/hascolumns}}
+        </ul>
     </div>
-</div>
-<div class="row mod_kanban_main">
-
-<ul class="mod_kanban_board row col" id="mod_kanban_board-{{id}}" data-id="{{id}}" data-cmid="{{cmid}}">
-    <li class="mod_kanban_addcolumn_first">
-        {{>mod_kanban/addcolumn}}
-    </li>
-    {{#hascolumns}}
-        {{#columns}}
-            {{>mod_kanban/column}}
-        {{/columns}}
-    {{/hascolumns}}
-</ul>
 </div>
 {{#js}}
 require(['core/inplace_editable']);

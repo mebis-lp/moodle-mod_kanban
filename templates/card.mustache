@@ -29,7 +29,7 @@
         "completed": true
     }
 }}
-<li class="mod_kanban_card card{{#completed}} mod_kanban_closed{{/completed}}" id="mod_kanban_card-{{id}}" data-id="{{id}}" data-columnid="{{kanban_column}}">
+<li class="mod_kanban_card card{{#completed}} mod_kanban_closed{{/completed}} {{#hasassignees}}mod_kanban_unassigned{{/hasassignees}}" id="mod_kanban_card-{{id}}" data-id="{{id}}" data-columnid="{{kanban_column}}">
     <div class="card-body">
         <div class="mod_kanban_card_title card-title">
             <span class="inplaceeditable inplaceeditable-text"{{#managecards}} data-inplaceeditable="1" data-component="mod_kanban" data-itemtype="card" data-itemid="{{id}}"

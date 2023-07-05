@@ -157,4 +157,15 @@ $capabilities = [
             'manager' => CAP_ALLOW
         ]
     ],
+
+    'mod/kanban:manageboard' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'student' => CAP_PREVENT,
+            'guest' => CAP_PREVENT,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ]
+    ],
 ];

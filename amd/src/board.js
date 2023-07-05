@@ -5,6 +5,9 @@ import exporter from 'mod_kanban/exporter';
  * Component representing a kanban board.
  */
 export default class extends BaseComponent {
+    LOCKED_COLUMNS = 1;
+    LOCKED_COMPLETE = 2;
+
     static init(target) {
         let element = document.getElementById(target);
         return new this({
@@ -30,6 +33,16 @@ export default class extends BaseComponent {
             'click',
             this._addColumn
         );
+        this.addEventListener(
+            this.getElement(selectors.LOCKBOARDCOLUMNS),
+            'click',
+            this._lockColumns
+        );
+        this.addEventListener(
+            this.getElement(selectors.UNLOCKBOARDCOLUMNS),
+            'click',
+            this._unlockColumns
+        );
         this.dragdrop = new DragDrop(this);
         this._continuousUpdate();
     }
@@ -52,16 +65,26 @@ export default class extends BaseComponent {
 
     _boardUpdated({element}) {
         const el = this.getElement();
-        let sequence = element.sequence.split(',');
-        [...el.children]
-        .forEach((node) => {
-            if (node.classList.contains('mod_kanban_column') && !sequence.includes(node.dataset.id)) {
-                el.removeChild(node);
+        const colcontainer = this.getElement(selectors.COLUMNCONTAINER);
+        if (element.sequence !== undefined) {
+            let sequence = element.sequence.split(',');
+            [...colcontainer.children]
+            .forEach((node) => {
+                if (node.classList.contains('mod_kanban_column') && !sequence.includes(node.dataset.id)) {
+                    colcontainer.removeChild(node);
+                }
+            });
+            [...colcontainer.children]
+            .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
+            .forEach(node=>colcontainer.appendChild(node));
+        }
+        if (element.locked !== undefined) {
+            if (element.locked != 0) {
+                el.classList.add('mod_kanban_board_locked_columns');
+            } else {
+                el.classList.remove('mod_kanban_board_locked_columns');
             }
-        });
-        [...el.children]
-        .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
-        .forEach(node=>el.appendChild(node));
+        }
     }
 
     async _createColumn({element}) {
@@ -81,6 +104,14 @@ export default class extends BaseComponent {
 
     _addColumn() {
         this.reactive.dispatch('addColumn', 0);
+    }
+
+    _lockColumns() {
+        this.reactive.dispatch('lockColumns');
+    }
+
+    _unlockColumns() {
+        this.reactive.dispatch('unlockColumns');
     }
 
     /**

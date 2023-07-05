@@ -104,6 +104,8 @@ export default class extends BaseComponent {
         this.checkDragging(state);
         this.boardid = state.board.id;
         this.cmid = state.board.cmid;
+        this.userid = state.board.user;
+        this.groupid = state.board.groupid;
         this._dueDateFormat();
     }
 
@@ -159,26 +161,31 @@ export default class extends BaseComponent {
         const userids = [...assignedUsers].map(v => {
             return v.dataset.userid;
         });
-        const additional = element.assignees.filter(x => !userids.includes(x));
-        if (assignedUsers !== null) {
-            assignedUsers.forEach(assignedUser => {
-                if (!element.assignees.includes(assignedUser.dataset.userid)) {
-                    assignedUser.parentNode.removeChild(assignedUser);
-                }
-            });
-        }
-        if (element.assignees.length > 0) {
-            additional.forEach(async user => {
-                let placeholder = document.createElement('div');
-                let userdata = this.reactive.state.users.get(user);
-                let data = Object.assign({cardid: element.id}, userdata);
-                data = Object.assign(data, exporter.exportCapabilities(this.reactive.state));
-                placeholder.setAttribute('data-id', element.id);
-                assignees.appendChild(placeholder);
-                const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/user', data);
-                const newelement = newcomponent.getElement();
-                assignees.replaceChild(newelement, placeholder);
-            });
+        if (element.assignees !== undefined) {
+            const additional = element.assignees.filter(x => !userids.includes(x));
+            if (assignedUsers !== null) {
+                assignedUsers.forEach(assignedUser => {
+                    if (!element.assignees.includes(assignedUser.dataset.userid)) {
+                        assignedUser.parentNode.removeChild(assignedUser);
+                    }
+                });
+            }
+            if (element.assignees.length > 0) {
+                this.getElement().classList.remove('mod_kanban_unassigned');
+                additional.forEach(async user => {
+                    let placeholder = document.createElement('div');
+                    let userdata = this.reactive.state.users.get(user);
+                    let data = Object.assign({cardid: element.id}, userdata);
+                    data = Object.assign(data, exporter.exportCapabilities(this.reactive.state));
+                    placeholder.setAttribute('data-id', element.id);
+                    assignees.appendChild(placeholder);
+                    const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/user', data);
+                    const newelement = newcomponent.getElement();
+                    assignees.replaceChild(newelement, placeholder);
+                });
+            } else {
+                this.getElement().classList.add('mod_kanban_unassigned');
+            }
         }
         if (element.selfassigned !== undefined) {
             if (element.selfassigned) {
@@ -363,7 +370,9 @@ export default class extends BaseComponent {
             args: {
                 id: this.id,
                 boardid: this.boardid,
-                cmid: this.cmid
+                cmid: this.cmid,
+                groupid: this.groupid,
+                userid: this.user
             },
             modalConfig: {title: getString('editcard', 'mod_kanban')},
             returnFocus: this.getElement(),

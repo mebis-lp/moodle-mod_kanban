@@ -117,34 +117,41 @@ class change_kanban_content extends external_api {
         require_capability('mod/kanban:managecolumns', $context);
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        if (empty($kanbanboard->locked)) {
+            helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
-        $aftercol = intval($aftercol);
-        $options = '{}';
-        $sequence = '';
+            $aftercol = intval($aftercol);
+            $options = '{}';
+            $sequence = '';
 
-        $kanbancolumnid = $DB->insert_record('kanban_column', [
-            'title' => $title,
-            'kanban_board' => $kanbanboard->id,
-            'timecreated' => time(),
-            'timemodified' => time(),
-            'options' => $options,
-            'sequence' => $sequence,
-        ]);
+            $kanbancolumnid = $DB->insert_record('kanban_column', [
+                'title' => $title,
+                'kanban_board' => $kanbanboard->id,
+                'timecreated' => time(),
+                'timemodified' => time(),
+                'options' => $options,
+                'sequence' => $sequence,
+            ]);
 
-        $seq = helper::sequence_add_after($kanbanboard->sequence, $aftercol, $kanbancolumnid);
+            $seq = helper::sequence_add_after($kanbanboard->sequence, $aftercol, $kanbancolumnid);
 
-        $formatter = new updateformatter();
-        $formatter->put('columns', ['id' => $kanbancolumnid, 'title' => $title, 'options' => $options, 'sequence' => $sequence]);
-        $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
+            $formatter = new updateformatter();
+            $formatter->put('columns', ['id' => $kanbancolumnid, 'title' => $title, 'options' => $options, 'sequence' => $sequence]);
+            $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
-        return [
-            'success' => $DB->update_record(
-                'kanban_board',
-                ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
-            ),
-            'update' => $formatter->format()
-        ];
+            return [
+                'success' => $DB->update_record(
+                    'kanban_board',
+                    ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
+                ),
+                'update' => $formatter->format()
+            ];
+        } else {
+            return [
+                'success' => false,
+                'update' => ''
+            ];
+        }
     }
 
     /**
@@ -495,7 +502,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_card(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $DB;
         $params = self::validate_parameters(self::delete_card_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -947,6 +954,85 @@ class change_kanban_content extends external_api {
         $formatter->put('columns', $update);
         return [
             'success' => $DB->update_record('kanban_column', $update),
+            'update' => $formatter->format()
+        ];
+    }
+
+    /**
+     * Returns description of method parameters for the set_board_columns_locked function.
+     *
+     * @return external_function_parameters
+     */
+    public static function set_board_columns_locked_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'data' => new external_single_structure([
+                'state' => new external_value(PARAM_INT, 'lock state', VALUE_REQUIRED),
+            ]),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the set_board_columns_locked function.
+     *
+     * @return external_single_structure
+     */
+    public static function set_board_columns_locked_returns(): external_single_structure {
+        return
+            new external_single_structure(
+                [
+                    'success' => new external_value(PARAM_BOOL, 'success'),
+                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
+                ]
+            );
+    }
+
+    /**
+     * This method sets the lock state of a board.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @param array $data array containing 'state'
+     * @return bool Whether the request was successful
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function set_board_columns_locked(int $cmid, int $boardid, array $data): array {
+        global $DB;
+        $params = self::validate_parameters(self::set_board_columns_locked_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+            'data' => $data,
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        $state = $params['data']['state'];
+
+        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
+        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $kanbancolumns = $DB->get_records('kanban_column', ['kanban_board' => $boardid], 'id');
+        require_capability('mod/kanban:manageboard', $context);
+
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+
+        $formatter = new updateformatter();
+        $update = ['id' => $boardid, 'locked' => $state, 'timemodified' => time()];
+        $formatter->put('board', $update);
+        $success = $DB->update_record('kanban_board', $update);
+        foreach ($kanbancolumns as $col) {
+            $update = ['id' => $col->id, 'locked' => $state, 'timemodified' => time()];
+            $success &= $DB->update_record('kanban_column', $update);
+            $formatter->put('columns', $update);
+        }
+        return [
+            'success' => $success,
             'update' => $formatter->format()
         ];
     }

@@ -258,29 +258,30 @@ export default class extends BaseComponent {
      */
     _columnUpdated({element}) {
         const el = this.getElement(selectors.COLUMNINNER, this.id);
-        let sequence = element.sequence.split(',');
-        [...el.children]
-        .forEach((node) => {
-            if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
-                el.removeChild(node);
+        if (element.sequence !== undefined) {
+            let sequence = element.sequence.split(',');
+            [...el.children]
+            .forEach((node) => {
+                if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
+                    el.removeChild(node);
+                }
+            });
+            [...el.children]
+            .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
+            .forEach(node => el.appendChild(node));
+        }
+        if (element.locked !== undefined) {
+            if (element.locked != 0) {
+                this.getElement().classList.add('mod_kanban_locked_column');
+                this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
+            } else {
+                this.getElement().classList.remove('mod_kanban_locked_column');
+                this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
             }
-        });
-        [...el.children]
-        .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
-        .forEach(node => el.appendChild(node));
-        if (element.locked) {
-            this.getElement(selectors.UNLOCKCOLUMN).parentNode.classList.remove('hidden');
-            this.getElement(selectors.LOCKCOLUMN).parentNode.classList.add('hidden');
-            this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
-        } else {
-            this.getElement(selectors.UNLOCKCOLUMN).parentNode.classList.add('hidden');
-            this.getElement(selectors.LOCKCOLUMN).parentNode.classList.remove('hidden');
-            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
         }
         if (element.title !== undefined) {
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
-            this.getElement(selectors.DESCRIPTIONMODALTITLE).innerHTML = element.title;
         }
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);

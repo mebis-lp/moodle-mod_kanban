@@ -20,9 +20,31 @@
     Example context (json):
     {
         "cmid": 5,
-        "boardid": 1
+        "boardid": 1,
+        "userboardsonly": true,
+        "userboards": true,
+        "userid": 4,
+        "showallusers": true,
+        "groupmode": true,
+        "groupselector": "",
+        "ismyuserboard": true,
+        "heading": "Course board"
     }
 }}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h3>{{heading}}</h3>
+        </div>
+    </div>
+    <div class="row">
+        {{#groupmode}}<div class="col">{{{groupselector}}}</div>{{/groupmode}}
+        {{^ismyuserboard}}<div class="col">
+            <a href="view.php?id={{cmid}}&group=0&user={{userid}}" class="btn btn-primary">{{#pix}} t/right, core {{/pix}}{{#str}} myuserboard, mod_kanban {{/str}}</a>
+        </div>
+        {{/ismyuserboard}}
+    </div>
+</div>
 <div id="mod_kanban_render_container-{{cmid}}" class="mod_kanban_render_container container" data-cmid="{{cmid}}" data-id="{{id}}">
     {{>mod_kanban/loadingplaceholder}}
 </div>

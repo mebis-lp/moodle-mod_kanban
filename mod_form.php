@@ -44,6 +44,13 @@ class mod_kanban_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('description'));
 
+        $userboards = [
+            MOD_KANBAN_NOUSERBOARDS => get_string('nouserboards', 'kanban'),
+            MOD_KANBAN_USERBOARDS_ENABLED => get_string('userboardsenabled', 'kanban'),
+            MOD_KANBAN_USERBOARDS_ONLY => get_string('userboardsonly', 'kanban'),
+        ];
+        $mform->addElement('select', 'userboards', get_string('userboards', 'kanban'), $userboards);
+
         $this->standard_coursemodule_elements();
 
         $this->add_action_buttons(true, false, null);
