@@ -22,7 +22,7 @@ require_once($CFG->dirroot.'/mod/kanban/backup/moodle2/backup_kanban_stepslib.ph
  * Backup class for mod_kanban
  *
  * @package     mod_kanban
- * @copyright   2021-2023, ISB Bayern
+ * @copyright   2023, ISB Bayern
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -136,7 +136,15 @@ class change_kanban_content extends external_api {
             $seq = helper::sequence_add_after($kanbanboard->sequence, $aftercol, $kanbancolumnid);
 
             $formatter = new updateformatter();
-            $formatter->put('columns', ['id' => $kanbancolumnid, 'title' => $title, 'options' => $options, 'sequence' => $sequence]);
+            $formatter->put(
+                'columns',
+                [
+                    'id' => $kanbancolumnid,
+                    'title' => $title,
+                    'options' => $options,
+                    'sequence' => $sequence
+                ]
+            );
             $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
             return [

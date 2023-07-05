@@ -23,8 +23,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use report_customsql\external\get_users;
-
 require('../../config.php');
 require_once('lib.php');
 
