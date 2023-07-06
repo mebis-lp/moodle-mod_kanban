@@ -46,10 +46,10 @@
         <li class="dropdown-item">
             <a href="#" data-action="delete_card" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}{{#str}} delete, core {{/str}}</a>
         </li>
-        <li class="dropdown-item {{#completed}}hidden{{/completed}}{{^moveallcards}}{{^selfassigned}} mod_kanban_hidden{{/selfassigned}}{{/moveallcards}} mod_kanban_complete_card">
+        <li class="dropdown-item {{^moveallcards}}{{^selfassigned}} mod_kanban_hidden{{/selfassigned}}{{/moveallcards}} mod_kanban_complete_card">
             <a href="#" data-action="complete_card" data-id="{{id}}">{{#pix}} t/check, core, {{#str}} complete, core {{/str}} {{/pix}}{{#str}} complete, core {{/str}}</a>
         </li>
-        <li class="dropdown-item {{^completed}}hidden{{/completed}}{{^moveallcards}}{{^selfassigned}} mod_kanban_hidden{{/selfassigned}}{{/moveallcards}} mod_kanban_uncomplete_card">
+        <li class="dropdown-item {{^moveallcards}}{{^selfassigned}} mod_kanban_hidden{{/selfassigned}}{{/moveallcards}} mod_kanban_uncomplete_card">
             <a href="#" data-action="uncomplete_card" data-id="{{id}}">{{#pix}} t/reload, core, {{#str}} uncomplete, mod_kanban {{/str}} {{/pix}}{{#str}} uncomplete, mod_kanban {{/str}}</a>
         </li>
         <li class="dropdown-item">
