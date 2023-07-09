@@ -51,6 +51,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="board" UNIQUE="false" FIELDS="kanban_board"/>
+        <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timemodified"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="kanban_card" COMMENT="Default comment for the table, please edit me">
@@ -68,6 +69,7 @@
         <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="descriptionformat" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="linkedactivity" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="discussion" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -75,6 +77,7 @@
       <INDEXES>
         <INDEX NAME="kanban_column" UNIQUE="false" FIELDS="kanban_column"/>
         <INDEX NAME="kanban_board" UNIQUE="false" FIELDS="kanban_board"/>
+        <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timemodified"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="kanban_assignee" COMMENT="Default comment for the table, please edit me">
@@ -105,6 +108,7 @@
       <INDEXES>
         <INDEX NAME="card" UNIQUE="false" FIELDS="kanban_card"/>
         <INDEX NAME="user" UNIQUE="false" FIELDS="user"/>
+        <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timecreated"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="kanban_history" COMMENT="Default comment for the table, please edit me">

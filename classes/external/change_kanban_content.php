@@ -327,20 +327,28 @@ class change_kanban_content extends external_api {
         require_capability('mod/kanban:managecolumns', $context);
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $kanbancolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
+
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        if ($kanbanboard->locked || $kanbancolumn->locked) {
+            return [
+                'success' => false,
+                'update' => ''
+            ];
+        } else {
+            $seq = helper::sequence_move_after($kanbanboard->sequence, $aftercol, $columnid);
 
-        $seq = helper::sequence_move_after($kanbanboard->sequence, $aftercol, $columnid);
+            $formatter = new updateformatter();
+            $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
-        $formatter = new updateformatter();
-        $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
-
-        return [
-            'success' => $DB->update_record(
-                'kanban_board',
-                ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
-            ),
-            'update' => $formatter->format()
-        ];
+            return [
+                'success' => $DB->update_record(
+                    'kanban_board',
+                    ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
+                ),
+                'update' => $formatter->format()
+            ];
+        }
     }
 
     /**
@@ -1039,6 +1047,169 @@ class change_kanban_content extends external_api {
             $success &= $DB->update_record('kanban_column', $update);
             $formatter->put('columns', $update);
         }
+        return [
+            'success' => $success,
+            'update' => $formatter->format()
+        ];
+    }
+
+    /**
+     * Returns description of method parameters for the add_discussion_message function.
+     *
+     * @return external_function_parameters
+     */
+    public static function add_discussion_message_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'data' => new external_single_structure([
+                'cardid' => new external_value(PARAM_INT, 'card id', VALUE_REQUIRED),
+                'message' => new external_value(PARAM_TEXT, 'message', VALUE_REQUIRED),
+            ]),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the add_discussion_message function.
+     *
+     * @return external_single_structure
+     */
+    public static function add_discussion_message_returns(): external_single_structure {
+        return
+            new external_single_structure(
+                [
+                    'success' => new external_value(PARAM_BOOL, 'success'),
+                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
+                ]
+            );
+    }
+
+    /**
+     * This adds a message to a discussion.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @param array $data array containing 'cardId' and 'message'
+     * @return bool Whether the request was successful
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function add_discussion_message(int $cmid, int $boardid, array $data): array {
+        global $DB, $USER;
+        $params = self::validate_parameters(self::add_discussion_message_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+            'data' => $data,
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        $cardid = $params['data']['cardid'];
+        $message = $params['data']['message'];
+
+        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
+        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $kanbancard = $DB->get_record('kanban_card', ['id' => $cardid], '*', MUST_EXIST);
+
+        require_capability('mod/kanban:view', $context);
+
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+
+        $formatter = new updateformatter();
+        $update = ['kanban_card' => $cardid, 'content' => $message, 'user' => $USER->id, 'timecreated' => time()];
+        $id = $DB->insert_record('kanban_discussion', $update);
+        $success = (bool)$id;
+        $update['id'] = $id;
+        $update['candelete'] = true;
+        $formatter->discussionput("discussions[$cardid]", $update);
+        if ($kanbancard->discussion == 0) {
+            $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
+            $success &= $DB->update_record('kanban_card', $update);
+            $formatter->put('cards', $update);
+        }
+
+        return [
+            'success' => $success,
+            'update' => $formatter->format()
+        ];
+    }
+
+    /**
+     * Returns description of method parameters for the delete_discussion_message function.
+     *
+     * @return external_function_parameters
+     */
+    public static function delete_discussion_message_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'data' => new external_single_structure([
+                'messageid' => new external_value(PARAM_INT, 'message id', VALUE_REQUIRED),
+            ]),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the delete_discussion_message function.
+     *
+     * @return external_single_structure
+     */
+    public static function delete_discussion_message_returns(): external_single_structure {
+        return
+            new external_single_structure(
+                [
+                    'success' => new external_value(PARAM_BOOL, 'success'),
+                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
+                ]
+            );
+    }
+
+    /**
+     * This method deletes a message from a discussion.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @param array $data array containing 'messageId'
+     * @return bool Whether the request was successful
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function delete_discussion_message(int $cmid, int $boardid, array $data): array {
+        global $DB, $USER;
+        $params = self::validate_parameters(self::delete_discussion_message_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+            'data' => $data,
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        $messageid = $params['data']['messageid'];
+
+        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
+        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $kanbandiscussion = $DB->get_record('kanban_discussion', ['id' => $messageid]);
+        $kanbancard = $DB->get_record('kanban_card', ['id' => $kanbandiscussion->kanban_card], '*', MUST_EXIST);
+
+        require_capability('mod/kanban:view', $context);
+
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+
+        $formatter = new updateformatter();
+        $update = ['id' => $messageid, 'kanban_card' => $kanbandiscussion->kanban_card];
+        $success = $DB->delete_records('kanban_discussion', $update);
+        $formatter->discussiondelete("discussions[$kanbandiscussion->kanban_card]", $update);
+
         return [
             'success' => $success,
             'update' => $formatter->format()

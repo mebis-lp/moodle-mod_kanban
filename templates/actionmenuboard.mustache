@@ -28,11 +28,11 @@
 {{#manageboard}}
 <button class="mod_kanban_action_menu_trigger btn btn-icon icon-no-margin p-0 dropdown-toggle" data-toggle="dropdown">{{#pix}} i/menu, core, {{#str}} editboard, mod_kanban {{/str}} {{/pix}}</button>
 <ul class="dropdown-menu dropdown-menu-left">
-    <li class="dropdown-item mod_kanban_lock_board_columns">
-        <a href="#" data-action="lock_board_columns" data-id="{{id}}">{{#pix}} t/lock, core, {{#str}} lockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} lock, mod_kanban {{/str}}</a>
+    <li class="nav-item mod_kanban_lock_board_columns">
+        <a class="dropdown-item" href="#" data-action="lock_board_columns" data-id="{{id}}">{{#pix}} t/lock, core, {{#str}} lockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} lock, mod_kanban {{/str}}</a>
     </li>
-    <li class="dropdown-item mod_kanban_unlock_board_columns">
-        <a href="#" data-action="unlock_board_columns" data-id="{{id}}">{{#pix}} t/unlock, core, {{#str}} unlockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} unlock, mod_kanban {{/str}}</a>
+    <li class="nav-item mod_kanban_unlock_board_columns">
+        <a class="dropdown-item" href="#" data-action="unlock_board_columns" data-id="{{id}}">{{#pix}} t/unlock, core, {{#str}} unlockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} unlock, mod_kanban {{/str}}</a>
     </li>
 </ul>
 {{/manageboard}}

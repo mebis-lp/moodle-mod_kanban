@@ -1,14 +1,15 @@
-import {BaseComponent, DragDrop} from 'core/reactive';
+import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import {get_string as getString} from 'core/str';
 import ModalForm from 'core_form/modalform';
+import KanbanComponent from 'mod_kanban/kanbancomponent';
 
 /**
  * Component representing a column in a kanban board.
  */
-export default class extends BaseComponent {
+export default class extends KanbanComponent {
     /**
      * Function to initialize component, called by mustache template.
      * @param {*} target The id of the HTMLElement to attach to
@@ -89,7 +90,7 @@ export default class extends BaseComponent {
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
         this.boardid = state.board.id;
-        this.cmid = state.board.cmid;
+        this.cmid = state.common.id;
     }
 
     /**
@@ -271,11 +272,10 @@ export default class extends BaseComponent {
             .forEach(node => el.appendChild(node));
         }
         if (element.locked !== undefined) {
+            this.toggleClass(element.locked != 0, 'mod_kanban_locked_column');
             if (element.locked != 0) {
-                this.getElement().classList.add('mod_kanban_locked_column');
                 this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
             } else {
-                this.getElement().classList.remove('mod_kanban_locked_column');
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
             }
         }
@@ -285,11 +285,7 @@ export default class extends BaseComponent {
         }
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
-            if (options.autohide) {
-                this.getElement().classList.add('mod_kanban_autohide');
-            } else {
-                this.getElement().classList.remove('mod_kanban_autohide');
-            }
+            this.toggleClass(options.autohide, 'mod_kanban_autohide');
         }
         this.checkDragging();
     }

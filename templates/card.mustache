@@ -29,7 +29,7 @@
         "completed": true
     }
 }}
-<li class="mod_kanban_card card{{#completed}} mod_kanban_closed{{/completed}} {{#hasassignees}}mod_kanban_unassigned{{/hasassignees}}" id="mod_kanban_card-{{id}}" data-id="{{id}}" data-columnid="{{kanban_column}}">
+<li class="mod_kanban_card card{{#completed}} mod_kanban_closed{{/completed}} {{^hasassignees}}mod_kanban_unassigned{{/hasassignees}} {{#hasdescription}}mod_kanban_hasdescription{{/hasdescription}} {{#hasattachment}}mod_kanban_hasattachment{{/hasattachment}} {{#hasdiscussion}}mod_kanban_hasdiscussion{{/hasdiscussion}} {{#selfassigned}}mod_kanban_selfassigned{{/selfassigned}} {{#discussion}}mod_kanban_hasdiscussion{{/discussion}}" id="mod_kanban_card-{{id}}" data-id="{{id}}" data-columnid="{{kanban_column}}">
     <div class="card-body">
         <div class="mod_kanban_card_title card-title">
             <span class="inplaceeditable inplaceeditable-text"{{#managecards}} data-inplaceeditable="1" data-component="mod_kanban" data-itemtype="card" data-itemid="{{id}}"
@@ -59,7 +59,10 @@
                 {{/assignees}}
             {{/hasassignees}}
         </div>
-        <div class="mod_kanban_description{{^hasdescription}}{{^hasattachment}} hidden{{/hasattachment}}{{/hasdescription}}">
+        <div class="mod_kanban_description">
+            <button class="mod_kanban_discussion_trigger btn btn-icon icon-no-margin p-0" data-toggle="modal" data-target="#mod_kanban_discussion_modal_{{id}}">
+            {{#pix}} t/messages, core, {{#str}} showdiscussion, mod_kanban {{/str}} {{/pix}}
+            </button>
             <button class="mod_kanban_description_trigger btn btn-icon icon-no-margin p-0" data-toggle="modal" data-target="#mod_kanban_description_modal_{{id}}">
             {{#pix}} e/file-text, core, {{#str}} showdescription, mod_kanban {{/str}} {{/pix}}
             </button>
@@ -80,6 +83,31 @@
                         {{#hasattachment}}
                             {{>mod_kanban/attachmentitems}}
                         {{/hasattachment}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mod_kanban_discussion_modal modal fade" id="mod_kanban_discussion_modal_{{id}}" data-id="{{id}}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{title}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mod_kanban_loading_status" role="status">
+                            {{> core/loading}} {{#str}} loadingdiscussion, mod_kanban {{/str}}
+                        </div>
+                        <div class="mod_kanban_discussion" data-id="{{id}}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <textarea id="mod_kanban_discussion_input_{{id}}" class="mod_kanban_discussion_input"></textarea>
+                        <button type="button" class="mod_kanban_discussion_send btn btn-icon icon-no-margin p-0" data-action="send_discussion_message" data-id="{{id}}">
+                        {{#pix}} i/sendmessage, core, {{#str}} senddiscussion, mod_kanban {{/str}} {{/pix}}
+                        </button>
                     </div>
                 </div>
             </div>

@@ -4,6 +4,42 @@ import Ajax from 'core/ajax';
  * The functions are just used to forward data to the webservice.
  */
 export default class {
+    init(stateManager) {
+        stateManager.addUpdateTypes({
+            discussionput: this._discussionPut,
+            discussiondelete: this._discussionDelete,
+        });
+    }
+
+    _discussionPut(stateManager, name, fields) {
+        stateManager.setReadOnly(false);
+        const cardid = parseInt(fields.kanban_card);
+        if (stateManager.state.discussions.get(cardid) === undefined) {
+            stateManager.state.discussions.set(cardid, {'id': cardid, values: []});
+        }
+        stateManager.state.discussions.get(cardid).values[fields.id] = fields;
+        stateManager.eventsToPublish.push({
+            eventName: `${name}:updated`,
+            eventData: fields,
+            action: `updated`,
+        });
+        stateManager.setReadOnly(false);
+    }
+
+    _discussionDelete(stateManager, name, fields) {
+        stateManager.setReadOnly(false);
+        const cardid = parseInt(fields.kanban_card);
+        if (stateManager.state.discussions.get(cardid) !== undefined) {
+            delete stateManager.state.discussions.get(cardid).values[fields.id];
+            stateManager.eventsToPublish.push({
+                eventName: `${name}:updated`,
+                eventData: fields,
+                action: `updated`,
+            });
+        }
+        stateManager.setReadOnly(false);
+    }
+
     /**
      * Delete a card.
      * @param {*} stateManager StateManager instance
@@ -135,6 +171,25 @@ export default class {
     }
 
     /**
+     * Adds a message to discussion.
+     * @param {*} stateManager
+     * @param {*} cardId
+     * @param {*} message
+     */
+    async sendDiscussionMessage(stateManager, cardId, message) {
+        await this.sendChange('add_discussion_message', stateManager, {cardid: cardId, message: message});
+    }
+
+    /**
+     * Delete a message from a discussion.
+     * @param {*} stateManager StateManager instance
+     * @param {number} messageId Id of the message to be deleted
+     */
+    async deleteMessage(stateManager, messageId) {
+        await this.sendChange('delete_discussion_message', stateManager, {messageid: messageId});
+    }
+
+    /**
      * Send change request to webservice
      * @param {string} method Name of the method
      * @param {*} stateManager StateManager instance
@@ -145,7 +200,7 @@ export default class {
         const result = await Ajax.call([{
             methodname: 'mod_kanban_change_kanban_content_' + method,
             args: {
-                cmid: state.board.cmid,
+                cmid: state.common.id,
                 boardid: state.board.id,
                 data: data
             },
@@ -163,9 +218,40 @@ export default class {
         const result = await Ajax.call([{
             methodname: 'mod_kanban_get_kanban_content_update',
             args: {
-                cmid: state.board.cmid,
+                cmid: state.common.id,
                 boardid: state.board.id,
-                timestamp: state.board.timestamp,
+                timestamp: state.common.timestamp,
+            },
+        }])[0];
+
+        this.processUpdates(stateManager, result);
+    }
+
+    /**
+     * Update discussions for a card.
+     * @param {*} stateManager
+     * @param {number} cardId
+     */
+    async getDiscussionUpdates(stateManager, cardId) {
+        const state = stateManager.state;
+        let timestamp = 0;
+        if (state.discussions.get(cardId) !== undefined) {
+            state.discussions.get(cardId).values.forEach((discussion) => {
+                if (discussion.timestamp === undefined) {
+                    return;
+                }
+                if (discussion.timestamp > timestamp) {
+                    timestamp = discussion.timestamp;
+                }
+            });
+        }
+        const result = await Ajax.call([{
+            methodname: 'mod_kanban_get_discussion_update',
+            args: {
+                cmid: state.common.id,
+                boardid: state.board.id,
+                cardid: cardId,
+                timestamp: timestamp,
             },
         }])[0];
 

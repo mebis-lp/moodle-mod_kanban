@@ -42,6 +42,14 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:view',
     ],
+    'mod_kanban_get_discussion_update' => [
+        'classname'   => 'mod_kanban\external\get_kanban_content',
+        'methodname'  => 'get_discussion_update',
+        'description' => 'Retrieves the discussion for a card',
+        'type'        => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:view',
+    ],
     'mod_kanban_change_kanban_content_add_column' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
         'methodname'  => 'add_column',
@@ -130,5 +138,20 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:manageboard',
     ],
-
+    'mod_kanban_change_kanban_content_add_discussion_message' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'add_discussion_message',
+        'description' => 'Adds a message to card discussion',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:managecards',
+    ],
+    'mod_kanban_change_kanban_content_delete_discussion_message' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'delete_discussion_message',
+        'description' => 'Deletes a message from card discussion',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:managecards',
+    ],
 ];

@@ -39,6 +39,7 @@ class updateformatter {
      * @var array
      */
     private $updates = [];
+
     /**
      * Put a new value.
      * @param string $name Name of the value to update
@@ -46,6 +47,24 @@ class updateformatter {
      */
     public function put(string $name, array $data) {
         $this->updates[] = ['name' => $name, 'action' => 'put', 'fields' => $data];
+    }
+
+    /**
+     * Put a new value for discussion.
+     * @param string $name Name of the value to update
+     * @param array $data Fields to update, must contain 'id' field
+     */
+    public function discussionput(string $name, array $data) {
+        $this->updates[] = ['name' => $name, 'action' => 'discussionput', 'fields' => $data];
+    }
+
+    /**
+     * Delete a value from discussion.
+     * @param string $name Name of the value to update
+     * @param array $data Fields to update, must contain 'id' field
+     */
+    public function discussiondelete(string $name, array $data) {
+        $this->updates[] = ['name' => $name, 'action' => 'discussiondelete', 'fields' => $data];
     }
 
     /**

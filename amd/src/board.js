@@ -1,10 +1,12 @@
-import {BaseComponent, DragDrop} from 'core/reactive';
+import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
+import KanbanComponent from 'mod_kanban/kanbancomponent';
+
 /**
  * Component representing a kanban board.
  */
-export default class extends BaseComponent {
+export default class extends KanbanComponent {
     LOCKED_COLUMNS = 1;
     LOCKED_COMPLETE = 2;
 
@@ -64,7 +66,6 @@ export default class extends BaseComponent {
     }
 
     _boardUpdated({element}) {
-        const el = this.getElement();
         const colcontainer = this.getElement(selectors.COLUMNCONTAINER);
         if (element.sequence !== undefined) {
             let sequence = element.sequence.split(',');
@@ -78,13 +79,7 @@ export default class extends BaseComponent {
             .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
             .forEach(node=>colcontainer.appendChild(node));
         }
-        if (element.locked !== undefined) {
-            if (element.locked != 0) {
-                el.classList.add('mod_kanban_board_locked_columns');
-            } else {
-                el.classList.remove('mod_kanban_board_locked_columns');
-            }
-        }
+        this.toggleClass(element.locked, 'mod_kanban_board_locked_columns');
     }
 
     async _createColumn({element}) {

@@ -1,4 +1,4 @@
-import {BaseComponent, DragDrop} from 'core/reactive';
+import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
@@ -6,11 +6,12 @@ import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
 import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
+import KanbanComponent from 'mod_kanban/kanbancomponent';
 
 /**
  * Component representing a card in a kanban board.
  */
-export default class extends BaseComponent {
+export default class extends KanbanComponent {
     /**
      * For relative time helper.
      */
@@ -50,6 +51,8 @@ export default class extends BaseComponent {
         return [
             {watch: `cards[${this.id}]:updated`, handler: this._cardUpdated},
             {watch: `cards[${this.id}]:deleted`, handler: this._cardDeleted},
+            {watch: `discussions[${this.id}]:created`, handler: this._discussionUpdated},
+            {watch: `discussions[${this.id}]:updated`, handler: this._discussionUpdated},
         ];
     }
 
@@ -59,8 +62,8 @@ export default class extends BaseComponent {
      */
     stateReady(state) {
         let lang = 'en';
-        if (state.board.lang !== undefined) {
-            lang = state.board.lang;
+        if (state.common.lang !== undefined) {
+            lang = state.common.lang;
         }
         this.rtf = new Intl.RelativeTimeFormat(lang, {numeric: 'auto'});
 
@@ -99,11 +102,27 @@ export default class extends BaseComponent {
             'click',
             this._editDetails
         );
+        this.addEventListener(
+            this.getElement(selectors.DISCUSSIONMODALTRIGGER),
+            'click',
+            this._updateDiscussion
+        );
+        this.addEventListener(
+            this.getElement(selectors.DISCUSSIONSHOW, this.id),
+            'click',
+            this._updateDiscussion
+        );
+        this.addEventListener(
+            this.getElement(selectors.DISCUSSIONSEND),
+            'click',
+            this._sendMessage
+        );
+
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
         this.checkDragging(state);
         this.boardid = state.board.id;
-        this.cmid = state.board.cmid;
+        this.cmid = state.common.id;
         this.user = state.board.user;
         this.groupid = state.board.groupid;
         this._dueDateFormat();
@@ -122,6 +141,57 @@ export default class extends BaseComponent {
                 this._removeCard(event);
             }
         );
+    }
+
+    /**
+     * Display confirmation modal for deleting a discussion message.
+     * @param {*} event
+     */
+    _removeMessageConfirm(event) {
+        saveCancel(
+            getString('deletemessage', 'mod_kanban'),
+            getString('deletemessageconfirm', 'mod_kanban'),
+            getString('delete', 'core'),
+            () => {
+                this._removeMessage(event);
+            }
+        );
+    }
+
+    /**
+     * Dispatch event to add a message to discussion.
+     */
+    _sendMessage() {
+        let el = this.getElement(selectors.DISCUSSIONINPUT);
+        let message = el.value.trim();
+        if (message != '') {
+            this.reactive.dispatch('sendDiscussionMessage', this.id, message);
+            el.value = '';
+        }
+    }
+
+    /**
+     * Dispatch event to update the discussion data.
+     */
+    _updateDiscussion() {
+        this.getElement(selectors.DISCUSSIONMODAL).classList.add('mod_kanban_loading');
+        this.reactive.dispatch('getDiscussionUpdates', this.id);
+    }
+
+    async _discussionUpdated() {
+        let data = {
+            discussions: exporter.exportDiscussion(this.reactive.state, this.id)
+        };
+        Templates.renderForPromise('mod_kanban/discussionmessages', data).then(({html}) => {
+            this.getElement(selectors.DISCUSSION, this.id).innerHTML = html;
+            this.getElement(selectors.DISCUSSIONMODAL, this.id).classList.remove('mod_kanban_loading');
+            let el = this.getElement(selectors.DISCUSSIONMESSAGES);
+            el.scrollTop = el.scrollHeight;
+            data.discussions.forEach((d) => {
+                this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
+            });
+            return true;
+        }).catch((error) => displayException(error));
     }
 
     /**
@@ -170,8 +240,8 @@ export default class extends BaseComponent {
                     }
                 });
             }
+            this.toggleClass(element.assignees.length == 0, 'mod_kanban_unassigned');
             if (element.assignees.length > 0) {
-                this.getElement().classList.remove('mod_kanban_unassigned');
                 additional.forEach(async user => {
                     let placeholder = document.createElement('div');
                     let userdata = this.reactive.state.users.get(user);
@@ -183,34 +253,15 @@ export default class extends BaseComponent {
                     const newelement = newcomponent.getElement();
                     assignees.replaceChild(newelement, placeholder);
                 });
-            } else {
-                this.getElement().classList.add('mod_kanban_unassigned');
             }
         }
-        if (element.selfassigned !== undefined) {
-            if (element.selfassigned) {
-                this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.add('hidden');
-                this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.remove('hidden');
-                if (this.reactive.state.capabilities.get('moveassignedcards')) {
-                        this.getElement(selectors.UNCOMPLETE).parentNode.classList.remove('mod_kanban_hidden');
-                        this.getElement(selectors.COMPLETE).parentNode.classList.remove('mod_kanban_hidden');
-                }
-            } else {
-                this.getElement(selectors.ASSIGNSELF, this.id).parentNode.classList.remove('hidden');
-                this.getElement(selectors.UNASSIGNSELF, this.id).parentNode.classList.add('hidden');
-                if (this.reactive.state.capabilities.get('moveallcards').value == false) {
-                    this.getElement(selectors.UNCOMPLETE).parentNode.classList.add('mod_kanban_hidden');
-                    this.getElement(selectors.COMPLETE).parentNode.classList.add('mod_kanban_hidden');
-                }
-            }
-        }
+        this.toggleClass(element.selfassigned, 'mod_kanban_selfassigned');
         if (element.completed !== undefined) {
+            this.toggleClass(element.completed == 1, 'mod_kanban_closed');
             if (element.completed == 1) {
                 this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
-                this.getElement().classList.add('mod_kanban_closed');
             } else {
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
-                this.getElement().classList.remove('mod_kanban_closed');
             }
         }
         if (element.title !== undefined) {
@@ -227,17 +278,13 @@ export default class extends BaseComponent {
                 return true;
             }).catch((error) => displayException(error));
         }
-        if (element.hasdescription !== undefined || element.hasattachment !== undefined) {
-            if (element.hasdescription || element.hasattachment) {
-                this.getElement(selectors.DESCRIPTIONTOGGLE).classList.remove('hidden');
-            } else {
-                this.getElement(selectors.DESCRIPTIONTOGGLE).classList.add('hidden');
-            }
-        }
+        this.toggleClass(element.hasdescription, 'mod_kanban_hasdescription');
+        this.toggleClass(element.hasattachment, 'mod_kanban_hasattachment');
         if (element.duedate !== undefined) {
             this.getElement(selectors.DUEDATE).setAttribute('data-date', element.duedate);
             this._dueDateFormat();
         }
+        this.toggleClass(element.discussion, 'mod_kanban_hasdiscussion');
         this.checkDragging();
     }
 
@@ -258,6 +305,16 @@ export default class extends BaseComponent {
         let target = event.target.closest(selectors.DELETECARD);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('deleteCard', data.id);
+    }
+
+    /**
+     * Dispatch event to remove this card.
+     * @param {*} event
+     */
+    _removeMessage(event) {
+        let target = event.target.closest(selectors.DELETEMESSAGE);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('deleteMessage', data.id);
     }
 
     /**
@@ -310,7 +367,7 @@ export default class extends BaseComponent {
         }
         if (state.capabilities.get('moveallcards').value ||
             (state.capabilities.get('moveassignedcards').value &&
-            state.cards.get(this.id).assignees.includes(state.board.userid))) {
+            state.cards.get(this.id).assignees.includes(state.common.userid))) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);
         } else {

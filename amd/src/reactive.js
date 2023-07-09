@@ -11,6 +11,7 @@ export default class extends Reactive {
      * @param {number} boardid Board id
      */
     async loadBoard(cmid, boardid) {
+        this.mutations.init(this.stateManager);
         const initialData = await Ajax.call(
             [
                 {

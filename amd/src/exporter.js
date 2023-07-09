@@ -17,7 +17,7 @@ export default class {
             });
         }
         return Object.assign({
-            cmid: state.board.cmid,
+            cmid: state.common.id,
             id: state.board.id,
             sequence: state.board.sequence,
             hascolumns: hascolumns,
@@ -75,5 +75,25 @@ export default class {
             capabilities[c.id] = c.value;
         });
         return Object.assign({}, capabilities);
+    }
+
+    /**
+     * Exports the discussion for a card.
+     * @param {*} state
+     * @param {number} cardId
+     * @returns {array}
+     */
+    static exportDiscussion(state, cardId) {
+        let d = [];
+        state.discussions.get(cardId).values.forEach((c) => {
+            if (c === null) {
+                return;
+            }
+            let discussion = JSON.parse(JSON.stringify(c));
+            discussion.username = state.users.get(c.user).fullname;
+            d.push(discussion);
+        });
+        d = d.sort((a, b) => parseInt(a.timecreated) > parseInt(b.timecreated));
+        return d;
     }
 }
