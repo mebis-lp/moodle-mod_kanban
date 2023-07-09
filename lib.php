@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Library for mod_kanban
  *
@@ -24,6 +22,8 @@ defined('MOODLE_INTERNAL') || die();
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 define('MOD_KANBAN_NOUSERBOARDS', 0);
 define('MOD_KANBAN_USERBOARDS_ENABLED', 1);
