@@ -34,6 +34,7 @@ $string['attachments'] = 'Attachments';
 $string['autoclose'] = 'Auto close cards';
 $string['autohide'] = 'Auto hide closed cards';
 $string['cardtitle'] = 'Card title';
+$string['color'] = 'Color';
 $string['column'] = 'Column';
 $string['columntitle'] = 'Column title';
 $string['courseboard'] = 'Course board';

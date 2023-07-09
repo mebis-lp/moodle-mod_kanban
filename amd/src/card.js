@@ -285,6 +285,14 @@ export default class extends KanbanComponent {
             this._dueDateFormat();
         }
         this.toggleClass(element.discussion, 'mod_kanban_hasdiscussion');
+        if (element.options !== undefined) {
+            let options = JSON.parse(element.options);
+            if (options.background === undefined) {
+                this.getElement().removeAttribute('style');
+            } else {
+                this.getElement().setAttribute('style', 'background-color: ' + options.background);
+            }
+        }
         this.checkDragging();
     }
 

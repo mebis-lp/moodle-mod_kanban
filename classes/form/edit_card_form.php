@@ -81,6 +81,10 @@ class edit_card_form extends dynamic_form {
         $mform->addElement('date_time_selector', 'reminderdate', get_string('reminderdate', 'kanban'), ['optional' => true]);
 
         $mform->addElement('filemanager', 'attachments', get_string('attachments', 'kanban'));
+
+        $mform->addElement('color', 'color', get_string('color', 'mod_kanban'));
+        $mform->setType('color', PARAM_TEXT);
+        $mform->setDefault('color', '#ffffff');
     }
 
     /**
@@ -118,6 +122,7 @@ class edit_card_form extends dynamic_form {
         global $DB, $USER;
         $context = $this->get_context_for_dynamic_submission();
         $formdata = $this->get_data();
+        $options = json_encode(['background' => $formdata->color]);
         $carddata = [
             'id' => $formdata->id,
             'title' => $formdata->title,
@@ -125,6 +130,7 @@ class edit_card_form extends dynamic_form {
             'descriptionformat' => $formdata->description_editor['format'],
             'duedate' => $formdata->duedate,
             'reminderdate' => $formdata->reminderdate,
+            'options' => $options,
             'timemodified' => time(),
         ];
 
@@ -182,9 +188,11 @@ class edit_card_form extends dynamic_form {
         $context = $this->get_context_for_dynamic_submission();
         $id = $this->optional_param('id', null, PARAM_INT);
         $card = $DB->get_record('kanban_card', ['id' => $id]);
+        $options = json_decode($card->options);
         $card->cmid = $this->optional_param('cmid', null, PARAM_INT);
         $card->boardid = $card->kanban_board;
         $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $id]);
+        $card->color = $options->background;
         $draftitemid = file_get_submitted_draft_itemid('attachments');
         $card->description = file_prepare_draft_area(
             $draftitemid,

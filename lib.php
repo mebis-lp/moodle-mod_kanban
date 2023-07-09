@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Library for mod_kanban
  *
@@ -26,6 +28,12 @@
 define('MOD_KANBAN_NOUSERBOARDS', 0);
 define('MOD_KANBAN_USERBOARDS_ENABLED', 1);
 define('MOD_KANBAN_USERBOARDS_ONLY', 2);
+
+global $CFG;
+require_once($CFG->libdir . '/formslib.php');
+require_once('HTML/QuickForm/input.php');
+
+MoodleQuickForm::registerElementType('color', $CFG->dirroot . '/mod/kanban/classes/form/color.php', 'MoodleQuickForm_color');
 
 /**
  * Adds a new kanban instance

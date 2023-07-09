@@ -110,6 +110,7 @@ class get_kanban_content extends external_api {
                                 'title' => new external_value(PARAM_TEXT, 'card title'),
                                 'kanban_column' => new external_value(PARAM_INT, 'column'),
                                 'duedate' => new external_value(PARAM_INT, 'due date'),
+                                'options' => new external_value(PARAM_TEXT, 'options for the card'),
                                 'assignees' => new external_multiple_structure(
                                         new external_value(PARAM_INT, 'user id'),
                                         VALUE_OPTIONAL

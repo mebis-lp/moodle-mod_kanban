@@ -51,7 +51,7 @@
 
 .mod_kanban_card:hover,
 .mod_kanban_card:focus {
-    background-color: lightgray;
+    box-shadow: 0 0 3px;
 }
 
 .mod_kanban_addcolumn_container.col:not(:first-child) {

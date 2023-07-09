@@ -34,6 +34,7 @@ $string['attachments'] = 'Anhänge';
 $string['autoclose'] = 'Karten automatisch abschließen';
 $string['autohide'] = 'Abgeschlossene Karten automatisch verbergen';
 $string['cardtitle'] = 'Titel der Karte';
+$string['color'] = 'Farbe';
 $string['column'] = 'Spalte';
 $string['columntitle'] = 'Spaltentitel';
 $string['courseboard'] = 'Kurs-Board';
