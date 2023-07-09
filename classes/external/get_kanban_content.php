@@ -466,7 +466,7 @@ class get_kanban_content extends external_api {
         );
     }
 
-/**
+    /**
      * Get card discussion from database.
      *
      * @param int $cmid the course module id of the kanban board
