@@ -25,6 +25,7 @@
 namespace mod_kanban;
 
 use context_module;
+use mod_bigbluebuttonbn\task\send_notification;
 
 /**
  * Helper class
@@ -293,5 +294,55 @@ class helper {
         }
 
         return $attachmentslist;
+    }
+
+    /**
+     * Send a notification to a user.
+     *
+     * @param cm_info $cm The affected course module
+     * @param string $messagename The name of the message defined in message.php
+     * @param array $users The users to send the notification to
+     * @param object $data The data to describe the message details
+     * @param string $altmessagename The name of an alternative message string to be used
+     */
+    public static function send_notification(
+        \cm_info $cm,
+        string $messagename,
+        array $users,
+        object $data,
+        string $altmessagename = null
+    ) {
+        global $OUTPUT, $USER;
+        $message = new \core\message\message();
+        $message->component = 'mod_kanban';
+        $message->name = $messagename;
+        if (!empty($altmessagename)) {
+            $messagename = $altmessagename;
+        }
+        $message->userfrom = \core_user::get_noreply_user();
+
+        $message->subject = get_string('message_' . $messagename . '_subject', 'mod_kanban', $data);
+        $message->fullmessage = get_string('message_' . $messagename . '_fullmessage', 'mod_kanban', $data);
+        $message->fullmessageformat = FORMAT_MARKDOWN;
+        $templatename = 'mod_kanban/message_' . $messagename;
+        if (file_exists(__DIR__ . '/../templates/' . $templatename)) {
+            $message->fullmessagehtml = $OUTPUT->render_from_template($templatename, $data);
+        }
+        $message->smallmessage = get_string('message_' . $messagename . '_smallmessage', 'mod_kanban', $data);
+        $message->notification = 1;
+        $url = $cm->get_url();
+        if (!empty($data->boardid)) {
+            $url->param('boardid', $data->boardid);
+        }
+        $message->contexturl = $url->out(false);
+        $message->contexturlname = get_string('toboard', 'mod_kanban', $data);
+
+        foreach ($users as $user) {
+            // Don't notify current user about own actions.
+            if ($user != $USER->id) {
+                $message->userto = $user;
+                message_send($message);
+            }
+        }
     }
 }

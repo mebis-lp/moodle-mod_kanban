@@ -119,8 +119,11 @@ class edit_card_form extends dynamic_form {
      * @return array Returns whether a new template was created.
      */
     public function process_dynamic_submission(): array {
-        global $DB, $USER;
+        global $COURSE, $DB, $USER;
         $context = $this->get_context_for_dynamic_submission();
+        $cmid = $this->optional_param('cmid', null, PARAM_INT);
+        $modinfo = get_fast_modinfo($COURSE);
+        $cm = $modinfo->get_cm($cmid);
         $formdata = $this->get_data();
         $options = json_encode(['background' => $formdata->color]);
         $carddata = [
@@ -147,16 +150,29 @@ class edit_card_form extends dynamic_form {
 
         $result = $DB->update_record('kanban_card', $carddata);
         if (isset($formdata->assignees)) {
+            $currentassignees = $DB->get_fieldset_select(
+                'kanban_assignee',
+                'user',
+                'kanban_card = :cardid',
+                ['cardid' => $formdata->id]
+            );
+            $toinsert = array_diff ($formdata->assignees, $currentassignees);
+            $todelete = array_diff ($currentassignees, $formdata->assignees);
             if (has_capability('mod/kanban:assignothers', $context)) {
-                $result2 = $DB->delete_records('kanban_assignee', ['kanban_card' => $formdata->id]);
+                list($sql, $params) = $DB->get_in_or_equal($todelete);
+                $sql = 'kanban_card = :cardid AND user ' . $sql;
+                $parms['cardid'] = $formdata->id;
+                $result2 = $DB->delete_records_select('kanban_assignee', $sql, $params);
+                helper::send_notification($cm, 'assigned', $todelete, $formdata, 'unassigned');
             }
             $assignees = [];
-            foreach ($formdata->assignees as $assignee) {
+            foreach ($toinsert as $assignee) {
                 if (has_capability('mod/kanban:assignothers', $context) || $assignee == $USER->id) {
                     $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
                 }
             }
             $result3 = $DB->insert_records('kanban_assignee', $assignees);
+            helper::send_notification($cm, 'assigned', $toinsert, $formdata);
             $carddata['assignees'] = $formdata->assignees;
         }
         $carddata['description'] = file_rewrite_pluginfile_urls(

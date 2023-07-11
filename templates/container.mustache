@@ -41,6 +41,9 @@
         {{#groupmode}}<div class="col">{{{groupselector}}}</div>{{/groupmode}}
         {{#userboards}}{{^ismyuserboard}}<div class="col">
             <a href="view.php?id={{cmid}}&group=0&user={{userid}}" class="btn btn-primary">{{#pix}} t/right, core {{/pix}}{{#str}} myuserboard, mod_kanban {{/str}}</a>
+            {{#showallusers}}
+                {{>mod_kanban/singleuserselect}}
+            {{/showallusers}}
         </div>
         {{/ismyuserboard}}{{/userboards}}
     </div>

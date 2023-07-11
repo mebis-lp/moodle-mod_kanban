@@ -464,11 +464,27 @@ class change_kanban_content extends external_api {
             $formatter->put('columns', $updatesourcecol);
             $formatter->put('columns', $updatetargetcol);
             $formatter->put('cards', $updatecard);
+            $success = $DB->update_record('kanban_column', $updatetargetcol) &&
+                $DB->update_record('kanban_column', $updatesourcecol) &&
+                $DB->update_record('kanban_card', $updatecard);
+            if ($success) {
+                $data = array_merge((array)$kanbancard, $updatecard);
+                $data['username'] = fullname($USER);
+                $data['boardname'] = $kanban->name;
+                $data['columnname'] = $kanbancolumntarget->title;
+                $kanbanassignees = $DB->get_fieldset_select(
+                    'kanban_assignee',
+                    'user',
+                    'kanban_card = :cardid',
+                    ['cardid' => $kanbancard->id]
+                );
+                helper::send_notification($cminfo, 'moved', $kanbanassignees, (object)$data);
+                if (!empty($options->autoclose)) {
+                    helper::send_notification($cminfo, 'closed', $kanbanassignees, (object)$data);
+                }
+            }
             return [
-                'success' =>
-                    $DB->update_record('kanban_column', $updatetargetcol) &&
-                    $DB->update_record('kanban_column', $updatesourcecol) &&
-                    $DB->update_record('kanban_card', $updatecard),
+                'success' => $success,
                 'update' => $formatter->format(),
             ];
         }
@@ -893,8 +909,14 @@ class change_kanban_content extends external_api {
         $formatter = new updateformatter();
         $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
         $formatter->put('cards', $update);
+        $success = $DB->update_record('kanban_card', $update);
+        if ($success) {
+            $kanbancard->username = fullname($USER);
+            $kanbancard->boardname = $kanban->name;
+            helper::send_notification($cminfo, 'closed', $kanbanassignees, $kanbancard, ($state == 0 ? 'reopened' : null));
+        }
         return [
-            'success' => $DB->update_record('kanban_card', $update),
+            'success' => $success,
             'update' => $formatter->format()
         ];
     }
@@ -1126,13 +1148,25 @@ class change_kanban_content extends external_api {
         $success = (bool)$id;
         $update['id'] = $id;
         $update['candelete'] = true;
+        $data = (object)$update;
         $formatter->discussionput("discussions[$cardid]", $update);
         if ($kanbancard->discussion == 0) {
             $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
             $success &= $DB->update_record('kanban_card', $update);
             $formatter->put('cards', $update);
         }
-
+        if ($success) {
+            $data->username = fullname($USER);
+            $data->boardname = $kanban->name;
+            $data->title = $kanbancard->title;
+            $kanbanassignees = $DB->get_fieldset_select(
+                'kanban_assignee',
+                'user',
+                'kanban_card = :cardid',
+                ['cardid' => $kanbancard->id]
+            );
+            helper::send_notification($cminfo, 'discussion', $kanbanassignees, $data);
+        }
         return [
             'success' => $success,
             'update' => $formatter->format()
