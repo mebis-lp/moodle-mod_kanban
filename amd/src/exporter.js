@@ -90,9 +90,7 @@ export default class {
             if (c === null) {
                 return;
             }
-            let discussion = JSON.parse(JSON.stringify(c));
-            discussion.username = state.users.get(c.user).fullname;
-            d.push(discussion);
+            d.push(c);
         });
         d = d.sort((a, b) => parseInt(a.timecreated) > parseInt(b.timecreated));
         return d;

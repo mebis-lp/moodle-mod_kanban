@@ -91,10 +91,10 @@ export default class extends KanbanComponent {
         }, exporter.exportCapabilities(this.reactive.state));
         let placeholder = document.createElement('li');
         placeholder.setAttribute('data-id', data.id);
-        this.getElement().appendChild(placeholder);
+        this.getElement(selectors.COLUMNCONTAINER).appendChild(placeholder);
         const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/column', data);
         const newelement = newcomponent.getElement();
-        this.getElement().replaceChild(newelement, placeholder);
+        this.getElement(selectors.COLUMNCONTAINER).replaceChild(newelement, placeholder);
     }
 
     _addColumn() {

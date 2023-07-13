@@ -638,7 +638,7 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancolumn = $DB->get_record('kanban_column', ['kanban_board' => $boardid, 'id' => $columnid], '*', MUST_EXIST);
-        $kanbancardids = $DB->get_fieldset_select('kanban_card', 'kanban_column = :kanban_column', ['kanban_column' => $columnid]);
+        $kanbancardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_column = :kanban_column', ['kanban_column' => $columnid]);
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
@@ -1191,6 +1191,7 @@ class change_kanban_content extends external_api {
             );
             helper::send_notification($cminfo, 'discussion', $kanbanassignees, $data);
         }
+
         return [
             'success' => $success,
             'update' => $formatter->format()

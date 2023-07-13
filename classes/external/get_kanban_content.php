@@ -502,6 +502,7 @@ class get_kanban_content extends external_api {
         $formatter = new updateformatter();
         foreach ($discussions as $discussion) {
             $discussion->candelete = $discussion->user == $USER->id || has_capability('mod/kanban:manageboard', $context);
+            $discussion->username = fullname(\core_user::get_user($discussion->user));
             $formatter->discussionput("discussions[$cardid]", (array)$discussion);
         }
         return [
