@@ -567,7 +567,8 @@ class change_kanban_content extends external_api {
         $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
 
         $success = $DB->update_record('kanban_column', ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]) &&
-            $DB->delete_records('kanban_card', ['id' => $cardid]) & $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
+            $DB->delete_records('kanban_card', ['id' => $cardid]) &&
+            $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
 
         helper::remove_calendar_event($kanban, $kanbancard);
 
@@ -832,7 +833,7 @@ class change_kanban_content extends external_api {
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $success = $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]) &&
-            $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);    
+            $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
         helper::remove_calendar_event($kanban, (object)['id' => $cardid], [$userid]);
         $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
         $userids = array_map(function ($v) {
