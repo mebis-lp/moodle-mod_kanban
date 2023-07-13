@@ -148,7 +148,7 @@ class edit_card_form extends dynamic_form {
             $carddata['description']
         );
 
-        $result = $DB->update_record('kanban_card', $carddata);
+        $success = $DB->update_record('kanban_card', $carddata);
         if (isset($formdata->assignees)) {
             $currentassignees = $DB->get_fieldset_select(
                 'kanban_assignee',
@@ -156,14 +156,20 @@ class edit_card_form extends dynamic_form {
                 'kanban_card = :cardid',
                 ['cardid' => $formdata->id]
             );
-            $toinsert = array_diff ($formdata->assignees, $currentassignees);
-            $todelete = array_diff ($currentassignees, $formdata->assignees);
+            $toinsert = array_diff($formdata->assignees, $currentassignees);
+            $todelete = array_diff($currentassignees, $formdata->assignees);
+            if (!empty($todelete)) {
+                helper::remove_calendar_event((object)['id' => $cm->instance], (object)$carddata, $todelete);
+            }
+            helper::add_or_update_calendar_event((object)['id' => $cm->instance], (object)$carddata, $formdata->assignees);
             if (has_capability('mod/kanban:assignothers', $context)) {
-                list($sql, $params) = $DB->get_in_or_equal($todelete);
-                $sql = 'kanban_card = :cardid AND user ' . $sql;
-                $parms['cardid'] = $formdata->id;
-                $result2 = $DB->delete_records_select('kanban_assignee', $sql, $params);
-                helper::send_notification($cm, 'assigned', $todelete, $formdata, 'unassigned');
+                if (!empty($todelete)) {
+                    list($sql, $params) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
+                    $sql = 'kanban_card = :cardid AND user ' . $sql;
+                    $params['cardid'] = $formdata->id;
+                    $success &= $DB->delete_records_select('kanban_assignee', $sql, $params);
+                    helper::send_notification($cm, 'assigned', $todelete, $formdata, 'unassigned');
+                }
             }
             $assignees = [];
             foreach ($toinsert as $assignee) {
@@ -171,7 +177,7 @@ class edit_card_form extends dynamic_form {
                     $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
                 }
             }
-            $result3 = $DB->insert_records('kanban_assignee', $assignees);
+            $success &= $DB->insert_records('kanban_assignee', $assignees);
             helper::send_notification($cm, 'assigned', $toinsert, $formdata);
             $carddata['assignees'] = $formdata->assignees;
         }
@@ -191,7 +197,7 @@ class edit_card_form extends dynamic_form {
         $formatter->put('cards', $carddata);
         $updatestr = $formatter->format();
         return [
-            'result' => $result && $result2 && $result3,
+            'result' => $success,
             'update' => $updatestr,
         ];
     }

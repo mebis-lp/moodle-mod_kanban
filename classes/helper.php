@@ -25,7 +25,8 @@
 namespace mod_kanban;
 
 use context_module;
-use mod_bigbluebuttonbn\task\send_notification;
+use calendar_event;
+use stdClass;
 
 /**
  * Helper class
@@ -343,6 +344,66 @@ class helper {
                 $message->userto = $user;
                 message_send($message);
             }
+        }
+    }
+
+    /**
+     * Adds or updates a calendar event.
+     * @param stdClass $kanban The kanban record from the database
+     * @param stdClass $card The card record from the database
+     * @param array $users The usersthat should have the event in their calendar
+     */
+    public static function add_or_update_calendar_event(stdClass $kanban, stdClass $card, array $users) {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/calendar/lib.php');
+        $data = new stdClass();
+        $data->eventtype = 'due';
+        $data->type = CALENDAR_EVENT_TYPE_ACTION;
+        $data->name = get_string('message_due_smallmessage', 'mod_kanban', $card);
+        $data->description = $card->description;
+        $data->format = $card->descriptionformat;
+        $data->groupid = 0;
+        $data->userid = 0;
+        $data->modulename = 'kanban';
+        $data->instance = $kanban->id;
+        $data->timestart = $card->duedate;
+        $data->visible = instance_is_visible('kanban', $kanban);
+        $data->timeduration = 0;
+        $data->uuid = $card->id;
+        $data->name = get_string('message_due_subject', 'mod_kanban', $card);
+        $data->description = $card->description;
+        $data->format = $card->descriptionformat;
+        foreach ($users as $user) {
+            $data->userid = $user;
+            $eventrecord = $DB->get_record('event', ['uuid' => $card->id, 'instance' => $kanban->id, 'userid' => $user]);
+            if (!$eventrecord) {
+                calendar_event::create($data, false);
+            } else {
+                $data->id = $eventrecord->id;
+                $DB->update_record('event', $data);
+                unset($data->id);
+            }
+        }
+    }
+
+    /**
+     * Removes a calendar event.
+     * @param stdClass $kanban The kanban record from the database
+     * @param stdClass $card The card record from the database
+     * @param array $users The users that should have the event deleted from their calendar. If empty, all events of this
+     *                      card are deleted.
+     */
+    public static function remove_calendar_event(stdClass $kanban, stdClass $card, array $users = []) {
+        global $DB;
+        if (!empty($users)) {
+            list($sql, $params) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
+            $sql = 'instance = :id AND uuid = :cardid AND userid ' . $sql;
+            $params['cardid'] = $card->id;
+            $params['id'] = $kanban->id;
+            $DB->delete_records_select('event', $sql, $params);
+        } else {
+            $DB->delete_records('event', ['modulename' => 'kanban', 'instance' => $kanban->id]);
         }
     }
 }

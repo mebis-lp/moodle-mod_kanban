@@ -26,6 +26,8 @@
 require('../../config.php');
 require_once('lib.php');
 
+use mod_kanban\helper;
+
 $id = required_param('id', PARAM_INT);
 $boardid = optional_param('boardid', 0, PARAM_INT);
 
@@ -86,6 +88,9 @@ if (empty($boardid)) {
     } else {
         $boardid = $board->id;
     }
+} else {
+    $board = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*');
+    helper::check_permissions_for_user_or_group($board, $context, $cm, helper::MOD_KANBAN_VIEW);
 }
 
 if (!empty($cm->groupmode)) {

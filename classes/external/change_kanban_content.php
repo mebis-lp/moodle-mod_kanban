@@ -481,6 +481,7 @@ class change_kanban_content extends external_api {
                 helper::send_notification($cminfo, 'moved', $kanbanassignees, (object)$data);
                 if (!empty($options->autoclose)) {
                     helper::send_notification($cminfo, 'closed', $kanbanassignees, (object)$data);
+                    helper::remove_calendar_event($kanban, $kanbancard);
                 }
             }
             return [
@@ -565,10 +566,13 @@ class change_kanban_content extends external_api {
         $formatter->delete('cards', ['id' => $cardid]);
         $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
 
+        $success = $DB->update_record('kanban_column', ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]) &&
+            $DB->delete_records('kanban_card', ['id' => $cardid]) & $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
+
+        helper::remove_calendar_event($kanban, $kanbancard);
+
         return [
-            'success' =>
-                $DB->update_record('kanban_column', ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]) &&
-                $DB->delete_records('kanban_card', ['id' => $cardid]),
+            'success' => $success,
             'update' => $formatter->format()
         ];
     }
@@ -617,7 +621,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_column(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $DB;
         $params = self::validate_parameters(self::delete_column_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -633,6 +637,7 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancolumn = $DB->get_record('kanban_column', ['kanban_board' => $boardid, 'id' => $columnid], '*', MUST_EXIST);
+        $kanbancardids = $DB->get_fieldset_select('kanban_card', 'kanban_column = :kanban_column', ['kanban_column' => $columnid]);
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
@@ -645,11 +650,21 @@ class change_kanban_content extends external_api {
         $formatter->delete('columns', ['id' => $kanbancolumn->id]);
         $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
 
+        foreach ($kanbancardids as $cardid) {
+            helper::remove_calendar_event($kanban, (object)['id' => $cardid]);
+        }
+
+        list($sql, $params) = $DB->get_in_or_equal($kanbancardids);
+
+        $success = $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => $seq, 'timemodified' => time()]) &&
+            $DB->delete_records('kanban_column', ['id' => $columnid]) &&
+            $DB->delete_records('kanban_card', ['kanban_column' => $columnid]);
+        if (!empty($kanbancardids)) {
+            $success &= $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $sql, $params);
+        }
+
         return [
-            'success' =>
-                $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => $seq, 'timemodified' => time()]) &&
-                $DB->delete_records('kanban_column', ['id' => $columnid]) &&
-                $DB->delete_records('kanban_card', ['kanban_column' => $columnid]),
+            'success' => $success,
             'update' => $formatter->format()
         ];
     }
@@ -721,11 +736,13 @@ class change_kanban_content extends external_api {
 
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $kanbancard = $DB->get_record('kanban_card', ['id' => $cardid]);
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $success1 = $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]);
         $success2 = $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
+        helper::add_or_update_calendar_event($kanban, $kanbancard, [$userid]);
         $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
         $userids = array_map(function ($v) {
             return intval($v);
@@ -815,7 +832,8 @@ class change_kanban_content extends external_api {
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
         $success = $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]) &&
-            $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
+            $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);    
+        helper::remove_calendar_event($kanban, (object)['id' => $cardid], [$userid]);
         $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
         $userids = array_map(function ($v) {
             return intval($v);
@@ -910,6 +928,11 @@ class change_kanban_content extends external_api {
         $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
         $formatter->put('cards', $update);
         $success = $DB->update_record('kanban_card', $update);
+        if ($state) {
+            helper::remove_calendar_event($kanban, $kanbancard, $kanbanassignees);
+        } else {
+            helper::add_or_update_calendar_event($kanban, $kanbancard, $kanbanassignees);
+        }
         if ($success) {
             $kanbancard->username = fullname($USER);
             $kanbancard->boardname = $kanban->name;
