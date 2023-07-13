@@ -655,12 +655,11 @@ class change_kanban_content extends external_api {
             helper::remove_calendar_event($kanban, (object)['id' => $cardid]);
         }
 
-        list($sql, $params) = $DB->get_in_or_equal($kanbancardids);
-
-        $success = $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => $seq, 'timemodified' => time()]) &&
+                $success = $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => $seq, 'timemodified' => time()]) &&
             $DB->delete_records('kanban_column', ['id' => $columnid]) &&
             $DB->delete_records('kanban_card', ['kanban_column' => $columnid]);
         if (!empty($kanbancardids)) {
+            list($sql, $params) = $DB->get_in_or_equal($kanbancardids);
             $success &= $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $sql, $params);
         }
 

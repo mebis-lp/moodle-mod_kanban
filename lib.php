@@ -202,3 +202,14 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
 
     send_stored_file($file, 0, 0, false, $options);
 }
+
+/**
+ * This function is used by the reset_course_userdata function in moodlelib.
+ *
+ * @param object $data the data submitted from the reset course.
+ * @return array status array
+ */
+function kanban_reset_userdata($data) {
+    // Missing implementation.
+    return [];
+}
