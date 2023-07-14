@@ -158,10 +158,11 @@ class edit_card_form extends dynamic_form {
             );
             $toinsert = array_diff($formdata->assignees, $currentassignees);
             $todelete = array_diff($currentassignees, $formdata->assignees);
+            $kanban = $DB->get_record('kanban', ['id' => $cm->instance]);
             if (!empty($todelete)) {
-                helper::remove_calendar_event((object)['id' => $cm->instance], (object)$carddata, $todelete);
+                helper::remove_calendar_event($kanban, (object)$carddata, $todelete);
             }
-            helper::add_or_update_calendar_event((object)['id' => $cm->instance], (object)$carddata, $formdata->assignees);
+            helper::add_or_update_calendar_event($kanban, (object)$carddata, $formdata->assignees);
             if (has_capability('mod/kanban:assignothers', $context)) {
                 if (!empty($todelete)) {
                     list($sql, $params) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
