@@ -50,9 +50,8 @@ export default class extends KanbanComponent {
     }
 
     _continuousUpdate() {
-        setTimeout(() => {
+        setInterval(() => {
             this.reactive.dispatch('getUpdates');
-            this._continuousUpdate();
         }, 10000);
     }
 
@@ -95,6 +94,10 @@ export default class extends KanbanComponent {
         const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/column', data);
         const newelement = newcomponent.getElement();
         this.getElement(selectors.COLUMNCONTAINER).replaceChild(newelement, placeholder);
+        if (element.highlight !== undefined && element.highlight) {
+            newelement.classList.add('mod_kanban_updated');
+            setTimeout(() => this.newelement.classList.remove('mod_kanban_updated'), 3000);
+        }
     }
 
     _addColumn() {

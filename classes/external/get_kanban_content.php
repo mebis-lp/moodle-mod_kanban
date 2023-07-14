@@ -412,7 +412,7 @@ class get_kanban_content extends external_api {
         }
 
         if ($asupdate) {
-            $formatter = new updateformatter();
+            $formatter = new updateformatter(true);
             $formatter->put('common', (array)$common);
             if (intval($kanbanboard->timemodified) > $timestamp) {
                 $formatter->put('board', (array)$kanbanboard);

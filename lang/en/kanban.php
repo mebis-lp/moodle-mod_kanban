@@ -39,6 +39,7 @@ $string['column'] = 'Column';
 $string['columntitle'] = 'Column title';
 $string['courseboard'] = 'Course board';
 $string['closecard'] = 'Close card';
+$string['createtemplate'] = 'Create template';
 $string['deletecard'] = 'Delete card';
 $string['deletecardconfirm'] = 'Do you really want to delete this card?';
 $string['deletecolumn'] = 'Delete column';

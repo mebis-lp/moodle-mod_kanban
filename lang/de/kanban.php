@@ -39,6 +39,7 @@ $string['column'] = 'Spalte';
 $string['columntitle'] = 'Spaltentitel';
 $string['courseboard'] = 'Kurs-Board';
 $string['closecard'] = 'Karte abschließen';
+$string['createtemplate'] = 'Als Vorlage speichern';
 $string['deletecard'] = 'Karte löschen';
 $string['deletecardconfirm'] = 'Möchten Sie diese Karte wirklich löschen?';
 $string['deletecolumn'] = 'Spalte löschen';

@@ -293,6 +293,10 @@ export default class extends KanbanComponent {
                 this.getElement().setAttribute('style', 'background-color: ' + options.background);
             }
         }
+        if (element.highlight !== undefined && element.highlight) {
+            this.getElement().classList.add('mod_kanban_updated');
+            setTimeout(() => this.getElement().classList.remove('mod_kanban_updated'), 3000);
+        }
         this.checkDragging();
     }
 
