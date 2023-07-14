@@ -1,4 +1,4 @@
-.mod_kanban_board.row {
+.mod_kanban_column_container.row {
     flex-wrap: nowrap;
 }
 

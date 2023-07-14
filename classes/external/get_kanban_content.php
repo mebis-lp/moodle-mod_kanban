@@ -196,6 +196,8 @@ class get_kanban_content extends external_api {
                                 'user' => new external_value(PARAM_INT, 'userid'),
                                 'kanban_card' => new external_value(PARAM_INT, 'card id'),
                                 'content' => new external_value(PARAM_TEXT, 'discussion message'),
+                                'username' => new external_value(PARAM_TEXT, 'user name'),
+                                'candelete' => new external_value(PARAM_BOOL, 'whether the current user can delete this message')
                             ],
                             '',
                             VALUE_OPTIONAL

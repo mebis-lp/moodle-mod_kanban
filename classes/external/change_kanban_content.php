@@ -638,7 +638,12 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
         $kanbancolumn = $DB->get_record('kanban_column', ['kanban_board' => $boardid, 'id' => $columnid], '*', MUST_EXIST);
-        $kanbancardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_column = :kanban_column', ['kanban_column' => $columnid]);
+        $kanbancardids = $DB->get_fieldset_select(
+            'kanban_card',
+            'id',
+            'kanban_column = :kanban_column',
+            ['kanban_column' => $columnid]
+        );
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
@@ -1171,6 +1176,7 @@ class change_kanban_content extends external_api {
         $success = (bool)$id;
         $update['id'] = $id;
         $update['candelete'] = true;
+        $update['username'] = fullname($USER);
         $data = (object)$update;
         $formatter->discussionput("discussions[$cardid]", $update);
         if ($kanbancard->discussion == 0) {
@@ -1179,7 +1185,6 @@ class change_kanban_content extends external_api {
             $formatter->put('cards', $update);
         }
         if ($success) {
-            $data->username = fullname($USER);
             $data->boardname = $kanban->name;
             $data->title = $kanbancard->title;
             $kanbanassignees = $DB->get_fieldset_select(
