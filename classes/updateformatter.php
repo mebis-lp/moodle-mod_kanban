@@ -42,6 +42,8 @@ class updateformatter {
 
     /**
      * Whether to add highlight field to updates.
+     *
+     * @var bool
      */
     private $highlight = false;
 

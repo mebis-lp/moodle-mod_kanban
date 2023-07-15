@@ -268,6 +268,7 @@ export default class extends KanbanComponent {
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
             this.getElement(selectors.DESCRIPTIONMODALTITLE).innerHTML = element.title;
+            this.getElement(selectors.DISCUSSIONMODALTITLE).innerHTML = element.title;
         }
         if (element.description !== undefined) {
             this.getElement(selectors.DESCRIPTIONMODALBODY).innerHTML = element.description;

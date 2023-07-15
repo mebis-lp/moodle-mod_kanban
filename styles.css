@@ -325,12 +325,12 @@ a.mod_kanban_attachment_item {
 
 @keyframes glow {
     from {
-      box-shadow: 0 0 5px -2px #ffc400;
+        box-shadow: 0 0 5px -2px #ffc400;
     }
     to {
-      box-shadow: 0 0 5px 2px #989600;
+        box-shadow: 0 0 5px 2px #989600;
     }
-  }
+}
 
 .mod_kanban_updated {
     animation: glow 3s 1 ease-out;

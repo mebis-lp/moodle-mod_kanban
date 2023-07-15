@@ -32,6 +32,7 @@ export default {
     DISCUSSIONINPUT: `.mod_kanban_discussion_input`,
     DISCUSSIONMESSAGES: `.mod_kanban_discussion_messages`,
     DISCUSSIONMODAL: `.mod_kanban_discussion_modal`,
+    DISCUSSIONMODALTITLE: `.mod_kanban_discussion_modal .modal-title`,
     DISCUSSIONMODALTRIGGER: `.mod_kanban_discussion_trigger`,
     DISCUSSIONSEND: `[data-action="send_discussion_message"]`,
     DISCUSSIONSHOW: `[data-action="show_discussion"]`,
