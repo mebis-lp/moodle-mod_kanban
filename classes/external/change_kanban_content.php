@@ -1322,7 +1322,7 @@ class change_kanban_content extends external_api {
      * @throws restricted_context_exception
      * @throws moodle_exception
      */
-    public static function save_as_template(int $cmid, int $boardid, array $data): array {
+    public static function save_as_template(int $cmid, int $boardid): array {
         global $DB;
         $params = self::validate_parameters(self::save_as_template_parameters(), [
             'cmid' => $cmid,
