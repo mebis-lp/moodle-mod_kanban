@@ -953,7 +953,6 @@ class change_kanban_content extends external_api {
         ];
     }
 
-
     /**
      * Returns description of method parameters for the set_column_locked function.
      *
@@ -1280,6 +1279,68 @@ class change_kanban_content extends external_api {
         return [
             'success' => $success,
             'update' => $formatter->format()
+        ];
+    }
+
+    /**
+     * Returns description of method parameters for the save_as_template function.
+     *
+     * @return external_function_parameters
+     */
+    public static function save_as_template_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the save_as_template function.
+     *
+     * @return external_single_structure
+     */
+    public static function save_as_template_returns(): external_single_structure {
+        return
+            new external_single_structure(
+                [
+                    'success' => new external_value(PARAM_BOOL, 'success'),
+                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
+                ]
+            );
+    }
+
+    /**
+     * This method saves the current board as template for the whole kanban activity.
+     * This does _not_ affect existing sub-boards (e.g. personal boards or group boards).
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @return bool Whether the request was successful
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function save_as_template(int $cmid, int $boardid, array $data): array {
+        global $DB;
+        $params = self::validate_parameters(self::save_as_template_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
+        require_capability('mod/kanban:manageboard', $context);
+
+        $success = helper::create_new_board($kanban->id, 0, 0, $boardid);
+
+        return [
+            'success' => $success,
+            'update' => json_encode([])
         ];
     }
 }

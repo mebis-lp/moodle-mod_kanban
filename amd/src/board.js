@@ -2,6 +2,8 @@ import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
+import {saveCancel} from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 /**
  * Component representing a kanban board.
@@ -45,6 +47,11 @@ export default class extends KanbanComponent {
             'click',
             this._unlockColumns
         );
+        this.addEventListener(
+            this.getElement(selectors.SAVEASTEMPLATE),
+            'click',
+            this._templateConfirm
+        );
         this.dragdrop = new DragDrop(this);
         this._continuousUpdate();
     }
@@ -62,6 +69,24 @@ export default class extends KanbanComponent {
         if (this.dragdrop !== undefined) {
             this.dragdrop.unregister();
         }
+    }
+
+    /**
+     * Display confirmation modal for saving a board as template.
+     */
+    _templateConfirm() {
+        saveCancel(
+            getString('saveastemplate', 'mod_kanban'),
+            getString('saveastemplateconfirm', 'mod_kanban'),
+            getString('save', 'core'),
+            () => {
+                this._saveAsTemplate();
+            }
+        );
+    }
+
+    _saveAsTemplate() {
+        this.reactive.dispatch('saveAsTemplate');
     }
 
     _boardUpdated({element}) {

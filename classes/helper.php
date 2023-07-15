@@ -174,10 +174,10 @@ class helper {
      * @param int $instance id of the kanban instance
      * @param int $user userid, if the board should be user specific (default 0 means no user specific board)
      * @param int $group groupid, if the board should be group specific (default 0 means no group specific board)
-     * @param bool $template whether to create a new template board for this kanban instance (defaults to false)
+     * @param int $createtemplate If != 0, create a new template for this board from this board id
      * @return int the id of the new board
      */
-    public static function create_new_board(int $instance, int $user = 0, int $group = 0, bool $template = false): int {
+    public static function create_new_board(int $instance, int $user = 0, int $group = 0, int $createtemplate = 0): int {
         global $DB;
         $fs = get_file_storage();
         $kanban = $DB->get_record('kanban', ['id' => $instance]);
@@ -193,8 +193,13 @@ class helper {
             'template' => 1
         ]);
         if ($template) {
+            if ($createtemplate) {
+                // For now, don't delete old template versions.
+                $DB->update_record('kanban_board', ['id' => $template->id, 'template' => 2]);
+                $template = $DB->get_record('kanbanboard', ['id' => $createtemplate]);
+            }
             $newboard = $template;
-            $newboard->template = 0;
+            $newboard->template = ($createtemplate ? 1 : 0);
             $newboard->timecreated = time();
             $newboard->timemodified = time();
             $newboard->user = $user;

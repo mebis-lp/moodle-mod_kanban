@@ -40,6 +40,10 @@ export default class {
         stateManager.setReadOnly(false);
     }
 
+    async _saveAsTemplate(stateManager) {
+        await this.sendChange('save_as_template', stateManager);
+    }
+
     /**
      * Delete a card.
      * @param {*} stateManager StateManager instance

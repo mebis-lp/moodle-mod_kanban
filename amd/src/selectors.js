@@ -42,6 +42,7 @@ export default {
     INPLACEEDITABLE: `.inplaceeditable`,
     LOCKCOLUMN: `[data-action="lock_column"]`,
     LOCKBOARDCOLUMNS: `[data-action="lock_board_columns"]`,
+    SAVEASTEMPLATE: `[data-action="create_template"]`,
     SHOWHIDDEN: `[data-action="show_hidden"]`,
     UNASSIGNSELF: `[data-action="unassign_self"]`,
     UNASSIGNUSER: `[data-action="unassign_user"]`,

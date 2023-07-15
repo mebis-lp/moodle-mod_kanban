@@ -154,4 +154,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:managecards',
     ],
+    'mod_kanban_change_kanban_content_save_as_template' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'save_as_template',
+        'description' => 'Saves the current board as template for the instance',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:manageboard',
+    ],
 ];
