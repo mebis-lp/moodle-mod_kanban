@@ -179,6 +179,7 @@ class edit_card_form extends dynamic_form {
                 }
             }
             $success &= $DB->insert_records('kanban_assignee', $assignees);
+            $formdata->boardname = $cm->name;
             helper::send_notification($cm, 'assigned', $toinsert, $formdata);
             $carddata['assignees'] = $formdata->assignees;
         }

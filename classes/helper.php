@@ -184,7 +184,7 @@ class helper {
         if ($kanban->userboards == MOD_KANBAN_NOUSERBOARDS) {
             $user = 0;
         }
-        $context = context_module::instance($instance);
+        $context = context_module::instance($instance, IGNORE_MISSING);
         // Is there a template for this instance?
         $template = $DB->get_record('kanban_board', [
             'kanban_instance' => $instance,
@@ -305,13 +305,15 @@ class helper {
      * @param array $users The users to send the notification to
      * @param object $data The data to describe the message details
      * @param string $altmessagename The name of an alternative message string to be used
+     * @param bool $tocurrentuser Whether to send notifications also to current user
      */
     public static function send_notification(
         \cm_info $cm,
         string $messagename,
         array $users,
         object $data,
-        string $altmessagename = null
+        string $altmessagename = null,
+        bool $tocurrentuser = false
     ) {
         global $OUTPUT, $USER;
         $message = new \core\message\message();
@@ -321,26 +323,29 @@ class helper {
             $messagename = $altmessagename;
         }
         $message->userfrom = \core_user::get_noreply_user();
-
-        $message->subject = get_string('message_' . $messagename . '_subject', 'mod_kanban', $data);
-        $message->fullmessage = get_string('message_' . $messagename . '_fullmessage', 'mod_kanban', $data);
         $message->fullmessageformat = FORMAT_MARKDOWN;
         $templatename = 'mod_kanban/message_' . $messagename;
-        if (file_exists(__DIR__ . '/../templates/' . $templatename)) {
-            $message->fullmessagehtml = $OUTPUT->render_from_template($templatename, $data);
-        }
-        $message->smallmessage = get_string('message_' . $messagename . '_smallmessage', 'mod_kanban', $data);
+
         $message->notification = 1;
         $url = $cm->get_url();
         if (!empty($data->boardid)) {
             $url->param('boardid', $data->boardid);
         }
         $message->contexturl = $url->out(false);
-        $message->contexturlname = get_string('toboard', 'mod_kanban', $data);
 
         foreach ($users as $user) {
+            $user = \core_user::get_user($user);
+            fix_current_language($user->lang);
+            $message->subject = get_string('message_' . $messagename . '_smallmessage', 'mod_kanban', $data);
+            $message->fullmessage = get_string('message_' . $messagename . '_fullmessage', 'mod_kanban', $data);
+            $message->smallmessage = $message->subject;
+            $message->contexturlname = get_string('toboard', 'mod_kanban', $data);
+            if (file_exists(__DIR__ . '/../templates/' . $templatename)) {
+                $message->fullmessagehtml = $OUTPUT->render_from_template($templatename, $data);
+            }
+
             // Don't notify current user about own actions.
-            if ($user != $USER->id) {
+            if ($user != $USER->id || $tocurrentuser) {
                 $message->userto = $user;
                 message_send($message);
             }

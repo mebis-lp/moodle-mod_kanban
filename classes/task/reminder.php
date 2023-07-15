@@ -51,10 +51,11 @@ class reminder extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
         $kanbancards = $DB->get_records_sql(
-            'SELECT c.id as id, c.title as title, k.name as boardname, c.duedate as duedate, a.user as user, k.id as instance
+            'SELECT ' . $DB->sql_concat('c.id', '"-"', 'a.user') . ' as uniqid,
+                    c.id as id, c.title as title, k.name as boardname, c.duedate as duedate, a.user as user, k.id as instance
              FROM {kanban_card} c
              JOIN {kanban_assignee} a ON a.kanban_card = c.id
-             JOIN {kanban_board} b ON b.id = c.kanban_board 
+             JOIN {kanban_board} b ON b.id = c.kanban_board
              JOIN {kanban} k ON b.kanban_instance = k.id
              WHERE c.duedate != 0
                 AND c.reminder_sent = 0
@@ -63,7 +64,10 @@ class reminder extends \core\task\scheduled_task {
         );
         foreach ($kanbancards as $kanbancard) {
             list($course, $cminfo) = get_course_and_cm_from_instance($kanbancard->instance, 'kanban');
-            helper::send_notification($cminfo, 'due', [$kanbancard->user], $kanbancard);
+            $user = \core_user::get_user($kanbancard->user);
+            fix_current_language($user->lang);
+            $kanbancard->duedate = userdate($kanbancard->duedate, get_string('strftimedate', 'langconfig'));
+            helper::send_notification($cminfo, 'due', [$kanbancard->user], $kanbancard, null, true);
             $data = new \stdClass;
             $data->id = $kanbancard->id;
             $data->reminder_sent = 1;
