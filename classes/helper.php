@@ -356,6 +356,10 @@ class helper {
     public static function add_or_update_calendar_event(stdClass $kanban, stdClass $card, array $users) {
         global $CFG, $DB;
 
+        if (empty($kanban->due)) {
+            return;
+        }
+
         require_once($CFG->dirroot . '/calendar/lib.php');
         $data = new stdClass();
         $data->eventtype = 'due';

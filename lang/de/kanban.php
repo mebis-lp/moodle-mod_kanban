@@ -81,7 +81,7 @@ $string['message_discussion_fullmessage'] = 'Es gibt eine neue Nachricht in der 
 {$a->content}';
 $string['message_discussion_smallmessage'] = 'Karte "{$a->title}" wurde diskutiert';
 $string['message_discussion_subject'] = 'Karte "{$a->title}" wurde diskutiert';
-$string['message_due_fullmessage'] = 'Karte "{$a->title}" im Board "{$a->boardname}" ist fällig am {$a->datetime}';
+$string['message_due_fullmessage'] = 'Karte "{$a->title}" im Board "{$a->boardname}" ist fällig am {$a->duedate}';
 $string['message_due_smallmessage'] = 'Karte "{$a->title}" ist fällig';
 $string['message_due_subject'] = 'Karte "{$a->title}" ist fällig';
 $string['message_moved_fullmessage'] = 'Karte "{$a->title}" wurde von {$a->username} in die Spalte "{$a->columnname}" verschoben.';
@@ -112,6 +112,7 @@ $string['nouserboards'] = 'Keine persönlichen Boards für die Nutzer/innen';
 $string['pluginadministration'] = 'Kanban-Administration';
 $string['pluginname'] = 'Kanban-Board';
 $string['reminderdate'] = 'Zeitpunkt für die Erinnerung';
+$string['remindertask'] = 'Erinnerungsnachrichten verschicken';
 $string['senddiscussion'] = 'Diskussionsbeitrag absenden';
 $string['showattachment'] = 'Anhänge anzeigen';
 $string['showdescription'] = 'Beschreibung anzeigen';

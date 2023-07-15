@@ -81,7 +81,7 @@ $string['message_discussion_fullmessage'] = 'There is a new message in discussio
 {$a->content}';
 $string['message_discussion_smallmessage'] = 'Card "{$a->title}" discussed';
 $string['message_discussion_subject'] = 'Card "{$a->title}" discussed';
-$string['message_due_fullmessage'] = 'Card "{$a->title}" in board "{$a->boardname}" is due at {$a->username}';
+$string['message_due_fullmessage'] = 'Card "{$a->title}" in board "{$a->boardname}" is due at {$a->duedate}';
 $string['message_due_smallmessage'] = 'Card "{$a->title}" due';
 $string['message_due_subject'] = 'Card "{$a->title}" due';
 $string['message_moved_fullmessage'] = 'Card "{$a->title}" was moved to column "{$a->columnname}" by {$a->username}';
@@ -112,6 +112,7 @@ $string['nouserboards'] = 'No personal boards';
 $string['pluginadministration'] = 'Kanban administration';
 $string['pluginname'] = 'Kanban board';
 $string['reminderdate'] = 'Reminder date';
+$string['remindertask'] = 'Send reminder notifications';
 $string['senddiscussion'] = 'Send discussion message';
 $string['showattachment'] = 'Show attachments';
 $string['showdescription'] = 'Show description';
