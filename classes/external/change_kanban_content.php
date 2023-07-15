@@ -719,7 +719,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function assign_user(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $DB, $OUTPUT, $USER;
         $params = self::validate_parameters(self::assign_user_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -756,7 +756,11 @@ class change_kanban_content extends external_api {
 
         $formatter = new updateformatter();
         $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids, 'selfassigned' => in_array($USER->id, $userids)]);
-
+        $formatter->put('users', [
+            'id' => $USER->id,
+            'fullname' => fullname($USER),
+            'userpicture' => $OUTPUT->user_picture($USER, ['link' => false]),
+        ]);
         return [
             'success' => $success1 && $success2,
             'update' => $formatter->format()

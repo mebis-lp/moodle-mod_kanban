@@ -23,16 +23,9 @@
     {
         "id": 4,
         "cardid": 18,
-        "assignself": true,
-        "selfassigned": true,
-        "assignothers": true
+        "userpicture": ""
     }
 }}
 <div id="mod_kanban_assignee-{{cardid}}-{{id}}" class="mod_kanban_assigned_user btn btn-icon icon-no-margin p-0" data-id="{{cardid}}" data-userid="{{id}}" title="{{fullname}}">
     {{{userpicture}}}
 </div>
-{{#js}}
-require(['mod_kanban/user'], function(component) {
-    component.init('mod_kanban_assignee-{{cardid}}-{{id}}');
-});
-{{/js}}

@@ -243,15 +243,13 @@ export default class extends KanbanComponent {
             this.toggleClass(element.assignees.length == 0, 'mod_kanban_unassigned');
             if (element.assignees.length > 0) {
                 additional.forEach(async user => {
-                    let placeholder = document.createElement('div');
                     let userdata = this.reactive.state.users.get(user);
                     let data = Object.assign({cardid: element.id}, userdata);
                     data = Object.assign(data, exporter.exportCapabilities(this.reactive.state));
-                    placeholder.setAttribute('data-id', element.id);
-                    assignees.appendChild(placeholder);
-                    const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/user', data);
-                    const newelement = newcomponent.getElement();
-                    assignees.replaceChild(newelement, placeholder);
+                    Templates.renderForPromise('mod_kanban/user', data).then(({html, js}) => {
+                        Templates.appendNodeContents(assignees, html, js);
+                        return true;
+                    }).catch((error) => displayException(error));
                 });
             }
         }

@@ -119,7 +119,8 @@ class edit_card_form extends dynamic_form {
      * @return array Returns whether a new template was created.
      */
     public function process_dynamic_submission(): array {
-        global $COURSE, $DB, $USER;
+        global $COURSE, $DB, $OUTPUT, $USER;
+        $formatter = new updateformatter();
         $context = $this->get_context_for_dynamic_submission();
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $modinfo = get_fast_modinfo($COURSE);
@@ -176,6 +177,12 @@ class edit_card_form extends dynamic_form {
             foreach ($toinsert as $assignee) {
                 if (has_capability('mod/kanban:assignothers', $context) || $assignee == $USER->id) {
                     $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
+                    $user = \core_user::get_user($assignee);
+                    $formatter->put('users', [
+                        'id' => $user->id,
+                        'fullname' => fullname($user),
+                        'userpicture' => $OUTPUT->user_picture($user, ['link' => false])]
+                    );
                 }
             }
             $success &= $DB->insert_records('kanban_assignee', $assignees);
@@ -194,7 +201,6 @@ class edit_card_form extends dynamic_form {
 
         $carddata['attachments'] = helper::get_attachments($context->id, $formdata->id);
         $carddata['hasattachment'] = count($carddata['attachments']) > 0;
-        $formatter = new updateformatter();
         $carddata['hasdescription'] = !empty(trim($carddata['description'])) || $draftinfo['filecount'] > 0;
         $formatter->put('cards', $carddata);
         $updatestr = $formatter->format();
