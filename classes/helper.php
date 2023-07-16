@@ -130,7 +130,7 @@ class helper {
             }
         }
 
-        return $newseq;
+        return join(',', $newseq);
     }
 
     /**

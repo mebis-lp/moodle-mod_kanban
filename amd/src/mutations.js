@@ -40,7 +40,7 @@ export default class {
         stateManager.setReadOnly(false);
     }
 
-    async _saveAsTemplate(stateManager) {
+    async saveAsTemplate(stateManager) {
         await this.sendChange('save_as_template', stateManager);
     }
 

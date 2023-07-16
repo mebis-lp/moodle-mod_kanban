@@ -274,25 +274,25 @@ class boardmanager {
 
             $newboard['id'] = $DB->insert_record('kanban_board', $newboard);
             $columns = $DB->get_records('kanban_column', ['kanban_board' => $template->id]);
-            $cards = $DB->get_records('kanban_cards', ['kanban_board' => $template->id]);
+            $cards = $DB->get_records('kanban_card', ['kanban_board' => $template->id]);
             $newcolumn = [];
             $newcard = [];
             foreach ($columns as $column) {
-                $newcolumn[$column->id] = $column;
+                $newcolumn[$column->id] = clone $column;
                 $newcolumn[$column->id]->kanban_board = $newboard['id'];
                 $newcolumn[$column->id]->timecreated = time();
                 $newcolumn[$column->id]->timemodified = time();
                 unset($newcolumn[$column->id]->id);
-                $newcolumn[$column->id] = $DB->insert_record('kanban_column', $newcolumn);
+                $newcolumn[$column->id]->id = $DB->insert_record('kanban_column', $newcolumn[$column->id]);
             }
             foreach ($cards as $card) {
-                $newcard = $card;
+                $newcard[$card->id] = clone $card;
                 $newcard[$card->id]->kanban_board = $newboard['id'];
                 $newcard[$card->id]->timecreated = time();
                 $newcard[$card->id]->timemodified = time();
                 $newcard[$card->id]->kanban_column = $newcolumn[$card->kanban_column]->id;
                 unset($newcard[$card->id]->id);
-                $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard);
+                $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard[$card->id]);
                 // Copy attachment files.
                 $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
                 foreach ($attachments as $attachment) {
