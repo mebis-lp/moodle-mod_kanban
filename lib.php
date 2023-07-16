@@ -65,7 +65,7 @@ function kanban_update_instance($data) : int {
 }
 
 /**
- * Deletes a kanban instance and all boards
+ * Deletes a kanban instance, all boards and all associated data (e.g. files)
  *
  * @param integer $id kanban record
  * @return void
@@ -73,15 +73,15 @@ function kanban_update_instance($data) : int {
 function kanban_delete_instance($id): void {
     global $DB;
     $transaction = $DB->start_delegated_transaction();
-    $boards = $DB->get_records_menu('kanban_board', ['instance' => $id], '', 'id, id');
+    $boards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id', ['id' => $id]);
+
+    foreach ($boards as $board) {
+        $boardmanager = new boardmanager();
+        $boardmanager->load_board($board);
+        $boardmanager->delete_board($board);
+    }
+
     $DB->delete_records('kanban', ['id' => $id]);
-
-    list($sql, $params) = $DB->get_in_or_equal($boards, SQL_PARAMS_QM);
-
-    $DB->delete_records_select('kanban_board', 'id ' . $sql, $params);
-    $DB->delete_records_select('kanban_column', 'kanban_board ' . $sql, $params);
-    $DB->delete_records_select('kanban_card', 'kanban_board ' . $sql, $params);
-
     $transaction->allow_commit();
 }
 
@@ -215,12 +215,74 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
 }
 
 /**
+ * Implementation of the function for printing the form elements that control
+ * whether the course reset functionality affects the kanban activity.
+ *
+ * @param object $mform form passed by reference
+ */
+function kanban_reset_course_form_definition(&$mform): void {
+    $mform->addElement('header', 'kanbanactivityheader', get_string('modulenameplural', 'mod_kanban'));
+    $mform->addElement('advcheckbox', 'reset_kanban_personal', get_string('reset_kanban_personal', 'mod_kanban'));
+    $mform->addElement('advcheckbox', 'reset_kanban_group', get_string('reset_kanban_group', 'mod_kanban'));
+    $mform->addElement('advcheckbox', 'reset_kanban', get_string('reset_kanban', 'mod_kanban'));
+
+}
+
+/**
+ * Course reset form defaults.
+ *
+ * @param stdClass $course the course object
+ * @return array
+ */
+function kanban_reset_course_form_defaults(stdClass $course): array {
+    return [
+        'reset_kanban_personal' => 1,
+        'reset_kanban_group' => 1,
+        'reset_kanban' => 1,
+    ];
+}
+
+/**
  * This function is used by the reset_course_userdata function in moodlelib.
  *
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
 function kanban_reset_userdata($data) {
-    // Missing implementation.
-    return [];
+    global $DB;
+    $status = [];
+    $kanbans = $DB->get_records('kanban', ['course' => $data->courseid]);
+    $boards = [];
+    foreach ($kanbans as $kanban) {
+        if (!empty($data->reset_kanban_personal)) {
+            $personalboards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND user > 0', ['id' => $kanban->id]);
+            if ($personalboards) {
+                $boards = array_merge($boards, $personalboards);
+            }
+        }
+        if (!empty($data->reset_kanban_group)) {
+            $groupboards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND groupid > 0', ['id' => $kanban->id]);
+            if ($groupboards) {
+                $boards = array_merge($boards, $groupboards);
+            }
+        }
+        if (!empty($data->reset_kanban)) {
+            $courseboards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND template = 0', ['id' => $kanban->id]);
+            if ($courseboards) {
+                $boards = array_merge($boards, $courseboards);
+            }
+        }
+    }
+    $boards = array_unique($boards);
+    foreach ($boards as $board) {
+        $boardmanager = new boardmanager();
+        $boardmanager->load_board($board);
+        $boardmanager->delete_board($board);
+        $status[] = [
+            'component' => get_string('modulenameplural', 'mod_kanban'),
+            'item' => get_string('reset_personal', 'mod_kanban'),
+            'error' => false,
+        ];
+    }
+    return $status;
 }

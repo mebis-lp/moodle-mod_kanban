@@ -84,7 +84,7 @@ if (empty($boardid)) {
          '*'
     );
     if (!$board) {
-        $boardmanager = new boardmanager($cmid);
+        $boardmanager = new boardmanager($cm->id);
         if (empty($userid)) {
             if (empty($groupid)) {
                 $boardid = $boardmanager->create_board();
@@ -94,6 +94,7 @@ if (empty($boardid)) {
         } else {
             $boardid = $boardmanager->create_user_board($userid);
         }
+        $boardmanager->load_board($boardid);
         $board = $boardmanager->get_board();
     } else {
         $boardid = $board->id;

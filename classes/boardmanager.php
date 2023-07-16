@@ -150,7 +150,7 @@ class boardmanager {
         global $DB;
         $result = $DB->get_records(
             'kanban_board',
-            ['instance' => $this->kanban->id, 'template' => 1],
+            ['kanban_instance' => $this->kanban->id, 'template' => 1],
             'timemodified DESC',
             'id',
             0,
@@ -163,7 +163,7 @@ class boardmanager {
         if (!$result) {
             return 0;
         } else {
-            return $result[0]->id;
+            return array_pop($result)->id;
         }
     }
 
@@ -262,7 +262,7 @@ class boardmanager {
             $template = $DB->get_record('kanban_board', ['id' => $templateid]);
 
             // If it is a site wide template, we need system context to copy files.
-            if ($template->instance == 0) {
+            if ($template->kanban_instance == 0) {
                 $context = context_system::instance(0);
             } else {
                 $context = context_module::instance($this->kanban->id, IGNORE_MISSING);
@@ -329,7 +329,7 @@ class boardmanager {
     public function delete_board(int $id) {
         global $DB;
         // Cards need to be read to identify files, assignees and discussions.
-        $cardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_cboard = :id', ['id' => $id]);
+        $cardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_board = :id', ['id' => $id]);
         $this->delete_cards($cardids);
 
         $DB->delete_records('kanban_history', ['kanban_board' => $id]);
