@@ -1002,7 +1002,7 @@ class change_kanban_content extends external_api {
         ];
     }
 
-/**
+    /**
      * Returns description of method parameters for the delete_board function.
      *
      * @return external_function_parameters
