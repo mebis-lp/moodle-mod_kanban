@@ -39,7 +39,7 @@ class boardmanager {
     /**
      * Course module id
      *
-     * @var integer
+     * @var int
      */
     private int $cmid;
 
@@ -81,8 +81,8 @@ class boardmanager {
     /**
      * Constructor
      *
-     * @param integer $cmid Course module id (0 if course module is not created yet)
-     * @param integer $boardid Board id (if 0, no board is loaded at this time)
+     * @param int $cmid Course module id (0 if course module is not created yet)
+     * @param int $boardid Board id (if 0, no board is loaded at this time)
      */
     public function __construct(int $cmid = 0, int $boardid = 0) {
         $this->cmid = $cmid;
@@ -99,7 +99,7 @@ class boardmanager {
     /**
      * Load a kanban instance
      *
-     * @param integer $instance Instance id
+     * @param int $instance Instance id
      * @return void
      */
     public function load_instance(int $instance) {
@@ -112,7 +112,7 @@ class boardmanager {
     /**
      * Load a board.
      *
-     * @param integer $id Id of the board
+     * @param int $id Id of the board
      * @return void
      */
     public function load_board(int $id) {
@@ -144,12 +144,19 @@ class boardmanager {
     /**
      * Get the current template for this board. If there are multiple templates, use the latest one.
      *
-     * @return integer Board id of the template board, 0 if none found.
+     * @return int Board id of the template board, 0 if none found.
      */
     public function get_template_board_id(): int {
         global $DB;
-        $result = $DB->get_records('kanban_board', ['instance' => $this->kanban->id, 'template' => 1], 'timemodified DESC', 'id', 0, 1);
-        if(!$result) {
+        $result = $DB->get_records(
+            'kanban_board',
+            ['instance' => $this->kanban->id, 'template' => 1],
+            'timemodified DESC',
+            'id',
+            0,
+            1
+        );
+        if (!$result) {
             // Is there a system-wide template?
             $result = $DB->get_records('kanban_board', ['instance' => 0, 'template' => 1], 'timemodified DESC', 'id', 0, 1);
         }
@@ -163,7 +170,7 @@ class boardmanager {
     /**
      * Creates a new user board.
      *
-     * @param integer $userid The user id (may not be 0, user existence is not checked)
+     * @param int $userid The user id (may not be 0, user existence is not checked)
      * @return int Id of the new board
      */
     public function create_user_board(int $userid): int {
@@ -176,7 +183,7 @@ class boardmanager {
     /**
      * Creates a new group board.
      *
-     * @param integer $groupid The group id (may not be 0, group existence is not checked)
+     * @param int $groupid The group id (may not be 0, group existence is not checked)
      * @return int Id of the new board
      */
     public function create_group_board(int $groupid): int {
@@ -209,7 +216,7 @@ class boardmanager {
      * Creates a new board from a template. If no template is given or found, the default template is used.
      * Assigned users, discussions and history are not copied.
      *
-     * @param integer $templateid Board id of the template.
+     * @param int $templateid Board id of the template.
      * @param array $data Data to override in the board record
      * @return int Id of the new board
      */
@@ -316,7 +323,7 @@ class boardmanager {
     /**
      * Deletes a board and all contents of it.
      *
-     * @param integer $id The board id
+     * @param int $id The board id
      * @return void
      */
     public function delete_board(int $id) {
@@ -347,7 +354,7 @@ class boardmanager {
     /**
      * Delete a card and all attached data (discussions, assignees, files, calendar events).
      *
-     * @param integer $cardid Card id
+     * @param int $cardid Card id
      * @param bool $updatecolumn Whether to update the column sequence (can be set to false, if column is going to be deleted)
      * @return void
      */
@@ -377,7 +384,7 @@ class boardmanager {
     /**
      * Delete a column and all cards inside.
      *
-     * @param integer $id The id of the column
+     * @param int $id The id of the column
      * @param bool $updateboard Whether to update the board sequence (can be set to false, if board is going to be deleted)
      * @return void
      */
@@ -398,7 +405,7 @@ class boardmanager {
     /**
      * Adds a new column.
      *
-     * @param integer $aftercol Id of the column before
+     * @param int $aftercol Id of the column before
      * @param array $data Data to override default values
      * @return void
      */
@@ -406,17 +413,17 @@ class boardmanager {
         global $DB;
         if (empty($this->board->locked)) {
             $aftercol = intval($aftercol);
-            $defaults =  [
+            $defaults = [
                 'title' => get_string('newcolumn', 'mod_kanban'),
                 'options' => '{}',
             ];
-            $defaults_fixed = [
+            $defaultsfixed = [
                 'kanban_board' => $this->board->id,
                 'timecreated' => time(),
                 'timemodified' => time(),
                 'sequence' => '',
             ];
-            $data = array_merge($defaults, $data, $defaults_fixed);
+            $data = array_merge($defaults, $data, $defaultsfixed);
 
             $data['id'] = $DB->insert_record('kanban_column', $data);
 
@@ -436,27 +443,27 @@ class boardmanager {
     /**
      * Adds a new card.
      *
-     * @param integer $columnid Id of the column
-     * @param integer $aftercard Id of the card before (0 means to insert at top)
+     * @param int $columnid Id of the column
+     * @param int $aftercard Id of the card before (0 means to insert at top)
      * @param array $data Data to override default values
      * @return void
      */
     public function add_card(int $columnid, int $aftercard = 0, array $data = []) {
         global $DB;
         $aftercard = intval($aftercard);
-        $defaults =  [
+        $defaults = [
             'title' => get_string('newcard', 'mod_kanban'),
             'options' => '{}',
             'description' => '',
         ];
-        $defaults_fixed = [
+        $defaultsfixed = [
             'kanban_board' => $this->board->id,
             'kanban_column' => $columnid,
             'timecreated' => time(),
             'timemodified' => time(),
             'sequence' => '',
         ];
-        $data = array_merge($defaults, $data, $defaults_fixed);
+        $data = array_merge($defaults, $data, $defaultsfixed);
 
         $data['id'] = $DB->insert_record('kanban_card', $data);
         $data['assignees'] = [];
@@ -477,8 +484,8 @@ class boardmanager {
     /**
      * Moves a column.
      *
-     * @param integer $columnid Id of the column to move
-     * @param integer $aftercol Id of the (future) column before (0 means to move at the leftmost position)
+     * @param int $columnid Id of the column to move
+     * @param int $aftercol Id of the (future) column before (0 means to move at the leftmost position)
      * @return void
      */
     public function move_column(int $columnid, int $aftercol) {
@@ -498,9 +505,9 @@ class boardmanager {
     /**
      * Moves a card.
      *
-     * @param integer $cardid Id of the card to move
-     * @param integer $aftercard If of the card to move after (0 means move to top of the column)
-     * @param integer $columnid Id of the column to move to (if 0, use current column)
+     * @param int $cardid Id of the card to move
+     * @param int $aftercard If of the card to move after (0 means move to top of the column)
+     * @param int $columnid Id of the column to move to (if 0, use current column)
      * @return void
      */
     public function move_card(int $cardid, int $aftercard, int $columnid = 0) {
@@ -567,8 +574,8 @@ class boardmanager {
     /**
      * Assigns a user to a card.
      *
-     * @param integer $cardid Id of the card
-     * @param integer $userid Id of the user
+     * @param int $cardid Id of the card
+     * @param int $userid Id of the user
      * @return void
      */
     public function assign_user(int $cardid, int $userid) {
@@ -600,8 +607,8 @@ class boardmanager {
     /**
      * Unassigns a user from a card.
      *
-     * @param integer $cardid Id of the card
-     * @param integer $userid Id of the user
+     * @param int $cardid Id of the card
+     * @param int $userid Id of the user
      * @return void
      */
     public function unassign_user(int $cardid, int $userid) {
@@ -627,8 +634,8 @@ class boardmanager {
     /**
      * Changes completion state of a card.
      *
-     * @param integer $cardid Id of the card
-     * @param integer $state State
+     * @param int $cardid Id of the card
+     * @param int $state State
      * @return void
      */
     public function set_card_complete(int $cardid, int $state) {
@@ -651,8 +658,8 @@ class boardmanager {
     /**
      * Changes lock state of a column.
      *
-     * @param integer $columnid Id of the column
-     * @param integer $state State
+     * @param int $columnid Id of the column
+     * @param int $state State
      * @return void
      */
     public function set_column_locked(int $columnid, int $state) {
@@ -665,8 +672,8 @@ class boardmanager {
     /**
      * Changes lock state of all board columns.
      *
-     * @param integer $columnid Id of the column
-     * @param integer $state State
+     * @param int $columnid Id of the column
+     * @param int $state State
      * @return void
      */
     public function set_board_columns_locked(int $state) {
@@ -683,7 +690,7 @@ class boardmanager {
     /**
      * Add a message to a card discussion.
      *
-     * @param integer $cardid Id of the card
+     * @param int $cardid Id of the card
      * @param string $message Message
      * @return void
      */
@@ -711,7 +718,7 @@ class boardmanager {
     /**
      * Delete a message from a discussion.
      *
-     * @param integer $messageid Id of the message
+     * @param int $messageid Id of the message
      * @param int $cardid Id of the card
      * @return void
      */
@@ -725,7 +732,7 @@ class boardmanager {
     /**
      * Updates a card with the given values.
      *
-     * @param integer $cardid Id of the card
+     * @param int $cardid Id of the card
      * @param array $data Data to update
      * @return void
      */
@@ -818,7 +825,7 @@ class boardmanager {
     /**
      * Updates a column with the given values.
      *
-     * @param integer $columnid Id of the column
+     * @param int $columnid Id of the column
      * @param array $data Data to update
      * @return void
      */
@@ -843,7 +850,7 @@ class boardmanager {
     /**
      * Returns the ids of all users assignes to a card.
      *
-     * @param integer $cardid Id of the card
+     * @param int $cardid Id of the card
      * @return array Array of userids
      */
     public function get_card_assignees(int $cardid): array {
@@ -854,7 +861,7 @@ class boardmanager {
     /**
      * Get a card record.
      *
-     * @param integer $cardid Id of the card
+     * @param int $cardid Id of the card
      * @return object
      */
     public function get_card(int $cardid): object {
@@ -865,7 +872,7 @@ class boardmanager {
     /**
      * Get a column record.
      *
-     * @param integer $columnid Id of the card
+     * @param int $columnid Id of the card
      * @return object
      */
     public function get_column(int $columnid): object {
@@ -876,7 +883,7 @@ class boardmanager {
     /**
      * Get a discussion record.
      *
-     * @param integer $messageid Id of the message
+     * @param int $messageid Id of the message
      * @return object
      */
     public function get_discussion_message(int $messageid): object {

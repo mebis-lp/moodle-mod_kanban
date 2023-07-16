@@ -128,7 +128,7 @@ class edit_card_form extends dynamic_form {
         $formdata = $this->get_data();
         $formdata->options = json_encode(['background' => $formdata->color]);
 
-        if(!has_capability('mod/kanban:assignothers', $context)) {
+        if (!has_capability('mod/kanban:assignothers', $context)) {
             unset($formdata->assignees);
         }
 
