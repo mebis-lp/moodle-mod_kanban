@@ -255,19 +255,28 @@ function kanban_reset_userdata($data) {
     $boards = [];
     foreach ($kanbans as $kanban) {
         if (!empty($data->reset_kanban_personal)) {
-            $personalboards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND user > 0', ['id' => $kanban->id]);
+            $personalboards = $DB->get_fieldset_sql(
+                'SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND user > 0',
+                ['id' => $kanban->id]
+            );
             if ($personalboards) {
                 $boards = array_merge($boards, $personalboards);
             }
         }
         if (!empty($data->reset_kanban_group)) {
-            $groupboards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND groupid > 0', ['id' => $kanban->id]);
+            $groupboards = $DB->get_fieldset_sql(
+                'SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND groupid > 0',
+                ['id' => $kanban->id]
+            );
             if ($groupboards) {
                 $boards = array_merge($boards, $groupboards);
             }
         }
         if (!empty($data->reset_kanban)) {
-            $courseboards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND template = 0', ['id' => $kanban->id]);
+            $courseboards = $DB->get_fieldset_sql(
+                'SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND template = 0',
+                ['id' => $kanban->id]
+            );
             if ($courseboards) {
                 $boards = array_merge($boards, $courseboards);
             }

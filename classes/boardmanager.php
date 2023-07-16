@@ -672,7 +672,6 @@ class boardmanager {
     /**
      * Changes lock state of all board columns.
      *
-     * @param int $columnid Id of the column
      * @param int $state State
      * @return void
      */
