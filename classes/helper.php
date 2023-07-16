@@ -60,7 +60,7 @@ class helper {
      * @param int $newitem The item to add
      * @return string The new sequence
      */
-    public static function sequence_add_after (string $sequence, int $afteritem, int $newitem): string {
+    public static function sequence_add_after(string $sequence, int $afteritem, int $newitem): string {
         if (empty($sequence)) {
             $seq = [];
         } else {
@@ -83,7 +83,7 @@ class helper {
      * @param int $item The item to remove
      * @return string The new sequence
      */
-    public static function sequence_remove (string $sequence, int $item): string {
+    public static function sequence_remove(string $sequence, int $item): string {
         if (empty($sequence)) {
             return '';
         }
@@ -103,7 +103,7 @@ class helper {
      * @param int $item The item to move
      * @return string The new sequence
      */
-    public static function sequence_move_after (string $sequence, int $afteritem, int $item): string {
+    public static function sequence_move_after(string $sequence, int $afteritem, int $item): string {
         $seq = self::sequence_remove($sequence, $item);
         return self::sequence_add_after($seq, $afteritem, $item);
     }
@@ -114,7 +114,7 @@ class helper {
      *                      object)
      * @return string The new sequence
      */
-    public static function sequence_replace (string $sequence, array $replace) {
+    public static function sequence_replace(string $sequence, array $replace) {
         if (empty($sequence)) {
             return '';
         }
@@ -166,111 +166,6 @@ class helper {
                 }
             }
         }
-    }
-
-    /**
-     * Creates a new board in the database. The board can be assigned to a certain user, group or can be marked as a template.
-     *
-     * @param int $instance id of the kanban instance
-     * @param int $user userid, if the board should be user specific (default 0 means no user specific board)
-     * @param int $group groupid, if the board should be group specific (default 0 means no group specific board)
-     * @param int $createtemplate If != 0, create a new template for this board from this board id
-     * @return int the id of the new board
-     */
-    public static function create_new_board(int $instance, int $user = 0, int $group = 0, int $createtemplate = 0): int {
-        global $DB;
-        $fs = get_file_storage();
-        $kanban = $DB->get_record('kanban', ['id' => $instance]);
-        if ($kanban->userboards == MOD_KANBAN_NOUSERBOARDS) {
-            $user = 0;
-        }
-        $context = context_module::instance($instance, IGNORE_MISSING);
-        // Is there a template for this instance?
-        $template = $DB->get_record('kanban_board', [
-            'kanban_instance' => $instance,
-            'user' => 0,
-            'groupid' => 0,
-            'template' => 1
-        ]);
-        if ($template) {
-            if ($createtemplate) {
-                // For now, don't delete old template versions.
-                $DB->update_record('kanban_board', ['id' => $template->id, 'template' => 2]);
-                $template = $DB->get_record('kanbanboard', ['id' => $createtemplate]);
-            }
-            $newboard = $template;
-            $newboard->template = ($createtemplate ? 1 : 0);
-            $newboard->timecreated = time();
-            $newboard->timemodified = time();
-            $newboard->user = $user;
-            $newboard->group = $group;
-            unset($newboard->id);
-            $newboard->id = $DB->insert_record('kanban_board', $newboard);
-            $columns = $DB->get_records('kanban_column', ['kanban_board' => $template->id]);
-            $cards = $DB->get_records('kanban_cards', ['kanban_board' => $template->id]);
-            $newcolumn = [];
-            $newcard = [];
-            foreach ($columns as $column) {
-                $newcolumn[$column->id] = $column;
-                $newcolumn[$column->id]->kanban_board = $newboard->id;
-                $newcolumn[$column->id]->timecreated = time();
-                $newcolumn[$column->id]->timemodified = time();
-                unset($newcolumn[$column->id]->id);
-                $newcolumn[$column->id] = $DB->insert_record('kanban_column', $newcolumn);
-            }
-            foreach ($cards as $card) {
-                $newcard = $card;
-                $newcard[$card->id]->kanban_board = $newboard->id;
-                $newcard[$card->id]->timecreated = time();
-                $newcard[$card->id]->timemodified = time();
-                $newcard[$card->id]->kanban_column = $newcolumn[$card->kanban_column]->id;
-                unset($newcard[$card->id]->id);
-                $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard);
-                // Copy attachment files.
-                $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
-                foreach ($attachments as $attachment) {
-                    $newfile = (array)$attachment;
-                    $newfile['itemid'] = $newcard[$card->id]->id;
-                    $fs->create_file_from_storedfile($newfile, $attachment);
-                }
-            }
-            $newboard->sequence = self::sequence_replace($newboard->sequence, $newcolumn);
-            $DB->update_record('kanban_board', $newboard);
-            foreach ($newcolumn as $col) {
-                $col->sequence = self::sequence_replace($col->sequence, $newcard);
-                $DB->update_record('kanban_column', $col);
-            }
-
-        } else {
-            // This could be moved to a side wide template.
-            $boardid = $DB->insert_record('kanban_board', [
-                'sequence' => '',
-                'user' => $user,
-                'groupid' => $group,
-                'template' => 0,
-                'timecreated' => time(),
-                'timemodified' => time(),
-                'kanban_instance' => $instance
-            ]);
-            $columnnames = [
-                get_string('todo', 'kanban') => '{}',
-                get_string('doing', 'kanban') => '{}',
-                get_string('done', 'kanban') => '{"autoclose": true}',
-            ];
-            $columnids = [];
-            foreach ($columnnames as $columnname => $options) {
-                $columnids[] = $DB->insert_record('kanban_column', [
-                    'title' => $columnname,
-                    'sequence' => '',
-                    'kanban_board' => $boardid,
-                    'options' => $options,
-                    'timecreated' => time(),
-                    'timemodified' => time(),
-                ]);
-            }
-            $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => join(',', $columnids)]);
-        }
-        return $boardid;
     }
 
     /**

@@ -26,6 +26,7 @@
 require('../../config.php');
 require_once('lib.php');
 
+use mod_kanban\boardmanager;
 use mod_kanban\helper;
 
 $id = required_param('id', PARAM_INT);
@@ -83,8 +84,17 @@ if (empty($boardid)) {
          '*'
     );
     if (!$board) {
-        $boardid = mod_kanban\helper::create_new_board($kanban->id, $userid, $groupid);
-        $board = $DB->get_record('kanban_board', ['id' => $boardid], '*');
+        $boardmanager = new boardmanager($cmid);
+        if (empty($userid)) {
+            if(empty($groupid)) {
+                $boardid = $boardmanager->create_board();
+            } else {
+                $boardid = $boardmanager->create_group_board($groupid);
+            }
+        } else {
+            $boardid = $boardmanager->create_user_board($userid);
+        }
+        $board = $boardmanager->get_board();
     } else {
         $boardid = $board->id;
     }

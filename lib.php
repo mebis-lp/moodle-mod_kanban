@@ -23,6 +23,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_kanban\boardmanager;
+
 defined('MOODLE_INTERNAL') || die();
 
 define('MOD_KANBAN_NOUSERBOARDS', 0);
@@ -44,7 +46,9 @@ MoodleQuickForm::registerElementType('color', $CFG->dirroot . '/mod/kanban/class
 function kanban_add_instance($data) : int {
     global $DB;
     $kanbanid = $DB->insert_record("kanban", $data);
-    mod_kanban\helper::create_new_board($kanbanid);
+    $boardmanager = new boardmanager();
+    $boardmanager->load_instance($kanbanid);
+    $boardmanager->create_board();
     return $kanbanid;
 }
 
@@ -132,20 +136,20 @@ function kanban_supports($feature) {
  * @throws dml_exception
  */
 function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
-    global $CFG, $DB, $USER;
+    global $CFG, $DB;
     require_once($CFG->libdir. '/externallib.php');
+    $boardmanager = new boardmanager();
+
     if ($itemtype == 'card') {
-        $kanbancard = $DB->get_record('kanban_card', ['id' => $itemid], '*', MUST_EXIST);
-        $kanbanboardid = $kanbancard->kanban_board;
+        $card = $boardmanager->get_card($itemid);
+        $boardmanager->load_board($card->kanban_board);
     }
     if ($itemtype == 'column') {
-        $kanbancolumn = $DB->get_record('kanban_column', ['id' => $itemid], '*', MUST_EXIST);
-        $kanbanboardid = $kanbancolumn->kanban_board;
+        $column = $boardmanager->get_column($itemid);
+        $boardmanager->load_board($column->kanban_board);
     }
-    $kanbanboard = $DB->get_record('kanban_board', ['id' => $kanbanboardid], '*', MUST_EXIST);
 
-    list ($course, $cminfo) = get_course_and_cm_from_instance($kanbanboard->kanban_instance, 'kanban');
-    $context = context_module::instance($cminfo->id);
+    $context = context_module::instance($boardmanager->get_cminfo()->id);
     external_api::validate_context($context);
 
     if ($itemtype == 'card') {
@@ -156,10 +160,17 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
         require_capability('mod/kanban:managecolumns', $context);
     }
 
-    \mod_kanban\helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+    \mod_kanban\helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $boardmanager->get_cminfo());
 
     $newtitle = clean_param($newvalue, PARAM_TEXT);
-    $DB->update_record('kanban_' . $itemtype, ['id' => $itemid, 'title' => $newtitle, 'timemodified' => time()]);
+
+    if ($itemtype == 'card') {
+        $boardmanager->update_card($itemid, ['title' => $newtitle]);
+    }
+
+    if ($itemtype == 'column') {
+        $boardmanager->update_column($itemid, ['title' => $newtitle]);
+    }
 
     return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, $newtitle, $newtitle, null, '');
 }

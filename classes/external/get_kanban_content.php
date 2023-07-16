@@ -81,6 +81,7 @@ class get_kanban_content extends external_api {
                         'timestamp' => new external_value(PARAM_INT, 'timestamp'),
                         'userid' => new external_value(PARAM_INT, 'current user id'),
                         'lang' => new external_value(PARAM_TEXT, 'language for the ui'),
+                        'liveupdate' => new external_value(PARAM_INT, 'seconds between two live updates'),
                     ]),
                     'board' => new external_single_structure([
                         'id' => new external_value(PARAM_INT, 'board id'),
@@ -313,8 +314,6 @@ class get_kanban_content extends external_api {
             'manageboard' => has_capability('mod/kanban:manageboard', $context)
         ];
 
-        $common = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-
         $params['board'] = $boardid;
         $params['timestamp'] = $timestamp;
 
@@ -352,6 +351,7 @@ class get_kanban_content extends external_api {
         $common->id = $cmid;
         $common->userid = $USER->id;
         $common->lang = current_language();
+        $common->liveupdate = get_config('mod_kanban', 'liveupdatetime');
 
         $kanbancards = [];
         $kanbanassignees = [];

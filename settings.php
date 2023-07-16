@@ -15,18 +15,29 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version information for mod_kanban
+ * Admin settings for mod_kanban
  *
  * @package     mod_kanban
  * @copyright   2023, ISB Bayern
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_kanban';
-$plugin->release = '0.1';
-$plugin->version = 2023071601;
-$plugin->requires = 2022041900;
-$plugin->supported = [400, 402];
-$plugin->maturity = MATURITY_ALPHA;
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configtext(
+        'mod_kanban/liveupdatetime',
+        get_string('liveupdatetime', 'kanban'),
+        get_string('liveupdatetimedescription', 'kanban'),
+        10,
+        PARAM_INT)
+    );
+    $settings->add(new admin_setting_configcheckbox(
+        'mod_kanban/enablehistory',
+        get_string('enablehistory', 'kanban'),
+        get_string('enablehistorydescription', 'kanban'),
+        true,
+        PARAM_BOOL)
+    );
+}

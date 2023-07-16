@@ -36,6 +36,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_kanban\boardmanager;
 use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
@@ -78,13 +79,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function add_column_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -101,7 +96,6 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function add_column(int $cmid, int $boardid, array $data): array {
-        global $DB;
         $params = self::validate_parameters(self::add_column_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -109,57 +103,25 @@ class change_kanban_content extends external_api {
         ]);
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
-        $title = empty($params['data']['title']) ? get_string('newcolumn', 'mod_kanban') : $params['data']['title'];
+        $data = [];
+        if (!empty($params['data']['title'])) {
+            $data['title'] = $params['data']['title'];
+        }
         $aftercol = $params['data']['aftercol'];
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecolumns', $context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        if (empty($kanbanboard->locked)) {
-            helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
-            $aftercol = intval($aftercol);
-            $options = '{}';
-            $sequence = '';
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-            $kanbancolumnid = $DB->insert_record('kanban_column', [
-                'title' => $title,
-                'kanban_board' => $kanbanboard->id,
-                'timecreated' => time(),
-                'timemodified' => time(),
-                'options' => $options,
-                'sequence' => $sequence,
-            ]);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-            $seq = helper::sequence_add_after($kanbanboard->sequence, $aftercol, $kanbancolumnid);
+        $boardmanager->add_column($aftercol, $data);
 
-            $formatter = new updateformatter();
-            $formatter->put(
-                'columns',
-                [
-                    'id' => $kanbancolumnid,
-                    'title' => $title,
-                    'options' => $options,
-                    'sequence' => $sequence
-                ]
-            );
-            $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
-
-            return [
-                'success' => $DB->update_record(
-                    'kanban_board',
-                    ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
-                ),
-                'update' => $formatter->format()
-            ];
-        } else {
-            return [
-                'success' => false,
-                'update' => ''
-            ];
-        }
+        return [
+            'update' => $boardmanager->format()
+        ];
     }
 
     /**
@@ -190,13 +152,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function add_card_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -213,7 +169,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function add_card(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $DB;
         $params = self::validate_parameters(self::add_card_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -222,47 +178,24 @@ class change_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $columnid = $params['data']['columnid'];
-        $title = empty($params['data']['title']) ? get_string('newcard', 'mod_kanban') : $params['data']['title'];
+        $data = [];
+        if (!empty($params['data']['title'])) {
+            $data['title'] = $params['data']['title'];
+        }
         $aftercard = $params['data']['aftercard'];
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:addcard', $context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancolumn = $DB->get_record('kanban_column', ['id' => $columnid, 'kanban_board' => $boardid], '*', MUST_EXIST);
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
 
-        $options = '{}';
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $kanbancardid = $DB->insert_record('kanban_card', [
-            'title' => $title,
-            'kanban_board' => $kanbanboard->id,
-            'kanban_column' => $kanbancolumn->id,
-            'timecreated' => time(),
-            'timemodified' => time(),
-            'options' => $options,
-            'description' => '',
-        ]);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $seq = helper::sequence_add_after($kanbancolumn->sequence, $aftercard, $kanbancardid);
-
-        $formatter = new updateformatter();
-        $formatter->put('cards', [
-            'id' => $kanbancardid,
-            'options' => $options,
-            'title' => $title,
-            'kanban_column' => $kanbancolumn->id,
-            'assignees' => [],
-        ]);
-        $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
+        $boardmanager->add_card($columnid, $aftercard, $data);
 
         return [
-            'success' => $DB->update_record(
-                'kanban_column',
-                ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]
-            ),
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -288,13 +221,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function move_column_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -325,30 +252,16 @@ class change_kanban_content extends external_api {
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecolumns', $context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
-        if ($kanbanboard->locked || $kanbancolumn->locked) {
-            return [
-                'success' => false,
-                'update' => ''
-            ];
-        } else {
-            $seq = helper::sequence_move_after($kanbanboard->sequence, $aftercol, $columnid);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-            $formatter = new updateformatter();
-            $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-            return [
-                'success' => $DB->update_record(
-                    'kanban_board',
-                    ['id' => $kanbanboard->id, 'sequence' => $seq, 'timemodified' => time()]
-                ),
-                'update' => $formatter->format()
-            ];
-        }
+        $boardmanager->move_column($columnid, $aftercol);
+
+        return [
+            'update' => $boardmanager->format()
+        ];
     }
 
     /**
@@ -374,13 +287,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function move_card_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -411,84 +318,23 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancard = $DB->get_record('kanban_card', ['kanban_board' => $boardid, 'id' => $cardid], '*', MUST_EXIST);
-        $kanbanassignees = $DB->get_fieldset_select(
-            'kanban_assignee',
-            'user',
-            'kanban_card = :cardid',
-            ['cardid' => $kanbancard->id]
-        );
-        if (in_array($USER->id, $kanbanassignees)) {
+        $boardmanager = new boardmanager($cmid, $boardid);
+
+        $assignees = $boardmanager->get_card_assignees($cardid);
+
+        if (in_array($USER->id, $assignees)) {
             require_capability('mod/kanban:moveassignedcards', $context);
         } else {
             require_capability('mod/kanban:moveallcards', $context);
         }
-        $kanbancolumn = $DB->get_record(
-            'kanban_column',
-            ['kanban_board' => $boardid, 'id' => $kanbancard->kanban_column],
-            '*',
-            MUST_EXIST
-        );
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        if ($kanbancard->kanban_column == $columnid) {
-            $seq = helper::sequence_move_after($kanbancolumn->sequence, $aftercard, $cardid);
-            $update = ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()];
-            $formatter = new updateformatter();
-            $formatter->put('columns', $update);
-            return [
-                'success' => $DB->update_record('kanban_column', $update),
-                'update' => $formatter->format()
-            ];
-        } else {
-            $seq = helper::sequence_remove($kanbancolumn->sequence, $cardid);
-            $kanbancolumntarget = $DB->get_record(
-                'kanban_column',
-                ['kanban_board' => $boardid, 'id' => $columnid],
-                '*',
-                MUST_EXIST
-            );
-            $seqtarget = helper::sequence_add_after($kanbancolumntarget->sequence, $aftercard, $cardid);
-            $updatesourcecol = ['id' => $columnid, 'sequence' => $seqtarget, 'timemodified' => time()];
-            $updatetargetcol = ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()];
-            $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
-            // If target column has autoclose option set, update card to be completed.
-            $options = json_decode($kanbancolumntarget->options);
-            if (!empty($options->autoclose)) {
-                $updatecard['completed'] = 1;
-            }
-            $formatter = new updateformatter();
-            $formatter->put('columns', $updatesourcecol);
-            $formatter->put('columns', $updatetargetcol);
-            $formatter->put('cards', $updatecard);
-            $success = $DB->update_record('kanban_column', $updatetargetcol) &&
-                $DB->update_record('kanban_column', $updatesourcecol) &&
-                $DB->update_record('kanban_card', $updatecard);
-            if ($success) {
-                $data = array_merge((array)$kanbancard, $updatecard);
-                $data['username'] = fullname($USER);
-                $data['boardname'] = $kanban->name;
-                $data['columnname'] = $kanbancolumntarget->title;
-                $kanbanassignees = $DB->get_fieldset_select(
-                    'kanban_assignee',
-                    'user',
-                    'kanban_card = :cardid',
-                    ['cardid' => $kanbancard->id]
-                );
-                helper::send_notification($cminfo, 'moved', $kanbanassignees, (object)$data);
-                if (!empty($options->autoclose)) {
-                    helper::send_notification($cminfo, 'closed', $kanbanassignees, (object)$data);
-                    helper::remove_calendar_event($kanban, $kanbancard);
-                }
-            }
-            return [
-                'success' => $success,
-                'update' => $formatter->format(),
-            ];
-        }
+        $boardmanager->move_card($cardid, $aftercard, $columnid);
+
+        return [
+            'update' => $boardmanager->format()
+        ];
     }
 
     /**
@@ -512,13 +358,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function delete_card_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -535,7 +375,6 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_card(int $cmid, int $boardid, array $data): array {
-        global $DB;
         $params = self::validate_parameters(self::delete_card_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -548,33 +387,15 @@ class change_kanban_content extends external_api {
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecards', $context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancard = $DB->get_record('kanban_card', ['kanban_board' => $boardid, 'id' => $cardid], '*', MUST_EXIST);
-        $kanbancolumn = $DB->get_record(
-            'kanban_column',
-            ['kanban_board' => $boardid, 'id' => $kanbancard->kanban_column],
-            '*',
-            MUST_EXIST
-        );
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $seq = helper::sequence_remove($kanbancolumn->sequence, $cardid);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $formatter = new updateformatter();
-        $formatter->delete('cards', ['id' => $cardid]);
-        $formatter->put('columns', ['id' => $kanbancolumn->id, 'sequence' => $seq]);
-
-        $success = $DB->update_record('kanban_column', ['id' => $kanbancolumn->id, 'sequence' => $seq, 'timemodified' => time()]) &&
-            $DB->delete_records('kanban_card', ['id' => $cardid]) &&
-            $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
-
-        helper::remove_calendar_event($kanban, $kanbancard);
+        $boardmanager->delete_card($cardid);
 
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -599,13 +420,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function delete_column_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -622,7 +437,6 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_column(int $cmid, int $boardid, array $data): array {
-        global $DB;
         $params = self::validate_parameters(self::delete_column_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -635,42 +449,15 @@ class change_kanban_content extends external_api {
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecolumns', $context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancolumn = $DB->get_record('kanban_column', ['kanban_board' => $boardid, 'id' => $columnid], '*', MUST_EXIST);
-        $kanbancardids = $DB->get_fieldset_select(
-            'kanban_card',
-            'id',
-            'kanban_column = :kanban_column',
-            ['kanban_column' => $columnid]
-        );
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $seq = helper::sequence_remove($kanbanboard->sequence, $columnid);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $formatter = new updateformatter();
-        foreach ($kanbancolumn->sequence as $kanbancardid) {
-            $formatter->delete('cards', ['id' => $kanbancardid]);
-        }
-        $formatter->delete('columns', ['id' => $kanbancolumn->id]);
-        $formatter->put('board', ['id' => $kanbanboard->id, 'sequence' => $seq]);
-
-        foreach ($kanbancardids as $cardid) {
-            helper::remove_calendar_event($kanban, (object)['id' => $cardid]);
-        }
-
-                $success = $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => $seq, 'timemodified' => time()]) &&
-            $DB->delete_records('kanban_column', ['id' => $columnid]) &&
-            $DB->delete_records('kanban_card', ['kanban_column' => $columnid]);
-        if (!empty($kanbancardids)) {
-            list($sql, $params) = $DB->get_in_or_equal($kanbancardids);
-            $success &= $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $sql, $params);
-        }
+        $boardmanager->delete_column($columnid);
 
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -696,13 +483,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function assign_user_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -719,7 +500,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function assign_user(int $cmid, int $boardid, array $data): array {
-        global $DB, $OUTPUT, $USER;
+        global $USER;
         $params = self::validate_parameters(self::assign_user_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -739,31 +520,14 @@ class change_kanban_content extends external_api {
             require_capability('mod/kanban:assignothers', $context);
         }
 
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancard = $DB->get_record('kanban_card', ['id' => $cardid]);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $success1 = $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]);
-        $success2 = $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
-        helper::add_or_update_calendar_event($kanban, $kanbancard, [$userid]);
-        $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
-        $userids = array_map(function ($v) {
-            return intval($v);
-        }, $userids);
-        $userids = array_unique($userids);
+        $boardmanager->assign_user($cardid, $userid);
 
-        $formatter = new updateformatter();
-        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids, 'selfassigned' => in_array($USER->id, $userids)]);
-        $formatter->put('users', [
-            'id' => $USER->id,
-            'fullname' => fullname($USER),
-            'userpicture' => $OUTPUT->user_picture($USER, ['link' => false]),
-        ]);
         return [
-            'success' => $success1 && $success2,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -790,13 +554,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function unassign_user_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -813,7 +571,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function unassign_user(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $USER;
         $params = self::validate_parameters(self::unassign_user_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -835,25 +593,14 @@ class change_kanban_content extends external_api {
             require_capability('mod/kanban:assignothers', $context);
         }
 
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $success = $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid, 'user' => $userid]) &&
-            $DB->update_record('kanban_card', ['id' => $cardid, 'timemodified' => time()]);
-        helper::remove_calendar_event($kanban, (object)['id' => $cardid], [$userid]);
-        $userids = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $cardid]);
-        $userids = array_map(function ($v) {
-            return intval($v);
-        }, $userids);
-        $userids = array_unique($userids);
-        $formatter = new updateformatter();
-        $formatter->put('cards', ['id' => $cardid, 'assignees' => $userids, 'selfassigned' => in_array($USER->id, $userids)]);
+        $boardmanager->unassign_user($cardid, $userid);
 
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -879,13 +626,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function set_card_complete_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -915,41 +656,21 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancard = $DB->get_record('kanban_card', ['kanban_board' => $boardid, 'id' => $cardid], '*', MUST_EXIST);
-        $kanbanassignees = $DB->get_fieldset_select(
-            'kanban_assignee',
-            'user',
-            'kanban_card = :cardid',
-            ['cardid' => $kanbancard->id]
-        );
+        $boardmanager = new boardmanager($cmid, $boardid);
+        $assignees = $boardmanager->get_card_assignees($cardid);
 
-        if (in_array($USER->id, $kanbanassignees)) {
+        if (in_array($USER->id, $assignees)) {
             require_capability('mod/kanban:moveassignedcards', $context);
         } else {
             require_capability('mod/kanban:moveallcards', $context);
         }
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $formatter = new updateformatter();
-        $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
-        $formatter->put('cards', $update);
-        $success = $DB->update_record('kanban_card', $update);
-        if ($state) {
-            helper::remove_calendar_event($kanban, $kanbancard, $kanbanassignees);
-        } else {
-            helper::add_or_update_calendar_event($kanban, $kanbancard, $kanbanassignees);
-        }
-        if ($success) {
-            $kanbancard->username = fullname($USER);
-            $kanbancard->boardname = $kanban->name;
-            helper::send_notification($cminfo, 'closed', $kanbanassignees, $kanbancard, ($state == 0 ? 'reopened' : null));
-        }
+        $boardmanager->set_card_complete($cardid, $state);
+
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -975,13 +696,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function set_column_locked_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -1011,19 +726,17 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
 
         require_capability('mod/kanban:managecolumns', $context);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $formatter = new updateformatter();
-        $update = ['id' => $columnid, 'locked' => $state, 'timemodified' => time()];
-        $formatter->put('columns', $update);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->set_column_locked($columnid, $state);
+
         return [
-            'success' => $DB->update_record('kanban_column', $update),
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -1048,13 +761,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function set_board_columns_locked_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -1084,25 +791,17 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancolumns = $DB->get_records('kanban_column', ['kanban_board' => $boardid], 'id');
+
         require_capability('mod/kanban:manageboard', $context);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $formatter = new updateformatter();
-        $update = ['id' => $boardid, 'locked' => $state, 'timemodified' => time()];
-        $formatter->put('board', $update);
-        $success = $DB->update_record('kanban_board', $update);
-        foreach ($kanbancolumns as $col) {
-            $update = ['id' => $col->id, 'locked' => $state, 'timemodified' => time()];
-            $success &= $DB->update_record('kanban_column', $update);
-            $formatter->put('columns', $update);
-        }
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->set_board_columns_locked($state);
+
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -1128,13 +827,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function add_discussion_message_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -1151,7 +844,6 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function add_discussion_message(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
         $params = self::validate_parameters(self::add_discussion_message_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -1165,44 +857,19 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbancard = $DB->get_record('kanban_card', ['id' => $cardid], '*', MUST_EXIST);
 
         require_capability('mod/kanban:view', $context);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $formatter = new updateformatter();
-        $update = ['kanban_card' => $cardid, 'content' => $message, 'user' => $USER->id, 'timecreated' => time()];
-        $id = $DB->insert_record('kanban_discussion', $update);
-        $success = (bool)$id;
-        $update['id'] = $id;
-        $update['candelete'] = true;
-        $update['username'] = fullname($USER);
-        $data = (object)$update;
-        $formatter->discussionput("discussions[$cardid]", $update);
-        if ($kanbancard->discussion == 0) {
-            $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
-            $success &= $DB->update_record('kanban_card', $update);
-            $formatter->put('cards', $update);
-        }
-        if ($success) {
-            $data->boardname = $kanban->name;
-            $data->title = $kanbancard->title;
-            $kanbanassignees = $DB->get_fieldset_select(
-                'kanban_assignee',
-                'user',
-                'kanban_card = :cardid',
-                ['cardid' => $kanbancard->id]
-            );
-            helper::send_notification($cminfo, 'discussion', $kanbanassignees, $data);
-        }
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->add_discussion_message($cardid, $message);
 
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
+
     }
 
     /**
@@ -1226,13 +893,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function delete_discussion_message_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -1262,23 +923,23 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
-        $kanbandiscussion = $DB->get_record('kanban_discussion', ['id' => $messageid]);
-        $kanbancard = $DB->get_record('kanban_card', ['id' => $kanbandiscussion->kanban_card], '*', MUST_EXIST);
 
         require_capability('mod/kanban:view', $context);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $formatter = new updateformatter();
-        $update = ['id' => $messageid, 'kanban_card' => $kanbandiscussion->kanban_card];
-        $success = $DB->delete_records('kanban_discussion', $update);
-        $formatter->discussiondelete("discussions[$kanbandiscussion->kanban_card]", $update);
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $message = $boardmanager->get_discussion_message($messageid);
+
+        if ($message->user != $USER->id) {
+            require_capability('mod/kanban:manageboard', $context);
+        }
+
+        $boardmanager->delete_discussion_message($messageid, $message->kanban_card);
 
         return [
-            'success' => $success,
-            'update' => $formatter->format()
+            'update' => $boardmanager->format()
         ];
     }
 
@@ -1300,13 +961,7 @@ class change_kanban_content extends external_api {
      * @return external_single_structure
      */
     public static function save_as_template_returns(): external_single_structure {
-        return
-            new external_single_structure(
-                [
-                    'success' => new external_value(PARAM_BOOL, 'success'),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
-                ]
-            );
+        return self::default_returns();
     }
 
     /**
@@ -1336,11 +991,29 @@ class change_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         require_capability('mod/kanban:manageboard', $context);
 
-        $success = helper::create_new_board($kanban->id, 0, 0, $boardid);
+        $boardmanager = new boardmanager($cmid, $boardid);
+
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->create_template();
 
         return [
-            'success' => $success,
-            'update' => json_encode([])
+            'update' => $boardmanager->format()
         ];
+    }
+
+    /**
+     * Definition of default return values for all functions.
+     *
+     * @return external_single_structure
+     */
+    public static function default_returns(): external_single_structure {
+        return
+            new external_single_structure(
+                [
+                    'success' => new external_value(PARAM_BOOL, 'success', VALUE_OPTIONAL, true),
+                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
+                ]
+            );
     }
 }

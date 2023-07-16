@@ -52,7 +52,15 @@ export default class {
      * @returns {object}
      */
     static exportCard(state, cardid) {
-        let card = JSON.parse(JSON.stringify(state.cards.get(cardid)));
+        let card = {
+            id: cardid,
+            title: '-',
+            assignees: [],
+            options: '{}',
+        };
+        if (state.cards.get(cardid) !== undefined) {
+            card = JSON.parse(JSON.stringify(state.cards.get(cardid)));
+        }
         card.cardid = card.id;
         card.hasassignees = card.assignees.length > 0;
         let options = JSON.parse(card.options);

@@ -31,7 +31,7 @@ export default class extends KanbanComponent {
         ];
     }
 
-    async stateReady() {
+    async stateReady(state) {
         this.addEventListener(
             this.getElement(selectors.ADDCOLUMNFIRST),
             'click',
@@ -53,13 +53,15 @@ export default class extends KanbanComponent {
             this._templateConfirm
         );
         this.dragdrop = new DragDrop(this);
-        this._continuousUpdate();
+        if (state.common.liveupdate > 0) {
+            this._continuousUpdate(state.common.liveupdate);
+        }
     }
 
-    _continuousUpdate() {
+    _continuousUpdate(seconds = 10) {
         setInterval(() => {
             this.reactive.dispatch('getUpdates');
-        }, 10000);
+        }, seconds * 1000);
     }
 
     /**

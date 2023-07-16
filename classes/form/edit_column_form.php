@@ -20,7 +20,8 @@ use core_form\dynamic_form;
 use moodle_url;
 use context;
 use context_module;
-use mod_kanban\updateformatter;
+use mod_kanban\boardmanager;
+use mod_kanban\helper;
 
 /**
  * From for editing a column.
@@ -91,27 +92,22 @@ class edit_column_form extends dynamic_form {
      * @return array Returns whether a new template was created.
      */
     public function process_dynamic_submission(): array {
-        global $DB;
+        global $COURSE;
         $formdata = $this->get_data();
-        $options = [
-            'autoclose' => $formdata->autoclose,
-            'autohide' => $formdata->autohide,
-        ];
-        $columndata = [
-            'id' => $formdata->id,
-            'title' => $formdata->title,
-            'options' => json_encode($options),
-            'timemodified' => time(),
-        ];
+        $cmid = $this->optional_param('cmid', null, PARAM_INT);
+        $boardid = $this->optional_param('boardid', null, PARAM_INT);
+        $modinfo = get_fast_modinfo($COURSE);
+        $cminfo = $modinfo->get_cm($cmid);
+        $context = $this->get_context_for_dynamic_submission();
 
-        $result = $DB->update_record('kanban_column', $columndata);
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $formatter = new updateformatter();
-        $formatter->put('columns', $columndata);
-        $updatestr = $formatter->format();
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->update_column($formdata->id, (array)$formdata);
+
         return [
-            'result' => $result,
-            'update' => $updatestr,
+            'update' => $boardmanager->format()
         ];
     }
 

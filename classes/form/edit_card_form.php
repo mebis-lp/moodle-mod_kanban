@@ -20,7 +20,7 @@ use core_form\dynamic_form;
 use moodle_url;
 use context;
 use context_module;
-use mod_kanban\updateformatter;
+use mod_kanban\boardmanager;
 use mod_kanban\helper;
 
 /**
@@ -119,95 +119,42 @@ class edit_card_form extends dynamic_form {
      * @return array Returns whether a new template was created.
      */
     public function process_dynamic_submission(): array {
-        global $COURSE, $DB, $OUTPUT, $USER;
-        $formatter = new updateformatter();
-        $context = $this->get_context_for_dynamic_submission();
+        global $COURSE;
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
+        $boardid = $this->optional_param('boardid', null, PARAM_INT);
         $modinfo = get_fast_modinfo($COURSE);
-        $cm = $modinfo->get_cm($cmid);
+        $cminfo = $modinfo->get_cm($cmid);
+        $context = $this->get_context_for_dynamic_submission();
         $formdata = $this->get_data();
-        $options = json_encode(['background' => $formdata->color]);
-        $carddata = [
-            'id' => $formdata->id,
-            'title' => $formdata->title,
-            'description' => $formdata->description_editor['text'],
-            'descriptionformat' => $formdata->description_editor['format'],
-            'duedate' => $formdata->duedate,
-            'reminderdate' => $formdata->reminderdate,
-            'options' => $options,
-            'timemodified' => time(),
-        ];
+        $formdata->options = json_encode(['background' => $formdata->color]);
 
-        $draftinfo = file_get_draft_area_info($formdata->attachments);
-        $carddata['description'] = file_save_draft_area_files(
+        if(!has_capability('mod/kanban:assignothers', $context)) {
+            unset($formdata->assignees);
+        }
+
+        $formdata->description = $formdata->description_editor['text'];
+        $formdata->descriptionformat = $formdata->description_editor['format'];
+
+        $formdata->description = file_save_draft_area_files(
             $formdata->attachments,
             $context->id,
             'mod_kanban',
             'attachments',
             $formdata->id,
             [],
-            $carddata['description']
+            $formdata->description
         );
 
-        $success = $DB->update_record('kanban_card', $carddata);
-        if (isset($formdata->assignees)) {
-            $currentassignees = $DB->get_fieldset_select(
-                'kanban_assignee',
-                'user',
-                'kanban_card = :cardid',
-                ['cardid' => $formdata->id]
-            );
-            $toinsert = array_diff($formdata->assignees, $currentassignees);
-            $todelete = array_diff($currentassignees, $formdata->assignees);
-            $kanban = $DB->get_record('kanban', ['id' => $cm->instance]);
-            if (!empty($todelete)) {
-                helper::remove_calendar_event($kanban, (object)$carddata, $todelete);
-            }
-            helper::add_or_update_calendar_event($kanban, (object)$carddata, $formdata->assignees);
-            if (has_capability('mod/kanban:assignothers', $context)) {
-                if (!empty($todelete)) {
-                    list($sql, $params) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
-                    $sql = 'kanban_card = :cardid AND user ' . $sql;
-                    $params['cardid'] = $formdata->id;
-                    $success &= $DB->delete_records_select('kanban_assignee', $sql, $params);
-                    helper::send_notification($cm, 'assigned', $todelete, $formdata, 'unassigned');
-                }
-            }
-            $assignees = [];
-            foreach ($toinsert as $assignee) {
-                if (has_capability('mod/kanban:assignothers', $context) || $assignee == $USER->id) {
-                    $assignees[] = ['kanban_card' => $formdata->id, 'user' => $assignee];
-                    $user = \core_user::get_user($assignee);
-                    $formatter->put('users', [
-                        'id' => $user->id,
-                        'fullname' => fullname($user),
-                        'userpicture' => $OUTPUT->user_picture($user, ['link' => false])]
-                    );
-                }
-            }
-            $success &= $DB->insert_records('kanban_assignee', $assignees);
-            $formdata->boardname = $cm->name;
-            helper::send_notification($cm, 'assigned', $toinsert, $formdata);
-            $carddata['assignees'] = $formdata->assignees;
-        }
-        $carddata['description'] = file_rewrite_pluginfile_urls(
-            $carddata['description'],
-            'pluginfile.php',
-            $context->id,
-            'mod_kanban',
-            'attachments',
-            $carddata['id']
-        );
+        $boardmanager = new boardmanager($cmid, $boardid);
 
-        $carddata['attachments'] = helper::get_attachments($context->id, $formdata->id);
-        $carddata['hasattachment'] = count($carddata['attachments']) > 0;
-        $carddata['hasdescription'] = !empty(trim($carddata['description'])) || $draftinfo['filecount'] > 0;
-        $formatter->put('cards', $carddata);
-        $updatestr = $formatter->format();
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->update_card($formdata->id, (array)$formdata);
+
         return [
-            'result' => $success,
-            'update' => $updatestr,
+            'update' => $boardmanager->format()
         ];
+
     }
 
     /**
