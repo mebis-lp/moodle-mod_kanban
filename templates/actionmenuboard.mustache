@@ -22,7 +22,8 @@
     Example context (json):
     {
         "id": 4,
-        "locked": false
+        "locked": false,
+        "hastemplate": false
     }
 }}
 {{#manageboard}}
@@ -36,6 +37,18 @@
     </li>
     <li class="nav-item mod_kanban_create_template">
         <a class="dropdown-item" href="#" data-action="create_template" data-id="{{id}}">{{#pix}} t/clipboard, core, {{#str}} createtemplate, mod_kanban {{/str}} {{/pix}}{{#str}} createtemplate, mod_kanban {{/str}}</a>
+    </li>
+    <li class="nav-item mod_kanban_show_template">
+        <a class="dropdown-item" href="#" data-action="show_template" data-id="{{id}}">{{#pix}} i/publish, core, {{#str}} showtemplate, mod_kanban {{/str}} {{/pix}}{{#str}} showtemplate, mod_kanban {{/str}}</a>
+    </li>
+    <li class="nav-item mod_kanban_delete_board">
+        <a class="dropdown-item" href="#" data-action="delete_board" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deleteboard, mod_kanban {{/str}} {{/pix}}{{#str}} deleteboard, mod_kanban {{/str}}</a>
+    </li>
+    <li class="nav-item mod_kanban_show_board">
+        <a class="dropdown-item" href="#" data-action="show_board" data-id="{{id}}">{{#pix}} e/backward, core, {{#str}} showboard, mod_kanban {{/str}} {{/pix}}{{#str}} showboard, mod_kanban {{/str}}</a>
+    </li>
+    <li class="nav-item mod_kanban_delete_template">
+        <a class="dropdown-item" href="#" data-action="delete_template" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deletetemplate, mod_kanban {{/str}} {{/pix}}{{#str}} deletetemplate, mod_kanban {{/str}}</a>
     </li>
 </ul>
 {{/manageboard}}

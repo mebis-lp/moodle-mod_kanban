@@ -100,13 +100,16 @@ class boardmanager {
      * Load a kanban instance
      *
      * @param int $instance Instance id
+     * @param bool $dontloadcm Don't load course module data - only needed at instance creation time
      * @return void
      */
-    public function load_instance(int $instance) {
+    public function load_instance(int $instance, bool $dontloadcm = false) {
         global $DB;
         $this->kanban = $DB->get_record('kanban', ['id' => $instance]);
-        list ($this->course, $this->cminfo) = get_course_and_cm_from_instance($this->kanban->id, 'kanban');
-        $this->cmid = $this->cminfo->id;
+        if (!$dontloadcm) {
+            list ($this->course, $this->cminfo) = get_course_and_cm_from_instance($this->kanban->id, 'kanban');
+            $this->cmid = $this->cminfo->id;
+        }
     }
 
     /**
@@ -158,7 +161,7 @@ class boardmanager {
         );
         if (!$result) {
             // Is there a system-wide template?
-            $result = $DB->get_records('kanban_board', ['instance' => 0, 'template' => 1], 'timemodified DESC', 'id', 0, 1);
+            $result = $DB->get_records('kanban_board', ['kanban_instance' => 0, 'template' => 1], 'timemodified DESC', 'id', 0, 1);
         }
         if (!$result) {
             return 0;
@@ -200,7 +203,9 @@ class boardmanager {
      */
     public function create_template(): int {
         // For now, this function does not touch existing templates.
-        return $this->create_board_from_template($this->board->id, ['template' => 1]);
+        $id = $this->create_board_from_template($this->board->id, ['template' => 1]);
+        $this->formatter->put('common', ['template' => $id]);
+        return $id;
     }
 
     /**
@@ -265,7 +270,7 @@ class boardmanager {
             if ($template->kanban_instance == 0) {
                 $context = context_system::instance(0);
             } else {
-                $context = context_module::instance($this->kanban->id, IGNORE_MISSING);
+                $context = context_module::instance($this->cmid, 'kanban');
             }
 
             $newboard = (array)$template;
@@ -301,11 +306,13 @@ class boardmanager {
                 unset($newcard[$card->id]->id);
                 $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard[$card->id]);
                 // Copy attachment files.
-                $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
-                foreach ($attachments as $attachment) {
-                    $newfile = (array)$attachment;
-                    $newfile['itemid'] = $newcard[$card->id]->id;
-                    $fs->create_file_from_storedfile($newfile, $attachment);
+                if ($context) {
+                    $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
+                    foreach ($attachments as $attachment) {
+                        $newfile = (array)$attachment;
+                        $newfile['itemid'] = $newcard[$card->id]->id;
+                        $fs->create_file_from_storedfile($newfile, $attachment);
+                    }
                 }
             }
 
@@ -336,6 +343,8 @@ class boardmanager {
         $DB->delete_records('kanban_column', ['kanban_board' => $id]);
         $DB->delete_records('kanban_card', ['kanban_board' => $id]);
         $DB->delete_records('kanban_board', ['id' => $id]);
+        // The rest of the elements is skipped in the update message.
+        $this->formatter->delete('board', ['id' => $id]);
     }
 
     /**
@@ -557,7 +566,7 @@ class boardmanager {
             $DB->update_record('kanban_card', $updatecard);
             $this->formatter->put('cards', $updatecard);
 
-            $data = array_merge($card, $updatecard);
+            $data = array_merge((array)$card, $updatecard);
             $data['username'] = fullname($USER);
             $data['boardname'] = $this->kanban->name;
             $data['columnname'] = $targetcolumn->title;

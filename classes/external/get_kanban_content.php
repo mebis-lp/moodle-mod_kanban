@@ -29,7 +29,6 @@ namespace mod_kanban\external;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/lib/externallib.php');
 
-use block_recentlyaccesseditems\external;
 use coding_exception;
 use context_module;
 use external_api;
@@ -82,6 +81,7 @@ class get_kanban_content extends external_api {
                         'userid' => new external_value(PARAM_INT, 'current user id'),
                         'lang' => new external_value(PARAM_TEXT, 'language for the ui'),
                         'liveupdate' => new external_value(PARAM_INT, 'seconds between two live updates'),
+                        'template' => new external_value(PARAM_INT, 'boardid for template', VALUE_OPTIONAL, 0)
                     ]),
                     'board' => new external_single_structure([
                         'id' => new external_value(PARAM_INT, 'board id'),
@@ -90,6 +90,7 @@ class get_kanban_content extends external_api {
                         'locked' => new external_value(PARAM_INT, 'lock state'),
                         'user' => new external_value(PARAM_INT, 'userboard for userid', VALUE_OPTIONAL, 0),
                         'groupid' => new external_value(PARAM_INT, 'groupboard for groupid', VALUE_OPTIONAL, 0),
+                        'template' => new external_value(PARAM_INT, 'board is a template', VALUE_OPTIONAL, 0)
                     ]),
                     'columns' => new external_multiple_structure(
                         new external_single_structure(
@@ -352,6 +353,20 @@ class get_kanban_content extends external_api {
         $common->userid = $USER->id;
         $common->lang = current_language();
         $common->liveupdate = get_config('mod_kanban', 'liveupdatetime');
+        if (!$asupdate) {
+            $common->template = $DB->get_field_sql(
+                'SELECT id
+                 FROM {kanban_board}
+                 WHERE template = 1 AND kanban_instance = :instance
+                 ORDER BY timemodified DESC
+                 LIMIT 0,1',
+                ['instance' => $kanbanboard->kanban_instance],
+                IGNORE_MISSING
+            );
+            if (!$common->template) {
+                $common->template = 0;
+            }
+        }
 
         $kanbancards = [];
         $kanbanassignees = [];

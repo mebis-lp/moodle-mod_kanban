@@ -1002,6 +1002,64 @@ class change_kanban_content extends external_api {
         ];
     }
 
+/**
+     * Returns description of method parameters for the delete_board function.
+     *
+     * @return external_function_parameters
+     */
+    public static function delete_board_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the delete_board function.
+     *
+     * @return external_single_structure
+     */
+    public static function delete_board_returns(): external_single_structure {
+        return self::default_returns();
+    }
+
+    /**
+     * Delete this board.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @return bool Whether the request was successful
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function delete_board(int $cmid, int $boardid): array {
+        $params = self::validate_parameters(self::delete_board_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+
+        require_capability('mod/kanban:manageboard', $context);
+
+        $boardmanager = new boardmanager($cmid, $boardid);
+
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->delete_board($boardid);
+
+        return [
+            'update' => $boardmanager->format()
+        ];
+    }
+
+
     /**
      * Definition of default return values for all functions.
      *

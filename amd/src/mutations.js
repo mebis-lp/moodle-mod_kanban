@@ -54,6 +54,14 @@ export default class {
     }
 
     /**
+     * Delete the board.
+     * @param {*} stateManager StateManager instance
+     */
+    async deleteBoard(stateManager) {
+        await this.sendChange('delete_board', stateManager);
+    }
+
+    /**
      * Add a card after an existing one.
      * @param {*} stateManager StateManager instance
      * @param {number} columnId Id of the column
@@ -219,16 +227,26 @@ export default class {
      */
     async getUpdates(stateManager) {
         const state = stateManager.state;
-        const result = await Ajax.call([{
-            methodname: 'mod_kanban_get_kanban_content_update',
-            args: {
-                cmid: state.common.id,
-                boardid: state.board.id,
-                timestamp: state.common.timestamp,
-            },
-        }])[0];
+        if (state.board === undefined) {
+            stateManager.setReadOnly(false);
+            stateManager.eventsToPublish.push({
+                eventName: `board:deleted`,
+                eventData: {},
+                action: `deleted`,
+            });
+            stateManager.setReadOnly(true);
+        } else {
+            const result = await Ajax.call([{
+                methodname: 'mod_kanban_get_kanban_content_update',
+                args: {
+                    cmid: state.common.id,
+                    boardid: state.board.id,
+                    timestamp: state.common.timestamp,
+                },
+            }])[0];
 
-        this.processUpdates(stateManager, result);
+            this.processUpdates(stateManager, result);
+        }
     }
 
     /**

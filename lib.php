@@ -47,7 +47,7 @@ function kanban_add_instance($data) : int {
     global $DB;
     $kanbanid = $DB->insert_record("kanban", $data);
     $boardmanager = new boardmanager();
-    $boardmanager->load_instance($kanbanid);
+    $boardmanager->load_instance($kanbanid, true);
     $boardmanager->create_board();
     return $kanbanid;
 }

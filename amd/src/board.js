@@ -28,6 +28,8 @@ export default class extends KanbanComponent {
         return [
             {watch: `board:updated`, handler: this._boardUpdated},
             {watch: `columns:created`, handler: this._createColumn},
+            {watch: `board:deleted`, handler: this._reload},
+            {watch: `common:updated`, handler: this._commonUpdated},
         ];
     }
 
@@ -52,16 +54,53 @@ export default class extends KanbanComponent {
             'click',
             this._templateConfirm
         );
+        this.addEventListener(
+            this.getElement(selectors.SHOWTEMPLATE),
+            'click',
+            this._showTemplate
+        );
+        this.addEventListener(
+            this.getElement(selectors.DELETEBOARD),
+            'click',
+            this._deleteConfirm
+        );
+        this.addEventListener(
+            this.getElement(selectors.DELETETEMPLATE),
+            'click',
+            this._deleteTemplateConfirm
+        );
+        this.addEventListener(
+            this.getElement(selectors.SHOWBOARD),
+            'click',
+            this._reload
+        );
         this.dragdrop = new DragDrop(this);
         if (state.common.liveupdate > 0) {
             this._continuousUpdate(state.common.liveupdate);
         }
     }
 
+    _showTemplate() {
+        window.location.href =
+            M.cfg.wwwroot +
+            '/mod/kanban/view.php?id=' +
+            this.reactive.state.common.id +
+            '&boardid=' +
+            this.reactive.state.common.template;
+    }
+
+    _reload() {
+        window.location.replace(M.cfg.wwwroot + '/mod/kanban/view.php?id=' + this.reactive.state.common.id);
+    }
+
     _continuousUpdate(seconds = 10) {
         setInterval(() => {
             this.reactive.dispatch('getUpdates');
         }, seconds * 1000);
+    }
+
+    _commonUpdated({element}) {
+        this.toggleClass(element.template != 0, 'mod_kanban_hastemplate');
     }
 
     /**
@@ -71,6 +110,7 @@ export default class extends KanbanComponent {
         if (this.dragdrop !== undefined) {
             this.dragdrop.unregister();
         }
+        this._reload();
     }
 
     /**
@@ -91,6 +131,38 @@ export default class extends KanbanComponent {
         this.reactive.dispatch('saveAsTemplate');
     }
 
+    /**
+     * Display confirmation modal for deleting a board.
+     */
+    _deleteConfirm() {
+        saveCancel(
+            getString('deleteboard', 'mod_kanban'),
+            getString('deleteboardconfirm', 'mod_kanban'),
+            getString('delete', 'core'),
+            () => {
+                this._deleteBoard();
+            }
+        );
+    }
+
+    /**
+     * Display confirmation modal for deleting a template.
+     */
+    _deleteTemplateConfirm() {
+        saveCancel(
+            getString('deletetemplate', 'mod_kanban'),
+            getString('deletetemplateconfirm', 'mod_kanban'),
+            getString('delete', 'core'),
+            () => {
+                this._deleteBoard();
+            }
+        );
+    }
+
+    _deleteBoard() {
+        this.reactive.dispatch('deleteBoard');
+    }
+
     _boardUpdated({element}) {
         const colcontainer = this.getElement(selectors.COLUMNCONTAINER);
         if (element.sequence !== undefined) {
@@ -106,6 +178,7 @@ export default class extends KanbanComponent {
             .forEach(node=>colcontainer.appendChild(node));
         }
         this.toggleClass(element.locked, 'mod_kanban_board_locked_columns');
+        this.toggleClass(element.hastemplate, 'mod_kanban_hastemplate');
     }
 
     async _createColumn({element}) {

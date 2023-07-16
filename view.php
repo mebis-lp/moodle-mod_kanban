@@ -135,6 +135,10 @@ if (!empty($cm->groupmode)) {
     }
 }
 
+if (!empty($board->template)) {
+    $heading = get_string('template', 'mod_kanban');
+}
+
 echo $OUTPUT->render_from_template(
     'mod_kanban/container',
     [

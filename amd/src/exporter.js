@@ -22,7 +22,9 @@ export default class {
             sequence: state.board.sequence,
             hascolumns: hascolumns,
             columns: columns,
-            locked: state.board.locked
+            locked: state.board.locked,
+            hastemplate: state.common.template != 0,
+            istemplate: state.board.template != 0
         }, this.exportCapabilities(state));
     }
     /**

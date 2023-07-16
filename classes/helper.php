@@ -136,24 +136,27 @@ class helper {
     /**
      * This function checks permissions if a board is a user or a group board.
      *
-     * @param object $kanbanboard The record from the board table
+     * @param object $board The record from the board table
      * @param \context $context The context of the course module
      * @param \cm_info $cminfo The course module info
      * @param int $type Type of permission to check: MOD_KANBAN_EDIT(default) or MOD_KANBAN_VIEW
      */
     public static function check_permissions_for_user_or_group(
-        object $kanbanboard,
+        object $board,
         \context $context,
         \cm_info $cminfo,
         int $type = self::MOD_KANBAN_EDIT
     ): void {
         global $USER;
-        if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
-            if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
+        if (!empty($board->template)) {
+            require_capability('mod/kanban:manageboard', $context);
+        }
+        if (!(empty($board->user) && empty($board->groupid))) {
+            if (!empty($board->user) && $board->user != $USER->id) {
                 require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
             }
-            if (!empty($kanbanboard->groupid)) {
-                $members = groups_get_members($kanbanboard->groupid, 'u.id');
+            if (!empty($board->groupid)) {
+                $members = groups_get_members($board->groupid, 'u.id');
                 $members = array_map(function ($v) {
                     return intval($v->id);
                 }, $members);

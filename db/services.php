@@ -162,4 +162,12 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:manageboard',
     ],
+    'mod_kanban_change_kanban_content_delete_board' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'delete_board',
+        'description' => 'Deletes the current board',
+        'type'        => 'write',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:manageboard',
+    ],
 ];
