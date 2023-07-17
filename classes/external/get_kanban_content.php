@@ -162,6 +162,12 @@ class get_kanban_content extends external_api {
                                     VALUE_OPTIONAL,
                                     false
                                 ),
+                                'createdby' => new external_value(
+                                    PARAM_INT,
+                                    'original creator of the card',
+                                    VALUE_OPTIONAL,
+                                    0
+                                ),
                             ],
                             '',
                             VALUE_OPTIONAL

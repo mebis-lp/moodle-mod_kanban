@@ -226,13 +226,8 @@ export default class extends KanbanComponent {
      */
     async _cardCreated({element}) {
         if (element.kanban_column == this.id) {
-            let data = Object.assign({
-                id: element.id,
-                title: element.title,
-                options: element.options,
-                // eslint-disable-next-line
-                kanban_column: element.kanban_column,
-            }, exporter.exportCapabilities(this.reactive.state));
+            let data = JSON.parse(JSON.stringify(element));
+            Object.assign(data, exporter.exportCapabilities(this.reactive.state));
             let placeholder = document.createElement('li');
             placeholder.setAttribute('data-id', data.id);
             let node = this.getElement(selectors.COLUMNINNER, this.id);

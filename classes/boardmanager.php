@@ -304,6 +304,8 @@ class boardmanager {
                 $newcard[$card->id]->timemodified = time();
                 $newcard[$card->id]->kanban_column = $newcolumn[$card->kanban_column]->id;
                 unset($newcard[$card->id]->id);
+                // Remove user id of original creator.
+                unset($newcard[$card->id]->createdby);
                 $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard[$card->id]);
                 // Copy attachment files.
                 if ($context) {
@@ -458,12 +460,13 @@ class boardmanager {
      * @return void
      */
     public function add_card(int $columnid, int $aftercard = 0, array $data = []) {
-        global $DB;
+        global $DB, $USER;
         $aftercard = intval($aftercard);
         $defaults = [
             'title' => get_string('newcard', 'mod_kanban'),
             'options' => '{}',
             'description' => '',
+            'createdby' => $USER->id
         ];
         $defaultsfixed = [
             'kanban_board' => $this->board->id,
@@ -485,6 +488,9 @@ class boardmanager {
             'timemodified' => time()
         ];
         $DB->update_record('kanban_column', $update);
+
+        // Users can always edit cards they created.
+        $data['canedit'] = true;
 
         $this->formatter->put('cards', $data);
         $this->formatter->put('columns', $update);

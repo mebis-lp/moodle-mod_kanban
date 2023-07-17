@@ -101,16 +101,20 @@ class edit_card_form extends dynamic_form {
      * Checks if current user has access to this card, otherwise throws exception
      */
     protected function check_access_for_dynamic_submission(): void {
-        global $COURSE, $DB;
+        global $COURSE, $DB, $USER;
         $context = $this->get_context_for_dynamic_submission();
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $boardid = $this->optional_param('boardid', null, PARAM_INT);
         $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
         $id = $this->optional_param('id', null, PARAM_INT);
-        require_capability('mod/kanban:managecards', $context);
+        $boardmanager = new boardmanager($cmid, $boardid);
+        $card = $boardmanager->get_card($id);
+        if (!(has_capability('mod/kanban:addcard', $context) && $card->createdby == $USER->id)) {
+            require_capability('mod/kanban:managecards', $context);
+        }
         $modinfo = get_fast_modinfo($COURSE);
         $cm = $modinfo->get_cm($cmid);
-        \mod_kanban\helper::check_permissions_for_user_or_group($kanbanboard, $context, $cm);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cm);
     }
 
     /**
@@ -122,8 +126,6 @@ class edit_card_form extends dynamic_form {
         global $COURSE;
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $boardid = $this->optional_param('boardid', null, PARAM_INT);
-        $modinfo = get_fast_modinfo($COURSE);
-        $cminfo = $modinfo->get_cm($cmid);
         $context = $this->get_context_for_dynamic_submission();
         $formdata = $this->get_data();
         $formdata->options = json_encode(['background' => $formdata->color]);
@@ -146,8 +148,6 @@ class edit_card_form extends dynamic_form {
         );
 
         $boardmanager = new boardmanager($cmid, $boardid);
-
-        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
         $boardmanager->update_card($formdata->id, (array)$formdata);
 

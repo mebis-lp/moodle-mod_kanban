@@ -375,6 +375,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_card(int $cmid, int $boardid, array $data): array {
+        global $USER;
         $params = self::validate_parameters(self::delete_card_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -386,9 +387,13 @@ class change_kanban_content extends external_api {
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
-        require_capability('mod/kanban:managecards', $context);
 
         $boardmanager = new boardmanager($cmid, $boardid);
+        $card = $boardmanager->get_card($cardid);
+
+        if (!(has_capability('mod/kanban:addcard', $context) && $card->createdby == $USER->id)) {
+            require_capability('mod/kanban:managecards', $context);
+        }
 
         helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
@@ -910,7 +915,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_discussion_message(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $USER;
         $params = self::validate_parameters(self::delete_discussion_message_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,

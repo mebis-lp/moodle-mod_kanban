@@ -65,6 +65,7 @@ $string['kanban:addinstance'] = 'Add a Kanban board';
 $string['kanban:assignothers'] = 'Assign others to a card';
 $string['kanban:assignself'] = 'Assign self to a card';
 $string['kanban:editallboards'] = 'Edit all boards';
+$string['kanban:manageboard'] = 'Manage the board (templates, delete the board)';
 $string['kanban:managecards'] = 'Edit the cards of the board';
 $string['kanban:managecolumns'] = 'Edit the columns of the board';
 $string['kanban:moveallcards'] = 'Move all cards';

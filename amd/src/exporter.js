@@ -59,12 +59,14 @@ export default class {
             title: '-',
             assignees: [],
             options: '{}',
+            canedit: false
         };
         if (state.cards.get(cardid) !== undefined) {
             card = JSON.parse(JSON.stringify(state.cards.get(cardid)));
         }
         card.cardid = card.id;
         card.hasassignees = card.assignees.length > 0;
+        card.canedit = state.capabilities.get('managecards').value == true || card.createdby == state.common.userid;
         let options = JSON.parse(card.options);
         if (card.hasassignees && typeof card.assignees[0] == 'number') {
             card.assignees = card.assignees.map((userid) => {
