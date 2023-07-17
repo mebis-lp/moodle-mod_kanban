@@ -98,11 +98,27 @@ export default class {
      */
     static exportDiscussion(state, cardId) {
         let d = [];
-        state.discussions.get(cardId).values.forEach((c) => {
-            if (c === null) {
-                return;
+        state.discussions.forEach((c) => {
+            if (c.kanban_card == cardId) {
+                d.push(c);
             }
-            d.push(c);
+        });
+        d = d.sort((a, b) => parseInt(a.timecreated) > parseInt(b.timecreated));
+        return d;
+    }
+
+    /**
+     * Exports history for a card.
+     * @param {*} state
+     * @param {number} cardId
+     * @returns {array}
+     */
+    static exportHistory(state, cardId) {
+        let d = [];
+        state.history.forEach((c) => {
+            if (c.kanban_card == cardId) {
+                d.push(c);
+            }
         });
         d = d.sort((a, b) => parseInt(a.timecreated) > parseInt(b.timecreated));
         return d;

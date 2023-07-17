@@ -585,8 +585,8 @@ class boardmanager {
                 helper::send_notification($this->cminfo, 'closed', $assignees, (object)$data);
                 helper::remove_calendar_event($this->kanban, $card);
             }
+            $this->write_history('moved', 'card', ['columnname' => $targetcolumn->title], $card->kanban_column, $cardid);
         }
-        $this->write_history('moved', 'card', [], $card->kanban_column, $cardid);
     }
 
     /**
@@ -722,7 +722,7 @@ class boardmanager {
         $update['id'] = $DB->insert_record('kanban_discussion', $update);
         $update['candelete'] = true;
         $update['username'] = fullname($USER);
-        $this->formatter->put("discussions[$cardid]", $update);
+        $this->formatter->put('discussions', $update);
 
         if (empty($card->discussion)) {
             $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
@@ -747,9 +747,9 @@ class boardmanager {
     public function delete_discussion_message(int $messageid, int $cardid) {
         global $DB;
         $card = $this->get_card($cardid);
-        $update = ['id' => $messageid, 'kanban_card' => $cardid];
+        $update = ['id' => $messageid];
         $DB->delete_records('kanban_discussion', $update);
-        $this->formatter->delete("discussions[$cardid]", $update);
+        $this->formatter->delete("discussions", $update);
         $this->write_history('deleted', 'discussion', $update, $card->kanban_column, $cardid);
     }
 
@@ -850,7 +850,7 @@ class boardmanager {
             );
         }
         $this->formatter->put('cards', $cardupdate);
-        
+
         $this->write_history('updated', 'card', $cardupdate, $card['kanban_column'], $card['id']);
     }
 
@@ -954,6 +954,7 @@ class boardmanager {
                 $affecteduser = $data['user'];
                 unset($data['user']);
             }
+            unset($data['timemodified']);
             $record = [
                 'action' => $action,
                 'kanban_board' => $this->board->id,

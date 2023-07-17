@@ -221,18 +221,45 @@ export default class {
     async getDiscussionUpdates(stateManager, cardId) {
         const state = stateManager.state;
         let timestamp = 0;
-        if (state.discussions.get(cardId) !== undefined) {
-            state.discussions.get(cardId).values.forEach((discussion) => {
-                if (discussion.timestamp === undefined) {
-                    return;
+        state.discussions.forEach((c) => {
+            if (c.kanban_card == cardId) {
+                if (c.timestamp > timestamp) {
+                    timestamp = c.timestamp;
                 }
-                if (discussion.timestamp > timestamp) {
-                    timestamp = discussion.timestamp;
-                }
-            });
-        }
+            }
+        });
+
         const result = await Ajax.call([{
             methodname: 'mod_kanban_get_discussion_update',
+            args: {
+                cmid: state.common.id,
+                boardid: state.board.id,
+                cardid: cardId,
+                timestamp: timestamp,
+            },
+        }])[0];
+
+        this.processUpdates(stateManager, result);
+    }
+
+    /**
+     * Update history for a card.
+     * @param {*} stateManager
+     * @param {number} cardId
+     */
+    async getHistoryUpdates(stateManager, cardId) {
+        const state = stateManager.state;
+        let timestamp = 0;
+        state.history.forEach((c) => {
+            if (c.kanban_card == cardId) {
+                if (c.timestamp > timestamp) {
+                    timestamp = c.timestamp;
+                }
+            }
+        });
+
+        const result = await Ajax.call([{
+            methodname: 'mod_kanban_get_history_update',
             args: {
                 cmid: state.common.id,
                 boardid: state.board.id,

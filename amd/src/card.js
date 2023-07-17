@@ -51,8 +51,12 @@ export default class extends KanbanComponent {
         return [
             {watch: `cards[${this.id}]:updated`, handler: this._cardUpdated},
             {watch: `cards[${this.id}]:deleted`, handler: this._cardDeleted},
-            {watch: `discussions[${this.id}]:created`, handler: this._discussionUpdated},
-            {watch: `discussions[${this.id}]:updated`, handler: this._discussionUpdated},
+            {watch: `discussions:created`, handler: this._discussionUpdated},
+            {watch: `discussions:updated`, handler: this._discussionUpdated},
+            {watch: `discussions:deleted`, handler: this._discussionUpdated},
+            {watch: `history:created`, handler: this._historyUpdated},
+            {watch: `history:updated`, handler: this._historyUpdated},
+            {watch: `history:deleted`, handler: this._historyUpdated},
         ];
     }
 
@@ -116,6 +120,11 @@ export default class extends KanbanComponent {
             this.getElement(selectors.DISCUSSIONSEND),
             'click',
             this._sendMessage
+        );
+        this.addEventListener(
+            this.getElement(selectors.HISTORYMODALTRIGGER),
+            'click',
+            this._updateHistory
         );
 
         this.draggable = false;
@@ -190,6 +199,27 @@ export default class extends KanbanComponent {
             data.discussions.forEach((d) => {
                 this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
             });
+            return true;
+        }).catch((error) => displayException(error));
+    }
+
+    /**
+     * Dispatch event to update the history data.
+     */
+    _updateHistory() {
+        this.getElement(selectors.HISTORYMODAL).classList.add('mod_kanban_loading');
+        this.reactive.dispatch('getHistoryUpdates', this.id);
+    }
+
+    async _historyUpdated() {
+        let data = {
+            historyitems: exporter.exportHistory(this.reactive.state, this.id)
+        };
+        Templates.renderForPromise('mod_kanban/historyitems', data).then(({html}) => {
+            this.getElement(selectors.HISTORY, this.id).innerHTML = html;
+            this.getElement(selectors.HISTORYMODAL).classList.remove('mod_kanban_loading');
+            let el = this.getElement(selectors.HISTORYITEMS);
+            el.scrollTop = el.scrollHeight;
             return true;
         }).catch((error) => displayException(error));
     }

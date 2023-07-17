@@ -211,6 +211,21 @@ class get_kanban_content extends external_api {
                             VALUE_OPTIONAL
                         ),
                     ),
+                    'history' => new external_multiple_structure(
+                        new external_single_structure(
+                            [
+                                'id' => new external_value(PARAM_INT, 'id'),
+                                'timestamp' => new external_value(PARAM_INT, 'timestamp'),
+                                'user' => new external_value(PARAM_INT, 'userid'),
+                                'kanban_card' => new external_value(PARAM_INT, 'card id'),
+                                'kanban_column' => new external_value(PARAM_INT, 'column'),
+                                'content' => new external_value(PARAM_TEXT, 'discussion message'),
+                                'affectedusername' => new external_value(PARAM_TEXT, 'user name'),
+                            ],
+                            '',
+                            VALUE_OPTIONAL
+                        ),
+                    ),
                 ]
             );
     }
@@ -461,6 +476,7 @@ class get_kanban_content extends external_api {
             'users' => $kanbanusers,
             'capabilities' => $caps,
             'discussions' => [],
+            'history' => [],
         ];
     }
 
@@ -527,7 +543,7 @@ class get_kanban_content extends external_api {
         foreach ($discussions as $discussion) {
             $discussion->candelete = $discussion->user == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->user));
-            $formatter->put("discussions[$cardid]", (array)$discussion);
+            $formatter->put('discussions', (array)$discussion);
         }
         return [
             'update' => $formatter->format()
@@ -594,8 +610,15 @@ class get_kanban_content extends external_api {
         $formatter = new updateformatter();
         foreach ($historyitems as $item) {
             $item->affectedusername = get_string('unknownuser');
+            $item->username = get_string('unknownuser');
+            if (!empty($item->user)) {
+                $user = \core_user::get_user($item->user, '*', IGNORE_MISSING);
+                if ($user) {
+                    $item->username = fullname($user);
+                }
+            }
             if (!empty($item->affecteduser)) {
-                $affecteduser = \core_user::get_user($item->affecteduser, IGNORE_MISSING);
+                $affecteduser = \core_user::get_user($item->affected_user, '*', IGNORE_MISSING);
                 if ($affecteduser) {
                     $item->affectedusername = fullname($affecteduser);
                 }
@@ -607,9 +630,11 @@ class get_kanban_content extends external_api {
             }
             $item = (object) array_merge((array)$item, json_decode($item->parameters, true));
             $historyitem = [];
+            $historyitem['id'] = $item->id;
             $historyitem['text'] = get_string('history_' . $type . '_' . $item->action, 'mod_kanban', $item);
             $historyitem['timestamp'] = $item->timestamp;
-            $formatter->put("history[$cardid]", $historyitem);
+            $historyitem['kanban_card'] = $cardid;
+            $formatter->put("history", $historyitem);
         }
         return [
             'update' => $formatter->format()
