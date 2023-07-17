@@ -123,7 +123,6 @@ class edit_card_form extends dynamic_form {
      * @return array Returns whether a new template was created.
      */
     public function process_dynamic_submission(): array {
-        global $COURSE;
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $boardid = $this->optional_param('boardid', null, PARAM_INT);
         $context = $this->get_context_for_dynamic_submission();

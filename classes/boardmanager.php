@@ -390,6 +390,7 @@ class boardmanager {
         $DB->delete_records('kanban_card', ['id' => $cardid]);
         helper::remove_calendar_event($this->kanban, (object)['id' => $cardid]);
         $this->formatter->delete('cards', ['id' => $cardid]);
+        $this->write_history('deleted', 'card', [], $card->kanban_column, $cardid);
     }
 
     /**
@@ -494,6 +495,7 @@ class boardmanager {
 
         $this->formatter->put('cards', $data);
         $this->formatter->put('columns', $update);
+        $this->write_history('added', 'card', $data, $columnid, $data['id']);
     }
 
     /**
@@ -584,6 +586,7 @@ class boardmanager {
                 helper::remove_calendar_event($this->kanban, $card);
             }
         }
+        $this->write_history('moved', 'card', [], $card->kanban_column, $cardid);
     }
 
     /**
@@ -617,6 +620,8 @@ class boardmanager {
             'fullname' => fullname($user),
             'userpicture' => $OUTPUT->user_picture($user, ['link' => false]),
         ]);
+
+        $this->write_history('assigned', 'card', ['user' => $userid], $card->kanban_column, $cardid);
     }
 
     /**
@@ -644,6 +649,7 @@ class boardmanager {
         $update['assignees'] = $userids;
         $update['selfassigned'] = in_array($USER->id, $userids);
         $this->formatter->put('cards', $update);
+        $this->write_history('unassigned', 'card', ['user' => $userid], $card->kanban_column, $cardid);
     }
 
     /**
@@ -668,6 +674,7 @@ class boardmanager {
         $card->username = fullname($USER);
         $card->boardname = $this->kanban->name;
         helper::send_notification($this->cminfo, 'closed', $assignees, $card, ($state == 0 ? 'reopened' : null));
+        $this->write_history('completed', 'card', $update, $card->kanban_column, $cardid);
     }
 
     /**
@@ -727,6 +734,7 @@ class boardmanager {
         $update['title'] = $card->title;
         $assignees = $this->get_card_assignees($cardid);
         helper::send_notification($this->cminfo, 'discussion', $assignees, (object)$update);
+        $this->write_history('added', 'discussion', $update, $card->kanban_column, $cardid);
     }
 
     /**
@@ -738,9 +746,11 @@ class boardmanager {
      */
     public function delete_discussion_message(int $messageid, int $cardid) {
         global $DB;
+        $card = $this->get_card($cardid);
         $update = ['id' => $messageid];
         $DB->delete_records('kanban_discussion', $update);
         $this->formatter->discussiondelete("discussions[$cardid]", $update);
+        $this->write_history('deleted', 'discussion', $update, $card->kanban_column, $cardid);
     }
 
     /**
@@ -798,6 +808,9 @@ class boardmanager {
                 $params['cardid'] = $cardid;
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
                 helper::send_notification($this->cminfo, 'assigned', $todelete, (object)$carddata, 'unassigned');
+                foreach ($todelete as $user) {
+                    $this->write_history('unassigned', 'card', ['user' => $user], $card['kanban_column'], $card['id']);
+                }
             }
             if (!empty($toinsert) || !empty($todelete)) {
                 $cardupdate['assignees'] = $assignees;
@@ -819,6 +832,9 @@ class boardmanager {
                 $toinsert,
                 (object)array_merge($carddata, ['boardname' => $this->cminfo->name])
             );
+            foreach ($toinsert as $user) {
+                $this->write_history('assigned', 'card', ['user' => $user], $card['kanban_column'], $card['id']);
+            }
         }
         $cardupdate['attachments'] = helper::get_attachments($context->id, $cardid);
         $cardupdate['hasattachment'] = count($cardupdate['attachments']) > 0;
@@ -834,6 +850,8 @@ class boardmanager {
             );
         }
         $this->formatter->put('cards', $cardupdate);
+        
+        $this->write_history('updated', 'card', $cardupdate, $card['kanban_column'], $card['id']);
     }
 
     /**
@@ -845,6 +863,7 @@ class boardmanager {
      */
     public function update_column(int $columnid, array $data) {
         global $DB;
+        $column = $this->get_column($columnid);
         $options = [
             'autoclose' => $data['autoclose'],
             'autohide' => $data['autohide'],
@@ -859,6 +878,10 @@ class boardmanager {
         $DB->update_record('kanban_column', $columndata);
 
         $this->formatter->put('columns', $columndata);
+
+        if ($column->title != $columndata['title']) {
+            $this->write_history('updated', 'column', $columndata, $columnid);
+        }
     }
 
     /**
@@ -912,5 +935,36 @@ class boardmanager {
      */
     public function get_cminfo(): object {
         return $this->cminfo;
+    }
+
+    /**
+     * Writes a record to the history table.
+     * @param string $action Action for history
+     * @param int $columnid Id of the column
+     * @param int $cardid Id of the card
+     * @param string $type Type of item that was modified
+     * @param array $data Array of data to write
+     */
+    public function write_history(string $action, string $type, array $data = [], int $columnid = 0, int $cardid = 0) {
+        global $DB, $USER;
+        if (!empty($this->kanban->history)) {
+            $affecteduser = null;
+            // Affected user must be written to a separate column (for privacy provider).
+            if (!empty($data['user'])) {
+                $affecteduser = $data['user'];
+                unset($data['user']);
+            }
+            $record = [
+                'action' => $action,
+                'kanban_board' => $this->board->id,
+                'user' => $USER->id,
+                'kanban_column' => $columnid,
+                'kanban_card' => $cardid,
+                'parameters' => json_encode($data),
+                'affected_user' => $affecteduser,
+                'timestamp' => time()
+            ];
+            $DB->insert_record('kanban_history', $record);
+        }
     }
 }

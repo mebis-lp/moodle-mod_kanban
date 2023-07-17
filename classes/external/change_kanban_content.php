@@ -304,7 +304,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function move_card(int $cmid, int $boardid, array $data): array {
-        global $DB, $USER;
+        global $USER;
         $params = self::validate_parameters(self::move_card_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
