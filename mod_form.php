@@ -51,7 +51,9 @@ class mod_kanban_mod_form extends moodleform_mod {
         ];
         $mform->addElement('select', 'userboards', get_string('userboards', 'kanban'), $userboards);
 
-        $mform->addElement('checkbox', 'history', get_string('enablehistory', 'mod_kanban'));
+        if (!empty(get_config('mod_kanban', 'enablehistory'))) {
+            $mform->addElement('checkbox', 'history', get_string('enablehistory', 'mod_kanban'));
+        }
 
         $this->standard_coursemodule_elements();
 

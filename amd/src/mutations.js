@@ -4,42 +4,6 @@ import Ajax from 'core/ajax';
  * The functions are just used to forward data to the webservice.
  */
 export default class {
-    init(stateManager) {
-        stateManager.addUpdateTypes({
-            discussionput: this._discussionPut,
-            discussiondelete: this._discussionDelete,
-        });
-    }
-
-    _discussionPut(stateManager, name, fields) {
-        stateManager.setReadOnly(false);
-        const cardid = parseInt(fields.kanban_card);
-        if (stateManager.state.discussions.get(cardid) === undefined) {
-            stateManager.state.discussions.set(cardid, {'id': cardid, values: []});
-        }
-        stateManager.state.discussions.get(cardid).values[fields.id] = fields;
-        stateManager.eventsToPublish.push({
-            eventName: `${name}:updated`,
-            eventData: fields,
-            action: `updated`,
-        });
-        stateManager.setReadOnly(false);
-    }
-
-    _discussionDelete(stateManager, name, fields) {
-        stateManager.setReadOnly(false);
-        const cardid = parseInt(fields.kanban_card);
-        if (stateManager.state.discussions.get(cardid) !== undefined) {
-            delete stateManager.state.discussions.get(cardid).values[fields.id];
-            stateManager.eventsToPublish.push({
-                eventName: `${name}:updated`,
-                eventData: fields,
-                action: `updated`,
-            });
-        }
-        stateManager.setReadOnly(false);
-    }
-
     async saveAsTemplate(stateManager) {
         await this.sendChange('save_as_template', stateManager);
     }

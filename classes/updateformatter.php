@@ -72,8 +72,8 @@ class updateformatter {
      * @param string $name Name of the value to update
      * @param array $data Fields to update, must contain 'id' field
      */
-    public function discussionput(string $name, array $data) {
-        $this->updates[] = ['name' => $name, 'action' => 'discussionput', 'fields' => $data];
+    public function put(string $name, array $data) {
+        $this->updates[] = ['name' => $name, 'action' => 'put', 'fields' => $data];
     }
 
     /**
@@ -81,8 +81,8 @@ class updateformatter {
      * @param string $name Name of the value to update
      * @param array $data Fields to update, must contain 'id' field
      */
-    public function discussiondelete(string $name, array $data) {
-        $this->updates[] = ['name' => $name, 'action' => 'discussiondelete', 'fields' => $data];
+    public function delete(string $name, array $data) {
+        $this->updates[] = ['name' => $name, 'action' => 'delete', 'fields' => $data];
     }
 
     /**

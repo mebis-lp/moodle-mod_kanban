@@ -722,7 +722,7 @@ class boardmanager {
         $update['id'] = $DB->insert_record('kanban_discussion', $update);
         $update['candelete'] = true;
         $update['username'] = fullname($USER);
-        $this->formatter->discussionput("discussions[$cardid]", $update);
+        $this->formatter->put("discussions[$cardid]", $update);
 
         if (empty($card->discussion)) {
             $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
@@ -747,9 +747,9 @@ class boardmanager {
     public function delete_discussion_message(int $messageid, int $cardid) {
         global $DB;
         $card = $this->get_card($cardid);
-        $update = ['id' => $messageid];
+        $update = ['id' => $messageid, 'kanban_card' => $cardid];
         $DB->delete_records('kanban_discussion', $update);
-        $this->formatter->discussiondelete("discussions[$cardid]", $update);
+        $this->formatter->delete("discussions[$cardid]", $update);
         $this->write_history('deleted', 'discussion', $update, $card->kanban_column, $cardid);
     }
 
@@ -947,7 +947,7 @@ class boardmanager {
      */
     public function write_history(string $action, string $type, array $data = [], int $columnid = 0, int $cardid = 0) {
         global $DB, $USER;
-        if (!empty($this->kanban->history)) {
+        if (!empty($this->kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))) {
             $affecteduser = null;
             // Affected user must be written to a separate column (for privacy provider).
             if (!empty($data['user'])) {
