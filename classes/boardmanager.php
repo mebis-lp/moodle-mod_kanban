@@ -955,7 +955,6 @@ class boardmanager {
      * @param int $type Type of object affected by the entry
      * @param int $columnid Id of the column
      * @param int $cardid Id of the card
-     * @param string $type Type of item that was modified
      * @param array $data Array of data to write
      */
     public function write_history(string $action, int $type, array $data = [], int $columnid = 0, int $cardid = 0) {
