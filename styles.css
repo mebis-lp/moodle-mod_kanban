@@ -142,7 +142,6 @@
     overflow-y: visible;
     min-height: 300px;
     max-width: none;
-    margin-bottom: 100px;
 }
 
 .mod_kanban_action_menu {
@@ -356,4 +355,8 @@ a.mod_kanban_attachment_item {
 
 .mod_kanban_updated {
     animation: glow 3s 1 ease-out;
+}
+
+.mod_kanban_board {
+    margin-bottom: 200px;
 }

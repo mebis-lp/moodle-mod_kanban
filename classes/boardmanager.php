@@ -953,9 +953,9 @@ class boardmanager {
      * Writes a record to the history table.
      * @param string $action Action for history
      * @param int $type Type of object affected by the entry
+     * @param array $data Array of data to write
      * @param int $columnid Id of the column
      * @param int $cardid Id of the card
-     * @param array $data Array of data to write
      */
     public function write_history(string $action, int $type, array $data = [], int $columnid = 0, int $cardid = 0) {
         global $DB, $USER;
