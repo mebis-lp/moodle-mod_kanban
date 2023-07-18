@@ -954,7 +954,11 @@ class boardmanager {
                 $affecteduser = $data['user'];
                 unset($data['user']);
             }
+            // Unset unused data.
             unset($data['timemodified']);
+            unset($data['timecreated']);
+            unset($data['createdby']);
+            unset($data['id']);
             $record = [
                 'action' => $action,
                 'kanban_board' => $this->board->id,
