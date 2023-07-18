@@ -8,6 +8,7 @@ import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 
+
 /**
  * Component representing a card in a kanban board.
  */
@@ -51,8 +52,12 @@ export default class extends KanbanComponent {
         return [
             {watch: `cards[${this.id}]:updated`, handler: this._cardUpdated},
             {watch: `cards[${this.id}]:deleted`, handler: this._cardDeleted},
-            {watch: `discussions[${this.id}]:created`, handler: this._discussionUpdated},
-            {watch: `discussions[${this.id}]:updated`, handler: this._discussionUpdated},
+            {watch: `discussions:created`, handler: this._discussionUpdated},
+            {watch: `discussions:updated`, handler: this._discussionUpdated},
+            {watch: `discussions:deleted`, handler: this._discussionUpdated},
+            {watch: `history:created`, handler: this._historyUpdated},
+            {watch: `history:updated`, handler: this._historyUpdated},
+            {watch: `history:deleted`, handler: this._historyUpdated},
         ];
     }
 
@@ -117,6 +122,16 @@ export default class extends KanbanComponent {
             'click',
             this._sendMessage
         );
+        this.addEventListener(
+            this.getElement(selectors.HISTORYMODALTRIGGER),
+            'click',
+            this._updateHistory
+        );
+        this.addEventListener(
+            this.getElement(selectors.MOVEMODALTRIGGER),
+            'click',
+            this._showMoveModal
+        );
 
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
@@ -126,6 +141,22 @@ export default class extends KanbanComponent {
         this.user = state.board.user;
         this.groupid = state.board.groupid;
         this._dueDateFormat();
+    }
+
+    _showMoveModal() {
+        let data = exporter.exportStateForTemplate(this.reactive.state);
+        data.cardid = this.id;
+        data.kanban_column = this.reactive.state.cards.get(this.id).kanban_column;
+        saveCancel(
+            getString('movecard', 'mod_kanban'),
+            Templates.render('mod_kanban/movemodal', data),
+            getString('move', 'core'),
+            () => {
+                let column = document.querySelector(selectors.MOVECARDCOLUMN + `[data-id="${this.id}"]`).value;
+                let aftercard = document.querySelector(selectors.MOVECARDAFTERCARD + `[data-id="${this.id}"]`).value;
+                this.reactive.dispatch('moveCard', this.id, column, aftercard);
+            }
+        );
     }
 
     /**
@@ -190,6 +221,27 @@ export default class extends KanbanComponent {
             data.discussions.forEach((d) => {
                 this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
             });
+            return true;
+        }).catch((error) => displayException(error));
+    }
+
+    /**
+     * Dispatch event to update the history data.
+     */
+    _updateHistory() {
+        this.getElement(selectors.HISTORYMODAL).classList.add('mod_kanban_loading');
+        this.reactive.dispatch('getHistoryUpdates', this.id);
+    }
+
+    async _historyUpdated() {
+        let data = {
+            historyitems: exporter.exportHistory(this.reactive.state, this.id)
+        };
+        Templates.renderForPromise('mod_kanban/historyitems', data).then(({html}) => {
+            this.getElement(selectors.HISTORY, this.id).innerHTML = html;
+            this.getElement(selectors.HISTORYMODAL).classList.remove('mod_kanban_loading');
+            let el = this.getElement(selectors.HISTORYITEMS);
+            el.scrollTop = el.scrollHeight;
             return true;
         }).catch((error) => displayException(error));
     }

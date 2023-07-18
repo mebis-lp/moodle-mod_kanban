@@ -4,42 +4,6 @@ import Ajax from 'core/ajax';
  * The functions are just used to forward data to the webservice.
  */
 export default class {
-    init(stateManager) {
-        stateManager.addUpdateTypes({
-            discussionput: this._discussionPut,
-            discussiondelete: this._discussionDelete,
-        });
-    }
-
-    _discussionPut(stateManager, name, fields) {
-        stateManager.setReadOnly(false);
-        const cardid = parseInt(fields.kanban_card);
-        if (stateManager.state.discussions.get(cardid) === undefined) {
-            stateManager.state.discussions.set(cardid, {'id': cardid, values: []});
-        }
-        stateManager.state.discussions.get(cardid).values[fields.id] = fields;
-        stateManager.eventsToPublish.push({
-            eventName: `${name}:updated`,
-            eventData: fields,
-            action: `updated`,
-        });
-        stateManager.setReadOnly(false);
-    }
-
-    _discussionDelete(stateManager, name, fields) {
-        stateManager.setReadOnly(false);
-        const cardid = parseInt(fields.kanban_card);
-        if (stateManager.state.discussions.get(cardid) !== undefined) {
-            delete stateManager.state.discussions.get(cardid).values[fields.id];
-            stateManager.eventsToPublish.push({
-                eventName: `${name}:updated`,
-                eventData: fields,
-                action: `updated`,
-            });
-        }
-        stateManager.setReadOnly(false);
-    }
-
     async saveAsTemplate(stateManager) {
         await this.sendChange('save_as_template', stateManager);
     }
@@ -257,18 +221,45 @@ export default class {
     async getDiscussionUpdates(stateManager, cardId) {
         const state = stateManager.state;
         let timestamp = 0;
-        if (state.discussions.get(cardId) !== undefined) {
-            state.discussions.get(cardId).values.forEach((discussion) => {
-                if (discussion.timestamp === undefined) {
-                    return;
+        state.discussions.forEach((c) => {
+            if (c.kanban_card == cardId) {
+                if (c.timestamp > timestamp) {
+                    timestamp = c.timestamp;
                 }
-                if (discussion.timestamp > timestamp) {
-                    timestamp = discussion.timestamp;
-                }
-            });
-        }
+            }
+        });
+
         const result = await Ajax.call([{
             methodname: 'mod_kanban_get_discussion_update',
+            args: {
+                cmid: state.common.id,
+                boardid: state.board.id,
+                cardid: cardId,
+                timestamp: timestamp,
+            },
+        }])[0];
+
+        this.processUpdates(stateManager, result);
+    }
+
+    /**
+     * Update history for a card.
+     * @param {*} stateManager
+     * @param {number} cardId
+     */
+    async getHistoryUpdates(stateManager, cardId) {
+        const state = stateManager.state;
+        let timestamp = 0;
+        state.history.forEach((c) => {
+            if (c.kanban_card == cardId) {
+                if (c.timestamp > timestamp) {
+                    timestamp = c.timestamp;
+                }
+            }
+        });
+
+        const result = await Ajax.call([{
+            methodname: 'mod_kanban_get_history_update',
             args: {
                 cmid: state.common.id,
                 boardid: state.board.id,
