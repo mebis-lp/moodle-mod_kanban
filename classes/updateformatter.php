@@ -41,29 +41,11 @@ class updateformatter {
     private $updates = [];
 
     /**
-     * Whether to add highlight field to updates.
-     *
-     * @var bool
-     */
-    private $highlight = false;
-
-    /**
-     * Constructor
-     * @param bool $highlight whether to add highlight field to updates
-     */
-    public function __construct(bool $highlight = false) {
-        $this->highlight = $highlight;
-    }
-
-    /**
      * Put a new value.
      * @param string $name Name of the value to update
      * @param array $data Fields to update, must contain 'id' field
      */
     public function put(string $name, array $data) {
-        if ($this->highlight) {
-            $data['highlight'] = true;
-        }
         $this->updates[] = ['name' => $name, 'action' => 'put', 'fields' => $data];
     }
 

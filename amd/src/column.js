@@ -235,10 +235,6 @@ export default class extends KanbanComponent {
             const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/card', data);
             const newelement = newcomponent.getElement();
             node.replaceChild(newelement, placeholder);
-            if (element.highlight !== undefined && element.highlight) {
-                newelement.classList.add('mod_kanban_updated');
-                setTimeout(() => this.newelement.classList.remove('mod_kanban_updated'), 3000);
-            }
         }
     }
 
@@ -285,10 +281,6 @@ export default class extends KanbanComponent {
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
             this.toggleClass(options.autohide, 'mod_kanban_autohide');
-        }
-        if (element.highlight !== undefined && element.highlight) {
-            this.getElement().classList.add('mod_kanban_updated');
-            setTimeout(() => this.getElement().classList.remove('mod_kanban_updated'), 3000);
         }
         this.checkDragging();
     }

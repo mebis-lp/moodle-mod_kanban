@@ -756,8 +756,13 @@ class boardmanager {
         $card = $this->get_card($cardid);
         $update = ['id' => $messageid];
         $DB->delete_records('kanban_discussion', $update);
-        $this->formatter->delete("discussions", $update);
+        $this->formatter->delete('discussions', $update);
         $this->write_history('deleted', MOD_KANBAN_DISCUSSION, $update, $card->kanban_column, $cardid);
+        if (!$DB->record_exists('kanban_discussions', ['kanban_card' => $cardid])) {
+            $update = ['id' => $cardid, 'discussion' => 0, 'timemodified' => time()];
+            $DB->update_record('kanban_card', $update);
+            $this->formatter->put('cards', $update);
+        }
     }
 
     /**
@@ -947,12 +952,13 @@ class boardmanager {
     /**
      * Writes a record to the history table.
      * @param string $action Action for history
+     * @param int $type Type of object affected by the entry
      * @param int $columnid Id of the column
      * @param int $cardid Id of the card
      * @param string $type Type of item that was modified
      * @param array $data Array of data to write
      */
-    public function write_history(string $action, string $type, array $data = [], int $columnid = 0, int $cardid = 0) {
+    public function write_history(string $action, int $type, array $data = [], int $columnid = 0, int $cardid = 0) {
         global $DB, $USER;
         if (!empty($this->kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))) {
             $affecteduser = null;

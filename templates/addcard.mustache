@@ -27,5 +27,5 @@
     }
 }}
 <div class="mod_kanban_addcard_container row" data-id="{{^kanban_column}}0{{/kanban_column}}{{#kanban_column}}{{id}}{{/kanban_column}}">
-    <button class="mod_kanban_addcard btn btn_icon icon-no-margin p-0{{^addcard}} hidden{{/addcard}}" id="mod_kanban_addcard_{{id}}" data-action="add_card" data-columnid="{{#kanban_column}}{{kanban_column}}{{/kanban_column}}{{^kanban_column}}{{id}}{{/kanban_column}}" data-id="{{id}}">{{#pix}} t/add, core, {{#str}} addcard, mod_kanban {{/str}} {{/pix}}</button>
+    <button class="mod_kanban_addcard btn icon-no-margin p-0{{^addcard}} hidden{{/addcard}}" id="mod_kanban_addcard_{{id}}" data-action="add_card" data-columnid="{{#kanban_column}}{{kanban_column}}{{/kanban_column}}{{^kanban_column}}{{id}}{{/kanban_column}}" data-id="{{id}}">{{#pix}} t/add, core, {{#str}} addcard, mod_kanban {{/str}} {{/pix}}</button>
 </div>

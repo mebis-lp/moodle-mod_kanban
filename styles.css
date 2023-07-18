@@ -153,8 +153,9 @@
 
 .mod_kanban_card_completion {
     position: absolute;
-    top: 12px;
-    right: 45px;
+    top: 10px;
+    right: 50px;
+    cursor: inherit;
 }
 
 .mod_kanban_description {
@@ -174,9 +175,10 @@
 }
 
 .mod_kanban_card_title {
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 80%;
 }
 
 .mod_kanban_assignees {
@@ -191,6 +193,10 @@
 .mod_kanban_assignees .mod_kanban_assigned_user:hover,
 .mod_kanban_assignees .mod_kanban_assigned_user:focus {
     z-index: 4;
+}
+
+.mod_kanban_assigned_user.btn {
+    cursor: inherit;
 }
 
 .mod_kanban_assigned_user:not(:first-of-type) {
@@ -225,7 +231,7 @@
     overflow-y: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 80%;
+    max-width: 90%;
 }
 
 .mod_kanban_action_menu_trigger.dropdown-toggle::after {
@@ -328,6 +334,11 @@ a.mod_kanban_attachment_item {
 .mod_kanban_card:not(.mod_kanban_closed) .mod_kanban_card_completion,
 .mod_kanban_card .modal-body:not(.mod_kanban_loading) .mod_kanban_loading_status {
     display: none;
+}
+
+.mod_kanban_column.mod_kanban_locked_column,
+.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned) {
+    cursor: not-allowed;
 }
 
 .mod_kanban_board_menu {
