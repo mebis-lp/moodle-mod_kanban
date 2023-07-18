@@ -60,6 +60,7 @@ $string['editdetails'] = 'Details bearbeiten';
 $string['enablehistory'] = 'Verlauf aktivieren';
 $string['enablehistorydescription'] = 'Wenn diese Option aktiv ist, ist der Änderungsverlauf in den Boards verfügbar.';
 $string['groupboard'] = 'Gruppen-Board der Gruppe "{$a}"';
+$string['history'] = 'Verlauf';
 $string['kanban:addcard'] = 'Eine Karte zu einem Board hinzufügen';
 $string['kanban:addinstance'] = 'Eim Board hinzufügen';
 $string['kanban:assignothers'] = 'Anderen eine Karte zuweisen';

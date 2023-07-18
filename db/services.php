@@ -42,6 +42,14 @@ $functions = [
         'ajax' => true,
         'capabilities' => 'mod/kanban:view',
     ],
+    'mod_kanban_get_history_update' => [
+        'classname'   => 'mod_kanban\external\get_kanban_content',
+        'methodname'  => 'get_history_update',
+        'description' => 'Retrieves the history of a the kanban card',
+        'type'        => 'read',
+        'ajax' => true,
+        'capabilities' => 'mod/kanban:viewhistory',
+    ],
     'mod_kanban_get_discussion_update' => [
         'classname'   => 'mod_kanban\external\get_kanban_content',
         'methodname'  => 'get_discussion_update',

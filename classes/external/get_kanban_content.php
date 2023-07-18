@@ -211,6 +211,21 @@ class get_kanban_content extends external_api {
                             VALUE_OPTIONAL
                         ),
                     ),
+                    'history' => new external_multiple_structure(
+                        new external_single_structure(
+                            [
+                                'id' => new external_value(PARAM_INT, 'id'),
+                                'timestamp' => new external_value(PARAM_INT, 'timestamp'),
+                                'user' => new external_value(PARAM_INT, 'userid'),
+                                'kanban_card' => new external_value(PARAM_INT, 'card id'),
+                                'kanban_column' => new external_value(PARAM_INT, 'column'),
+                                'content' => new external_value(PARAM_TEXT, 'discussion message'),
+                                'affectedusername' => new external_value(PARAM_TEXT, 'user name'),
+                            ],
+                            '',
+                            VALUE_OPTIONAL
+                        ),
+                    ),
                 ]
             );
     }
@@ -318,7 +333,8 @@ class get_kanban_content extends external_api {
             'moveallcards' => has_capability('mod/kanban:moveallcards', $context),
             'managecolumns' => has_capability('mod/kanban:managecolumns', $context),
             'editallboards' => has_capability('mod/kanban:editallboards', $context),
-            'manageboard' => has_capability('mod/kanban:manageboard', $context)
+            'manageboard' => has_capability('mod/kanban:manageboard', $context),
+            'viewhistory' => has_capability('mod/kanban:viewhistory', $context),
         ];
 
         $params['board'] = $boardid;
@@ -460,11 +476,12 @@ class get_kanban_content extends external_api {
             'users' => $kanbanusers,
             'capabilities' => $caps,
             'discussions' => [],
+            'history' => [],
         ];
     }
 
     /**
-     * Parameters for get_kanban_discussion_update().
+     * Parameters for get_discussion_update().
      *
      * @return external_function_parameters
      */
@@ -478,7 +495,7 @@ class get_kanban_content extends external_api {
     }
 
     /**
-     * Definition of return values of the get_kanban_content_update webservice function.
+     * Definition of return values of the get_discussion_update webservice function.
      *
      * @return external_single_structure
      */
@@ -526,11 +543,100 @@ class get_kanban_content extends external_api {
         foreach ($discussions as $discussion) {
             $discussion->candelete = $discussion->user == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->user));
-            $formatter->discussionput("discussions[$cardid]", (array)$discussion);
+            $formatter->put('discussions', (array)$discussion);
         }
         return [
             'update' => $formatter->format()
         ];
     }
 
+    /**
+     * Parameters for get_history_update().
+     *
+     * @return external_function_parameters
+     */
+    public static function get_history_update_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'cardid' => new external_value(PARAM_INT, 'card id', VALUE_REQUIRED),
+            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_OPTIONAL, 0),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the get_history_update webservice function.
+     *
+     * @return external_single_structure
+     */
+    public static function get_history_update_returns(): external_single_structure {
+        return new external_single_structure(
+            [
+                'update' => new external_value(PARAM_RAW, 'update JSON'),
+            ]
+        );
+    }
+
+    /**
+     * Get card history from database.
+     *
+     * @param int $cmid the course module id of the kanban board
+     * @param int $boardid the id of the kanban board
+     * @param int $cardid the id of the card
+     * @param int $timestamp the timestamp of the history present in the frontend
+     * @return array The requested content
+     * @throws coding_exception
+     * @throws invalid_parameter_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     * @throws moodle_exception
+     */
+    public static function get_history_update(int $cmid, int $boardid, int $cardid, int $timestamp = 0): array {
+        global $DB;
+        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+        require_capability('mod/kanban:viewhistory', $context);
+
+        $formatter = new updateformatter();
+        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
+        if (!empty($kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))){ 
+            $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+
+            helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, helper::MOD_KANBAN_VIEW);
+
+            $sql = 'kanban_card = :id AND timestamp > :time';
+            $params = ['id' => $cardid, 'time' => $timestamp];
+            $historyitems = $DB->get_records_select('kanban_history', $sql, $params);
+
+            foreach ($historyitems as $item) {
+                $item->affectedusername = get_string('unknownuser');
+                $item->username = get_string('unknownuser');
+                if (!empty($item->user)) {
+                    $user = \core_user::get_user($item->user, '*', IGNORE_MISSING);
+                    if ($user) {
+                        $item->username = fullname($user);
+                    }
+                }
+                if (!empty($item->affecteduser)) {
+                    $affecteduser = \core_user::get_user($item->affected_user, '*', IGNORE_MISSING);
+                    if ($affecteduser) {
+                        $item->affectedusername = fullname($affecteduser);
+                    }
+                }
+
+                $type = \MOD_KANBAN_TYPES[$item->type];
+                $item = (object) array_merge((array)$item, json_decode($item->parameters, true));
+                $historyitem = [];
+                $historyitem['id'] = $item->id;
+                $historyitem['text'] = get_string('history_' . $type . '_' . $item->action, 'mod_kanban', $item);
+                $historyitem['timestamp'] = $item->timestamp;
+                $historyitem['kanban_card'] = $cardid;
+                $formatter->put("history", $historyitem);
+            }
+        }
+        return [
+            'update' => $formatter->format()
+        ];
+    }
 }
