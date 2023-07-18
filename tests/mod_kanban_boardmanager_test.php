@@ -23,7 +23,7 @@ namespace mod_kanban;
  * @copyright   2021-2023, ISB Bayern
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers      mod_kanban\boardmanager
+ * @covers      \mod_kanban\boardmanager
  */
 class mod_kanban_boardmanager_test extends \advanced_testcase {
     /**
@@ -66,7 +66,7 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         $this->getDataGenerator()->enrol_user($this->users[0]->id, $this->course->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($this->users[1]->id, $this->course->id, $studentrole->id);
-        $this->getDataGenerator()->enrol_user($this->users[3]->id, $this->course->id, $teacherrole->id);
+        $this->getDataGenerator()->enrol_user($this->users[2]->id, $this->course->id, $teacherrole->id);
     }
 
     /**
@@ -76,6 +76,9 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
      */
     public function test_create_board() {
         global $DB;
+
+        $this->resetAfterTest();
+
         $boardmanager = new boardmanager($this->kanban->cmid);
         $boardid = $boardmanager->create_board();
         $this->assertNotEquals(false, $boardid);
