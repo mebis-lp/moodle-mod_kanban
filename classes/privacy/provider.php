@@ -116,9 +116,8 @@ class provider implements
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
-        $entries = $DB->get_recordset_sql($sql, $params);
+        $entries = $DB->get_records_sql($sql, $params);
         self::export_kanban_data($entries, $user);
-
 
         // Get all cards the user has created without private board of the user.
         $sql = "SELECT cm.id AS cmid,
@@ -137,7 +136,7 @@ class provider implements
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
-        $entries = $DB->get_recordset_sql($sql, $params);
+        $entries = $DB->get_records_sql($sql, $params);
         self::export_kanban_data($entries, $user);
 
         // Get all history items the user is part of.
@@ -154,10 +153,10 @@ class provider implements
                 LEFT JOIN {kanban_history} h ON h.kanban_board = b.id
                 WHERE c.id {$contextsql} AND (h.user = :userid OR h.affected_user = :userid
                 ORDER BY h.timestamp";
-        
+
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
-        $entries = $DB->get_recordset_sql($sql, $params);
+        $entries = $DB->get_records_sql($sql, $params);
         self::export_kanban_data($entries, $user);
 
         // Get all discussion messages created by the user.
@@ -176,10 +175,10 @@ class provider implements
                 LEFT JOIN {kanban_discussion} d ON d.kanban_card = ca.id
                 WHERE c.id {$contextsql} AND d.user = :userid
                 ORDER BY d.timecreated";
-        
+
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
-        $entries = $DB->get_recordset_sql($sql, $params);
+        $entries = $DB->get_records_sql($sql, $params);
         self::export_kanban_data($entries, $user);
 
         // Get all data from personal boards.
@@ -200,7 +199,7 @@ class provider implements
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
-        $entries = $DB->get_recordset_sql($sql, $params);
+        $entries = $DB->get_records_sql($sql, $params);
         self::export_kanban_data($entries, $user);
     }
 
@@ -364,7 +363,7 @@ class provider implements
             $DB->delete_records('kanban_card', ['kanban_board' => $boardid]);
             $DB->delete_records('kanban_column', ['kanban_board' => $boardid]);
             $DB->delete_records('kanban_board', ['id' => $boardid]);
-            $DB->delete_records('kanban_history', ['id' => $boardid])
+            $DB->delete_records('kanban_history', ['id' => $boardid]);
         }
     }
 }

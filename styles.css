@@ -281,7 +281,7 @@ a.mod_kanban_attachment_item {
     top: 10px;
 }
 
-.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_delete_card, 
+.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_delete_card,
 .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_card_edit_details,
 .mod_kanban_card:not(.mod_kanban_hasdescription):not(.mod_kanban_hasattachment) .mod_kanban_description_trigger,
 .mod_kanban_card:not(.mod_kanban_hasdiscussion) .mod_kanban_discussion_trigger,

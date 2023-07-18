@@ -28,6 +28,7 @@ namespace mod_kanban\external;
 // Compatibility with Moodle < 4.2.
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/lib/externallib.php');
+require_once($CFG->dirroot . '/mod/kanban/lib.php');
 
 use coding_exception;
 use context_module;
@@ -600,7 +601,7 @@ class get_kanban_content extends external_api {
 
         $formatter = new updateformatter();
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        if (!empty($kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))){ 
+        if (!empty($kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))) {
             $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
 
             helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, helper::MOD_KANBAN_VIEW);

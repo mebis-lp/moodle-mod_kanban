@@ -16,7 +16,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot.'/mod/kanban/backup/moodle2/restore_kanban_stepslib.php');
+require_once($CFG->dirroot . '/mod/kanban/backup/moodle2/restore_kanban_stepslib.php');
 
 /**
  * Restore class for mod_kanban

@@ -146,6 +146,7 @@ export default class extends KanbanComponent {
     _showMoveModal() {
         let data = exporter.exportStateForTemplate(this.reactive.state);
         data.cardid = this.id;
+        // eslint-disable-next-line
         data.kanban_column = this.reactive.state.cards.get(this.id).kanban_column;
         saveCancel(
             getString('movecard', 'mod_kanban'),

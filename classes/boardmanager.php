@@ -27,6 +27,11 @@ namespace mod_kanban;
 use context_module;
 use context_system;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/kanban/lib.php');
+
 /**
  * Class to handle updating the board. It also sends notifications, but does not check permissions.
  *

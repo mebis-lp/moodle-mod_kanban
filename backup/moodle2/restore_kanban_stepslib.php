@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use mod_kanban\helper;
-
 /**
  * Restore steps for mod_kanban
  *
@@ -45,6 +43,11 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
                 'assignee',
                 '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/assignees/assignee'
             );
+            $paths[] = new restore_path_element(
+                'assignee',
+                '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/discussions/discussion'
+            );
+            $paths[] = new restore_path_element('historyitem', '/activity/kanban/boards/kanban_board/historyitems/historyitem');
         }
 
         return $this->prepare_activity_structure($paths);
@@ -122,8 +125,14 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         $data = (object) $data;
         $oldid = $data->id;
 
+        $userinfo = $this->get_setting_value('userinfo');
+        if (!$userinfo) {
+            $data->discussion = 0;
+        }
+
         $data->kanban_column = $this->get_mappingid('kanban_column_id', $data->kanban_column);
         $data->kanban_board = $this->get_mappingid('kanban_board_id', $data->kanban_board);
+        $data->createdby = $this->get_mappingid('userid', $data->createdby);
 
         $newid = $DB->insert_record('kanban_card', $data);
         $this->set_mapping('kanban_card_id', $oldid, $newid);
@@ -140,12 +149,50 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         global $DB;
 
         $data = (object) $data;
-        $oldid = $data->id;
 
         $data->user = $this->get_mappingid('user', $data->user);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
 
-        $newid = $DB->insert_record('kanban_assignee', $data);
+        $DB->insert_record('kanban_assignee', $data);
+    }
+
+    /**
+     * Restore an historyitem record.
+     * @param array|object $data
+     * @throws base_step_exception
+     * @throws dml_exception
+     * @throws restore_step_exception
+     */
+    protected function process_historyitem($data) : void {
+        global $DB;
+
+        $data = (object) $data;
+
+        $data->user = $this->get_mappingid('user', $data->user);
+        $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
+        $data->kanban_column = $this->get_mappingid('kanban_column_id', $data->kanban_column);
+        $data->kanban_board = $this->get_mappingid('kanban_board_id', $data->kanban_board);
+        $data->affected_user = $this->get_mappingid('userid', $data->affected_user);
+
+        $DB->insert_record('kanban_history', $data);
+    }
+
+    /**
+     * Restore an discussion record.
+     * @param array|object $data
+     * @throws base_step_exception
+     * @throws dml_exception
+     * @throws restore_step_exception
+     */
+    protected function process_discussion($data) : void {
+        global $DB;
+
+        $data = (object) $data;
+
+        $data->user = $this->get_mappingid('user', $data->user);
+        $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
+
+        $DB->insert_record('kanban_discussion', $data);
     }
 
     /**
@@ -154,6 +201,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
     protected function after_execute() : void {
         global $DB;
         $this->add_related_files('mod_kanban', 'intro', null);
+        $this->add_related_files('mod_kanban', 'attachments', 'kanban_card_id');
 
         $kanbanboards = $DB->get_records('kanban_board', ['kanban_instance' => $this->task->get_activityid()]);
 
