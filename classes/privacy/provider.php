@@ -119,7 +119,70 @@ class provider implements
         $entries = $DB->get_recordset_sql($sql, $params);
         self::export_kanban_data($entries, $user);
 
-        // Get all data from private boards.
+
+        // Get all cards the user has created without private board of the user.
+        $sql = "SELECT cm.id AS cmid,
+                       co.title AS columntitle
+                       ca.title as cardtitle,
+                       ca.timemodified
+                  FROM {context} c
+            INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND b.user != :userid
+            INNER JOIN {kanban_column} co ON co.kanban_board = b.id
+            INNER JOIN {kanban_card} ca ON ca.kanban_column = co.id
+                 WHERE c.id {$contextsql} AND c.createdby = :userid
+              ORDER BY cm.id";
+
+        $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
+
+        $entries = $DB->get_recordset_sql($sql, $params);
+        self::export_kanban_data($entries, $user);
+
+        // Get all history items the user is part of.
+
+        $sql = "SELECT cm.id AS cmid,
+                       h.action AS columntitle
+                       ca.title AS cardtitle,
+                       h.timestamp
+                FROM {context} c
+                INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                INNER JOIN {kanban} k ON k.id = cm.instance
+                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
+                LEFT JOIN {kanban_history} h ON h.kanban_board = b.id
+                WHERE c.id {$contextsql} AND (h.user = :userid OR h.affected_user = :userid
+                ORDER BY h.timestamp";
+        
+        $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
+
+        $entries = $DB->get_recordset_sql($sql, $params);
+        self::export_kanban_data($entries, $user);
+
+        // Get all discussion messages created by the user.
+
+        $sql = "SELECT cm.id AS cmid,
+                       d.action AS columntitle
+                       ca.title AS cardtitle,
+                       h.timestamp
+                FROM {context} c
+                INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                INNER JOIN {kanban} k ON k.id = cm.instance
+                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
+                INNER JOIN {kanban_column} co ON co.kanban_board = b.id
+                LEFT JOIN {kanban_card} ca ON ca.kanban_column = co.id
+                LEFT JOIN {kanban_discussion} d ON d.kanban_card = ca.id
+                WHERE c.id {$contextsql} AND d.user = :userid
+                ORDER BY d.timecreated";
+        
+        $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
+
+        $entries = $DB->get_recordset_sql($sql, $params);
+        self::export_kanban_data($entries, $user);
+
+        // Get all data from personal boards.
         $sql = "SELECT cm.id AS cmid,
                        co.title AS columntitle
                        ca.title as cardtitle,
@@ -139,7 +202,6 @@ class provider implements
 
         $entries = $DB->get_recordset_sql($sql, $params);
         self::export_kanban_data($entries, $user);
-
     }
 
     /**
@@ -198,24 +260,31 @@ class provider implements
         }
 
         $boardids = $DB->get_fieldset_select('kanban_board', 'id', 'kanban_instance = :instance', ['instance' => $cm->instance]);
-        list($insql, $params) = $DB->get_in_or_equal($boardids);
-        $sql = 'SELECT id FROM {kanban_card} WHERE kanban_board ' . $insql;
-        $cardids = $DB->get_fieldset_sql($sql, $params);
+        if (!empty($boardids)) {
+            list($insql, $params) = $DB->get_in_or_equal($boardids);
+            $sql = 'SELECT id FROM {kanban_card} WHERE kanban_board ' . $insql;
+            $cardids = $DB->get_fieldset_sql($sql, $params);
 
-        // Delete all assignees (this needs to be done also for template boards).
-        list($insql, $params) = $DB->get_in_or_equal($cardids);
-        $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
+            // Delete all assignees (this needs to be done also for template boards).
+            list($insql, $params) = $DB->get_in_or_equal($cardids);
+            $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
 
-        // Delete all columns from boards that are no template boards.
-        $boardids = $DB->get_fieldset_select(
-            'kanban_board',
-            'id',
-            'kanban_instance = :instance AND template = 0',
-            ['instance' => $cm->instance]
-        );
-        list($insql, $params) = $DB->get_in_or_equal($boardids);
-        $DB->delete_records_select('kanban_column', 'kanban_board ' . $insql, $params);
+            // Delete discussion.
+            $DB->delete_records_select('kanban_discussion', 'kanban_card ' . $insql, $params);
 
+            // Delete all columns from boards that are no template boards.
+            $boardids = $DB->get_fieldset_select(
+                'kanban_board',
+                'id',
+                'kanban_instance = :instance AND template = 0',
+                ['instance' => $cm->instance]
+            );
+            list($insql, $params) = $DB->get_in_or_equal($boardids);
+            $DB->delete_records_select('kanban_column', 'kanban_board ' . $insql, $params);
+
+            // Delete history.
+            $DB->delete_records_select('kanban_history', 'kanban_board ' . $insql, $params);
+        }
         // Delete all boards that are no template boards.
         $DB->delete_records('kanban_board', ['instance' => $cm->instance, 'template' => 0]);
     }
@@ -237,6 +306,9 @@ class provider implements
                 return;
             }
 
+            // Delete calendar events.
+            $DB->delete_records('event', ['modulename' => 'kanban', 'instance' => $kanban->id, 'userid' => $userid]);
+
             $boardids = $DB->get_fieldset_select(
                 'kanban_board',
                 'id',
@@ -244,18 +316,35 @@ class provider implements
                 ['instance' => $cm->instance]
             );
             list($insql, $params) = $DB->get_in_or_equal($boardids);
+
+            // Delete history.
+            $params['userid'] = $userid;
+            $DB->delete_records_select('kanban_history', 'user = :userid AND kanban_board ' . $insql, $params);
+            $DB->execute(
+                'UPDATE kanban_history SET affected_user = 0 WHERE affected_user = :userid AND kanban_board ' . $insql,
+                $params
+            );
+
+            // Remove card author.
+            $DB->execute(
+                'UPDATE kanban_card SET createdby = 0 WHERE createdby = :userid AND kanban_board ' . $insql,
+                $params
+            );
+
             $sql = 'SELECT id FROM {kanban_card} WHERE kanban_board ' . $insql;
             $cardids = $DB->get_fieldset_sql($sql, $params);
 
-            // Unassign user.
             if (!empty($cardids)) {
                 list($insql, $params) = $DB->get_in_or_equal($cardids);
                 $sql = 'user = :userid AND kanban_card ' . $insql;
                 $params['userid'] = $userid;
+                // Unassign user.
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
+                // Delete discussion.
+                $DB->delete_records_select('kanban_discussion', 'kanban_card ' . $insql, $params);
             }
 
-            // Get all privat board.
+            // Get all personal boards.
             $boardid = $DB->get_field_select(
                 'kanban_board',
                 'id',
@@ -268,11 +357,14 @@ class provider implements
                 // Unassign all users from private board.
                 list($insql, $params) = $DB->get_in_or_equal($cardids);
                 $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
+                // Delete all discussions.
+                $DB->delete_records_select('kanban_discussion', 'kanban_card ' . $insql, $params);
             }
 
             $DB->delete_records('kanban_card', ['kanban_board' => $boardid]);
             $DB->delete_records('kanban_column', ['kanban_board' => $boardid]);
             $DB->delete_records('kanban_board', ['id' => $boardid]);
+            $DB->delete_records('kanban_history', ['id' => $boardid])
         }
     }
 }
