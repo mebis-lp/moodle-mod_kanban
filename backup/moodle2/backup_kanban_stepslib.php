@@ -95,7 +95,17 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         $historyitem = new backup_nested_element(
             'kanban_history',
             ['id'],
-            ['userid', 'kanban_board', 'kanban_column', 'kanban_card', 'action', 'parameters', 'timestamp', 'affected_userid', 'type']
+            [
+                'userid',
+                'kanban_board',
+                'kanban_column',
+                'kanban_card',
+                'action',
+                'parameters',
+                'timestamp',
+                'affected_userid',
+                'type'
+            ]
         );
 
         $kanban->add_child($boards);
