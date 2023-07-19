@@ -94,6 +94,27 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
     }
 
     /**
+     * Test for deleting a board.
+     *
+     * @return void
+     */
+    public function test_delete_board() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardcount = $DB->count_records('kanban_board', ['kanban_instance' => $this->kanban->id]);
+        $boardid = $boardmanager->create_board();
+        $this->assertEquals($boardcount + 1, $DB->count_records('kanban_board', ['kanban_instance' => $this->kanban->id]));
+        $this->assertEquals(3, $DB->count_records('kanban_column', ['kanban_board' => $boardid]));
+
+        $boardmanager->delete_board($boardid);
+        $this->assertEquals($boardcount, $DB->count_records('kanban_board', ['kanban_instance' => $this->kanban->id]));
+        $this->assertEquals(0, $DB->count_records('kanban_column', ['kanban_board' => $boardid]));
+    }
+
+    /**
      * Test for creating a card.
      *
      * @return void
@@ -161,5 +182,28 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
 
         $column = $boardmanager->get_column($columnids[2]);
         $this->assertEquals($column->sequence, join(',', [$cards[2]->id, $cards[1]->id, $cards[0]->id]));
+    }
+
+    /**
+     * Test for deleting a card.
+     *
+     * @return void
+     */
+    public function test_delete_card() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+
+        $cardid = $boardmanager->add_card($columnids[0], 0, ['title' => 'Testcard']);
+        $boardmanager->delete_card($cardid);
+        $this->assertEquals(0, $DB->count_records('kanban_card', ['id' => $cardid]));
+
+        $column = $boardmanager->get_column($columnids[0]);
+        $this->assertEquals('', $column->sequence);
     }
 }
