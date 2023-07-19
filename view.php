@@ -56,7 +56,7 @@ if (!empty($cm->groupmode)) {
     $groupid = groups_get_activity_group($cm, true);
 }
 
-$userid = optional_param('user', 0, PARAM_INT);
+$userid = optional_param('userid', 0, PARAM_INT);
 if (
     $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY &&
     empty($groupid) &&
@@ -80,7 +80,7 @@ if (!empty($userid)) {
 if (empty($boardid)) {
     $board = $DB->get_record(
         'kanban_board',
-        ['kanban_instance' => $kanban->id, 'user' => $userid, 'groupid' => $groupid, 'template' => 0],
+        ['kanban_instance' => $kanban->id, 'userid' => $userid, 'groupid' => $groupid, 'template' => 0],
          '*'
     );
     if (!$board) {
@@ -150,7 +150,7 @@ echo $OUTPUT->render_from_template(
         'userboards' => $kanban->userboards != MOD_KANBAN_NOUSERBOARDS,
         'userboardsonly' => $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY,
         'showallusers' => has_capability('mod/kanban:viewallboards', $context),
-        'ismyuserboard' => $board->user == $USER->id,
+        'ismyuserboard' => $board->userid == $USER->id,
         'heading' => $heading,
     ]
 );

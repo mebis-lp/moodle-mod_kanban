@@ -167,7 +167,7 @@ class edit_card_form extends dynamic_form {
         $options = json_decode($card->options);
         $card->cmid = $this->optional_param('cmid', null, PARAM_INT);
         $card->boardid = $card->kanban_board;
-        $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'user', 'kanban_card = :cardid', ['cardid' => $id]);
+        $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'userid', 'kanban_card = :cardid', ['cardid' => $id]);
         $card->color = $options->background;
         $draftitemid = file_get_submitted_draft_itemid('attachments');
         $card->description = file_prepare_draft_area(

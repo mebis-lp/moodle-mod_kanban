@@ -85,7 +85,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->user = $this->get_mappingid('user', $data->user);
+        $data->userid = $this->get_mappingid('userid', $data->userid);
         $data->groupid = $this->get_mappingid('group', $data->groupid);
         $data->kanban_instance = $this->get_mappingid('kanban_id', $data->kanban_instance);
 
@@ -150,7 +150,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data = (object) $data;
 
-        $data->user = $this->get_mappingid('user', $data->user);
+        $data->userid = $this->get_mappingid('userid', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
 
         $DB->insert_record('kanban_assignee', $data);
@@ -168,7 +168,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data = (object) $data;
 
-        $data->user = $this->get_mappingid('user', $data->user);
+        $data->userid = $this->get_mappingid('userid', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
         $data->kanban_column = $this->get_mappingid('kanban_column_id', $data->kanban_column);
         $data->kanban_board = $this->get_mappingid('kanban_board_id', $data->kanban_board);
@@ -189,7 +189,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data = (object) $data;
 
-        $data->user = $this->get_mappingid('user', $data->user);
+        $data->userid = $this->get_mappingid('userid', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
 
         $DB->insert_record('kanban_discussion', $data);

@@ -32,8 +32,6 @@ class mod_kanban_generator extends testing_module_generator {
      * @return stdClass kanban instance
      */
     public function create_instance($record = null, array $options = null) : stdClass {
-        global $CFG;
-
         $record = (array)$record + [
             'name' => 'test kanban',
             'intro' => '',

@@ -107,11 +107,11 @@ class provider implements
             INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {kanban} k ON k.id = cm.instance
-            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND b.user != :userid
+            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND b.userid != :userid
             INNER JOIN {kanban_column} co ON co.kanban_board = b.id
             INNER JOIN {kanban_card} ca ON ca.kanban_column = co.id
             INNER JOIN {kanban_assignee} a ON a.kanban_card = ca.id
-                 WHERE c.id {$contextsql} AND a.user = :userid
+                 WHERE c.id {$contextsql} AND a.userid = :userid
               ORDER BY cm.id";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
@@ -128,7 +128,7 @@ class provider implements
             INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {kanban} k ON k.id = cm.instance
-            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND b.user != :userid
+            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND b.userid != :userid
             INNER JOIN {kanban_column} co ON co.kanban_board = b.id
             INNER JOIN {kanban_card} ca ON ca.kanban_column = co.id
                  WHERE c.id {$contextsql} AND c.createdby = :userid
@@ -151,7 +151,7 @@ class provider implements
                 INNER JOIN {kanban} k ON k.id = cm.instance
                 INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
                 LEFT JOIN {kanban_history} h ON h.kanban_board = b.id
-                WHERE c.id {$contextsql} AND (h.user = :userid OR h.affected_user = :userid
+                WHERE c.id {$contextsql} AND (h.userid = :userid OR h.affected_user = :userid
                 ORDER BY h.timestamp";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
@@ -173,7 +173,7 @@ class provider implements
                 INNER JOIN {kanban_column} co ON co.kanban_board = b.id
                 LEFT JOIN {kanban_card} ca ON ca.kanban_column = co.id
                 LEFT JOIN {kanban_discussion} d ON d.kanban_card = ca.id
-                WHERE c.id {$contextsql} AND d.user = :userid
+                WHERE c.id {$contextsql} AND d.userid = :userid
                 ORDER BY d.timecreated";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
@@ -190,10 +190,10 @@ class provider implements
                 INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
                 INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                 INNER JOIN {kanban} k ON k.id = cm.instance
-                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND k.user = :userid
+                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND k.userid = :userid
                 INNER JOIN {kanban_column} co ON co.kanban_board = b.id
                 LEFT JOIN {kanban_card} ca ON ca.kanban_column = co.id
-                LEFT JOIN {kanban_assignee} a ON a.kanban_card = ca.id AND a.user = :userid
+                LEFT JOIN {kanban_assignee} a ON a.kanban_card = ca.id AND a.userid = :userid
                 WHERE c.id {$contextsql}
                 ORDER BY cm.id";
 
@@ -318,7 +318,7 @@ class provider implements
 
             // Delete history.
             $params['userid'] = $userid;
-            $DB->delete_records_select('kanban_history', 'user = :userid AND kanban_board ' . $insql, $params);
+            $DB->delete_records_select('kanban_history', 'userid = :userid AND kanban_board ' . $insql, $params);
             $DB->execute(
                 'UPDATE kanban_history SET affected_user = 0 WHERE affected_user = :userid AND kanban_board ' . $insql,
                 $params
@@ -335,7 +335,7 @@ class provider implements
 
             if (!empty($cardids)) {
                 list($insql, $params) = $DB->get_in_or_equal($cardids);
-                $sql = 'user = :userid AND kanban_card ' . $insql;
+                $sql = 'userid = :userid AND kanban_card ' . $insql;
                 $params['userid'] = $userid;
                 // Unassign user.
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
@@ -347,8 +347,8 @@ class provider implements
             $boardid = $DB->get_field_select(
                 'kanban_board',
                 'id',
-                'kanban_instance = :instance AND user = :user',
-                ['instance' => $cm->instance, 'user' => $userid]
+                'kanban_instance = :instance AND userid = :user',
+                ['instance' => $cm->instance, 'userid' => $userid]
             );
             $cardids = $DB->get_fieldset_select('kanban_card', 'kanban_board = :board', ['board' => $boardid]);
 

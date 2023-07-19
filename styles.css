@@ -296,7 +296,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_complete_card,
 .mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_uncomplete_card,
 .mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_move_card,
-.mod_kanban_board:not(.mod_kanban_history) .mod_kanban_view_history,
+.mod_kanban_board:not(.mod_kanban_history) .mod_kanban_card_view_history,
 .mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
 .mod_kanban_complete_card,
 .mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)

@@ -937,7 +937,7 @@ class change_kanban_content extends external_api {
 
         $message = $boardmanager->get_discussion_message($messageid);
 
-        if ($message->user != $USER->id) {
+        if ($message->userid != $USER->id) {
             require_capability('mod/kanban:manageboard', $context);
         }
 

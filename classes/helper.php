@@ -151,8 +151,8 @@ class helper {
         if (!empty($board->template)) {
             require_capability('mod/kanban:manageboard', $context);
         }
-        if (!(empty($board->user) && empty($board->groupid))) {
-            if (!empty($board->user) && $board->user != $USER->id) {
+        if (!(empty($board->userid) && empty($board->groupid))) {
+            if (!empty($board->userid) && $board->userid != $USER->id) {
                 require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
             }
             if (!empty($board->groupid)) {

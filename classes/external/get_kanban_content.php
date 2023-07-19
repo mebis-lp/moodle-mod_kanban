@@ -89,7 +89,7 @@ class get_kanban_content extends external_api {
                         'sequence' => new external_value(PARAM_TEXT, 'order of the columns in the board'),
                         'timemodified' => new external_value(PARAM_INT, 'timemodified'),
                         'locked' => new external_value(PARAM_INT, 'lock state'),
-                        'user' => new external_value(PARAM_INT, 'userboard for userid', VALUE_OPTIONAL, 0),
+                        'userid' => new external_value(PARAM_INT, 'userboard for userid', VALUE_OPTIONAL, 0),
                         'groupid' => new external_value(PARAM_INT, 'groupboard for groupid', VALUE_OPTIONAL, 0),
                         'template' => new external_value(PARAM_INT, 'board is a template', VALUE_OPTIONAL, 0)
                     ]),
@@ -202,7 +202,7 @@ class get_kanban_content extends external_api {
                             [
                                 'id' => new external_value(PARAM_INT, 'id'),
                                 'timecreated' => new external_value(PARAM_INT, 'timecreated'),
-                                'user' => new external_value(PARAM_INT, 'userid'),
+                                'userid' => new external_value(PARAM_INT, 'userid'),
                                 'kanban_card' => new external_value(PARAM_INT, 'card id'),
                                 'content' => new external_value(PARAM_TEXT, 'discussion message'),
                                 'username' => new external_value(PARAM_TEXT, 'user name'),
@@ -217,7 +217,7 @@ class get_kanban_content extends external_api {
                             [
                                 'id' => new external_value(PARAM_INT, 'id'),
                                 'timestamp' => new external_value(PARAM_INT, 'timestamp'),
-                                'user' => new external_value(PARAM_INT, 'userid'),
+                                'userid' => new external_value(PARAM_INT, 'userid'),
                                 'kanban_card' => new external_value(PARAM_INT, 'card id'),
                                 'kanban_column' => new external_value(PARAM_INT, 'column'),
                                 'content' => new external_value(PARAM_TEXT, 'discussion message'),
@@ -342,9 +342,9 @@ class get_kanban_content extends external_api {
         $params['timestamp'] = $timestamp;
 
         $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
-        if (!(empty($kanbanboard->user) && empty($kanbanboard->groupid))) {
+        if (!(empty($kanbanboard->userid) && empty($kanbanboard->groupid))) {
             $restrictcaps = false;
-            if (!empty($kanbanboard->user) && $kanbanboard->user != $USER->id) {
+            if (!empty($kanbanboard->userid) && $kanbanboard->userid != $USER->id) {
                 require_capability('mod/kanban:viewallboards', $context);
                 $restrictcaps = true;
             }
@@ -417,9 +417,9 @@ class get_kanban_content extends external_api {
             $kanbanassignees = [];
             $kanbanuserids = [];
             foreach ($kanbanassigneesraw as $assignee) {
-                if (!empty($kanbanusers[$assignee->user])) {
-                    $kanbanassignees[$assignee->kanban_card][] = $assignee->user;
-                    $kanbanuserids[] = $assignee->user;
+                if (!empty($kanbanusers[$assignee->userid])) {
+                    $kanbanassignees[$assignee->kanban_card][] = $assignee->userid;
+                    $kanbanuserids[] = $assignee->userid;
                 }
             }
             foreach ($kanbancards as $key => $card) {
@@ -542,8 +542,8 @@ class get_kanban_content extends external_api {
 
         $formatter = new updateformatter();
         foreach ($discussions as $discussion) {
-            $discussion->candelete = $discussion->user == $USER->id || has_capability('mod/kanban:manageboard', $context);
-            $discussion->username = fullname(\core_user::get_user($discussion->user));
+            $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
+            $discussion->username = fullname(\core_user::get_user($discussion->userid));
             $formatter->put('discussions', (array)$discussion);
         }
         return [
@@ -613,8 +613,8 @@ class get_kanban_content extends external_api {
             foreach ($historyitems as $item) {
                 $item->affectedusername = get_string('unknownuser');
                 $item->username = get_string('unknownuser');
-                if (!empty($item->user)) {
-                    $user = \core_user::get_user($item->user, '*', IGNORE_MISSING);
+                if (!empty($item->userid)) {
+                    $user = \core_user::get_user($item->userid, '*', IGNORE_MISSING);
                     if ($user) {
                         $item->username = fullname($user);
                     }

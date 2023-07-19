@@ -43,7 +43,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         $board = new backup_nested_element(
             'kanban_board',
             ['id'],
-            ['sequence', 'timecreated', 'timemodified', 'user', 'groupid', 'template', 'kanban_instance', 'options', 'locked']
+            ['sequence', 'timecreated', 'timemodified', 'userid', 'groupid', 'template', 'kanban_instance', 'options', 'locked']
         );
 
         $columns = new backup_nested_element('columns');
@@ -81,21 +81,21 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         $assignee = new backup_nested_element(
             'kanban_assignee',
             ['id'],
-            ['kanban_card', 'user']
+            ['kanban_card', 'userid']
         );
 
         $discussions = new backup_nested_element('discussions');
         $discussion = new backup_nested_element(
             'kanban_discussion',
             ['id'],
-            ['kanban_card', 'user', 'timecreated', 'content']
+            ['kanban_card', 'userid', 'timecreated', 'content']
         );
 
         $historyitems = new backup_nested_element('historyitems');
         $historyitem = new backup_nested_element(
             'kanban_history',
             ['id'],
-            ['user', 'kanban_board', 'kanban_column', 'kanban_card', 'action', 'parameters', 'timestamp', 'affected_user', 'type']
+            ['userid', 'kanban_board', 'kanban_column', 'kanban_card', 'action', 'parameters', 'timestamp', 'affected_user', 'type']
         );
 
         $kanban->add_child($boards);
@@ -113,17 +113,17 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
 
         if ($userinfo) {
             $board->set_source_table('kanban_board', ['kanban_instance' => backup::VAR_PARENTID]);
-            $board->annotate_ids('userid', 'user');
+            $board->annotate_ids('userid', 'userid');
             $board->annotate_ids('groupid', 'groupid');
             $assignee->set_source_table('kanban_assignee', ['kanban_card' => backup::VAR_PARENTID]);
-            $assignee->annotate_ids('userid', 'user');
+            $assignee->annotate_ids('userid', 'userid');
             $assignee->annotate_ids('kanban_card_id', 'kanban_card');
             $card->annotate_ids('userid', 'createdby');
             $discussion->set_source_table('kanban_discussion', ['kanban_card' => backup::VAR_PARENTID]);
-            $discussion->annotate_ids('userid', 'user');
+            $discussion->annotate_ids('userid', 'userid');
             $discussion->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->set_source_table('kanban_history', ['kanban_board' => backup::VAR_PARENTID]);
-            $historyitem->annotate_ids('userid', 'user');
+            $historyitem->annotate_ids('userid', 'userid');
             $historyitem->annotate_ids('userid', 'affected_user');
             $historyitem->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->annotate_ids('kanban_column_id', 'kanban_column');
@@ -133,7 +133,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             $board->set_source_sql('
             SELECT *
               FROM {kanban_board}
-             WHERE kanban_instance = ? AND user=0 AND groupid=0 AND template=1',
+             WHERE kanban_instance = ? AND userid = 0 AND groupid = 0 AND template = 1',
             [backup::VAR_PARENTID]);
         }
         $column->set_source_table('kanban_column', ['kanban_board' => backup::VAR_PARENTID]);

@@ -57,7 +57,7 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
             $this->users[$i] = $this->getDataGenerator()->create_user(
                 [
                     'email' => $i . 'user@example.com',
-                    'username' => 'user' . $i,
+                    'username' => 'userid' . $i,
                 ]
             );
         }
@@ -80,10 +80,12 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $boardmanager = new boardmanager($this->kanban->cmid);
+        $boards = $DB->get_records('kanban_board', ['kanban_instance' => $this->kanban->id]);
+        $this->assertCount(1, $boards);
         $boardid = $boardmanager->create_board();
         $this->assertNotEquals(false, $boardid);
         $boards = $DB->get_records('kanban_board', ['kanban_instance' => $this->kanban->id]);
-        $this->assertCount(1, $boards);
+        $this->assertCount(2, $boards);
         // Board should consist of three columns without any cards as there is no template yet.
         $columns = $DB->get_records('kanban_column', ['kanban_board' => $boards[0]->id]);
         $this->assertCount(3, $columns);

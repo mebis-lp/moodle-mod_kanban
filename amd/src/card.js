@@ -138,7 +138,7 @@ export default class extends KanbanComponent {
         this.checkDragging(state);
         this.boardid = state.board.id;
         this.cmid = state.common.id;
-        this.user = state.board.user;
+        this.userid = state.board.userid;
         this.groupid = state.board.groupid;
         this._dueDateFormat();
     }
@@ -481,7 +481,7 @@ export default class extends KanbanComponent {
                 boardid: this.boardid,
                 cmid: this.cmid,
                 groupid: this.groupid,
-                userid: this.user
+                userid: this.userid
             },
             modalConfig: {title: getString('editcard', 'mod_kanban')},
             returnFocus: this.getElement(),
