@@ -979,7 +979,7 @@ class boardmanager {
                 'kanban_column' => $columnid,
                 'kanban_card' => $cardid,
                 'parameters' => json_encode($data),
-                'affected_user' => $affecteduser,
+                'affected_userid' => $affecteduser,
                 'timestamp' => time(),
                 'type' => $type,
             ];

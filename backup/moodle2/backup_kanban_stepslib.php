@@ -95,7 +95,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         $historyitem = new backup_nested_element(
             'kanban_history',
             ['id'],
-            ['userid', 'kanban_board', 'kanban_column', 'kanban_card', 'action', 'parameters', 'timestamp', 'affected_user', 'type']
+            ['userid', 'kanban_board', 'kanban_column', 'kanban_card', 'action', 'parameters', 'timestamp', 'affected_userid', 'type']
         );
 
         $kanban->add_child($boards);
@@ -124,7 +124,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             $discussion->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->set_source_table('kanban_history', ['kanban_board' => backup::VAR_PARENTID]);
             $historyitem->annotate_ids('userid', 'userid');
-            $historyitem->annotate_ids('userid', 'affected_user');
+            $historyitem->annotate_ids('userid', 'affected_userid');
             $historyitem->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->annotate_ids('kanban_column_id', 'kanban_column');
             $historyitem->annotate_ids('kanban_board_id', 'kanban_board');

@@ -620,7 +620,7 @@ class get_kanban_content extends external_api {
                     }
                 }
                 if (!empty($item->affecteduser)) {
-                    $affecteduser = \core_user::get_user($item->affected_user, '*', IGNORE_MISSING);
+                    $affecteduser = \core_user::get_user($item->affected_userid, '*', IGNORE_MISSING);
                     if ($affecteduser) {
                         $item->affectedusername = fullname($affecteduser);
                     }

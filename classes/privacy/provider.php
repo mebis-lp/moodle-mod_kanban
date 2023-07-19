@@ -151,7 +151,7 @@ class provider implements
                 INNER JOIN {kanban} k ON k.id = cm.instance
                 INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
                 LEFT JOIN {kanban_history} h ON h.kanban_board = b.id
-                WHERE c.id {$contextsql} AND (h.userid = :userid OR h.affected_user = :userid
+                WHERE c.id {$contextsql} AND (h.userid = :userid OR h.affected_userid = :userid
                 ORDER BY h.timestamp";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
@@ -320,7 +320,7 @@ class provider implements
             $params['userid'] = $userid;
             $DB->delete_records_select('kanban_history', 'userid = :userid AND kanban_board ' . $insql, $params);
             $DB->execute(
-                'UPDATE kanban_history SET affected_user = 0 WHERE affected_user = :userid AND kanban_board ' . $insql,
+                'UPDATE kanban_history SET affected_userid = 0 WHERE affected_userid = :userid AND kanban_board ' . $insql,
                 $params
             );
 

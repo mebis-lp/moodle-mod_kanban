@@ -87,9 +87,9 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $boards = $DB->get_records('kanban_board', ['kanban_instance' => $this->kanban->id]);
         $this->assertCount(2, $boards);
         // Board should consist of three columns without any cards as there is no template yet.
-        $columns = $DB->get_records('kanban_column', ['kanban_board' => $boards[0]->id]);
+        $columns = $DB->get_records('kanban_column', ['kanban_board' => $boardid]);
         $this->assertCount(3, $columns);
-        $cards = $DB->get_records('kanban_card', ['kanban_board' => $boards[0]->id]);
+        $cards = $DB->get_records('kanban_card', ['kanban_board' => $boardid]);
         $this->assertCount(0, $cards);
     }
 }
