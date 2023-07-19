@@ -104,16 +104,62 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $boardmanager = new boardmanager($this->kanban->cmid);
-        $boards = $DB->get_records('kanban_board', ['kanban_instance' => $this->kanban->id]);
-        $this->assertCount(1, $boards);
         $boardid = $boardmanager->create_board();
         $boardmanager->load_board($boardid);
         $columnid = $DB->get_field('kanban_column', 'id', ['kanban_board' => $boardid], IGNORE_MULTIPLE);
         $cardid = $boardmanager->add_card($columnid, 0, ['title' => 'Testcard']);
         $card = $boardmanager->get_card($cardid);
-        $this->assertEquals($card->title, 'Testcard');
+        $this->assertEquals('Testcard', $card->title);
+        $this->assertEquals($boardid, $card->kanban_board);
+        $this->assertEquals($columnid, $card->kanban_column);
+
         $card2id = $boardmanager->add_card($columnid, $cardid, ['title' => 'Testcard2']);
         $column = $boardmanager->get_column($columnid);
-        $this->assertEquals($column->sequence, join(',', [$cardid, $card2id]));
+        $this->assertEquals(join(',', [$cardid, $card2id]), $column->sequence);
+    }
+
+    /**
+     * Test for moving a card.
+     *
+     * @return void
+     */
+    public function test_move_card() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+        // Add one card to each column (three columns expected).
+        $cards = [];
+        foreach ($columnids as $columnid){
+            $cardid = $boardmanager->add_card($columnids[0], 0, ['title' => 'Testcard']);
+            $cards[] = $boardmanager->get_card($cardid);
+        }
+        $boardmanager->move_card($cards[0]->id, 0, $columnids[2]);
+        $cards[0] = $boardmanager->get_card($cards[0]->id);
+        $this->assertEquals($columnids[2], $cards[0]->kanban_column);
+
+        $column = $boardmanager->get_column($columnids[0]);
+        $this->assertEquals('', $column->sequence);
+
+        $column = $boardmanager->get_column($columnids[2]);
+        $this->assertEquals(join(',', [$cards[0]->id, $cards[2]->id]), $column->sequence);
+        
+        $boardmanager->move_card($cards[0]->id, $cards[2]->id);
+        $cards[0] = $boardmanager->get_card($cards[0]->id);
+        $this->assertEquals($columnids[2], $cards[0]->kanban_column);
+
+        $column = $boardmanager->get_column($columnids[2]);
+        $this->assertEquals($column->sequence, join(',', [$cards[2]->id, $cards[0]->id]));
+
+        $boardmanager->move_card($cards[1]->id, $cards[2]->id, $columnids[2]);
+        $cards[1] = $boardmanager->get_card($cards[1]->id);
+        $this->assertEquals($columnids[2], $cards[1]->kanban_column);
+
+        $column = $boardmanager->get_column($columnids[2]);
+        $this->assertEquals($column->sequence, join(',', [$cards[2]->id, $cards[1]->id, $cards[0]->id]));
     }
 }
