@@ -225,14 +225,14 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $columnids = array_merge([$columnid], $columnids);
         $boardmanager->load_board($boardid);
         $this->assertEquals(join(',', $columnids), $boardmanager->get_board()->sequence);
-        
+
         $this->assertEquals(1, $DB->count_records('kanban_column', ['id' => $columnid]));
 
         $columnid = $boardmanager->add_column($columnids[3], ['title' => 'Testcolumn 2']);
         $columnids = array_merge($columnids, [$columnid]);
         $boardmanager->load_board($boardid);
         $this->assertEquals(join(',', $columnids), $boardmanager->get_board()->sequence);
-        
+
         $this->assertEquals(1, $DB->count_records('kanban_column', ['id' => $columnid]));
     }
 
@@ -250,12 +250,35 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $boardid = $boardmanager->create_board();
         $boardmanager->load_board($boardid);
         $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
-        $columnid = $boardmanager->move_column($columnids[2], 0);
+        $boardmanager->move_column($columnids[2], 0);
         $boardmanager->load_board($boardid);
         $this->assertEquals(join(',', [$columnids[2], $columnids[0], $columnids[1]]), $boardmanager->get_board()->sequence);
 
-        $columnid = $boardmanager->move_column($columnids[0], $columnids[1]);
+        $boardmanager->move_column($columnids[0], $columnids[1]);
         $boardmanager->load_board($boardid);
         $this->assertEquals(join(',', [$columnids[2], $columnids[1], $columnids[0]]), $boardmanager->get_board()->sequence);
+    }
+
+    /**
+     * Test for deleting a column.
+     *
+     * @return void
+     */
+    public function test_delete_column() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columncount = $DB->count_records('kanban_column', ['kanban_board' => $boardid]);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+
+        $boardmanager->delete_column($columnids[0]);
+        $this->assertEquals($columncount - 1, $DB->count_records('kanban_column', ['kanban_board' => $boardid]));
+
+        $column = $boardmanager->get_column($columnids[0]);
+        $this->assertEquals('', $column->sequence);
     }
 }
