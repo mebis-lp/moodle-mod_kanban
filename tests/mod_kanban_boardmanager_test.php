@@ -134,7 +134,7 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
         // Add one card to each column (three columns expected).
         $cards = [];
-        foreach ($columnids as $columnid){
+        foreach ($columnids as $columnid) {
             $cardid = $boardmanager->add_card($columnid, 0, ['title' => 'Testcard']);
             $cards[] = $boardmanager->get_card($cardid);
         }
@@ -147,7 +147,7 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
 
         $column = $boardmanager->get_column($columnids[2]);
         $this->assertEquals(join(',', [$cards[0]->id, $cards[2]->id]), $column->sequence);
-        
+
         $boardmanager->move_card($cards[0]->id, $cards[2]->id);
         $cards[0] = $boardmanager->get_card($cards[0]->id);
         $this->assertEquals($columnids[2], $cards[0]->kanban_column);
