@@ -92,4 +92,28 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         $cards = $DB->get_records('kanban_card', ['kanban_board' => $boardid]);
         $this->assertCount(0, $cards);
     }
+
+    /**
+     * Test for creating a card.
+     *
+     * @return void
+     */
+    public function test_add_card() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boards = $DB->get_records('kanban_board', ['kanban_instance' => $this->kanban->id]);
+        $this->assertCount(1, $boards);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnid = $DB->get_field('kanban_column', 'id', ['kanban_board' => $boardid], IGNORE_MULTIPLE);
+        $cardid = $boardmanager->add_card($columnid, 0, ['title' => 'Testcard']);
+        $card = $boardmanager->get_card($cardid);
+        $this->assertEquals($card->title, 'Testcard');
+        $card2id = $boardmanager->add_card($columnid, $cardid, ['title' => 'Testcard2']);
+        $column = $boardmanager->get_column($columnid);
+        $this->assertEquals($column->sequence, join(',', [$cardid, $card2id]));
+    }
 }

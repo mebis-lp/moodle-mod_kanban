@@ -424,9 +424,9 @@ class boardmanager {
      *
      * @param int $aftercol Id of the column before
      * @param array $data Data to override default values
-     * @return void
+     * @return int Id of the column (0 if no column was added)
      */
-    public function add_column(int $aftercol = 0, array $data = []) {
+    public function add_column(int $aftercol = 0, array $data = []): int {
         global $DB;
         if (empty($this->board->locked)) {
             $aftercol = intval($aftercol);
@@ -453,7 +453,9 @@ class boardmanager {
 
             $this->formatter->put('board', $update);
             $this->formatter->put('columns', $data);
+            return $data['id'];
         }
+        return 0;
     }
 
 
@@ -463,9 +465,9 @@ class boardmanager {
      * @param int $columnid Id of the column
      * @param int $aftercard Id of the card before (0 means to insert at top)
      * @param array $data Data to override default values
-     * @return void
+     * @return int Id of the card
      */
-    public function add_card(int $columnid, int $aftercard = 0, array $data = []) {
+    public function add_card(int $columnid, int $aftercard = 0, array $data = []): int {
         global $DB, $USER;
         $aftercard = intval($aftercard);
         $defaults = [
@@ -502,6 +504,8 @@ class boardmanager {
         $this->formatter->put('cards', $data);
         $this->formatter->put('columns', $update);
         $this->write_history('added', MOD_KANBAN_CARD, $data, $columnid, $data['id']);
+
+        return $data['id'];
     }
 
     /**
