@@ -277,8 +277,7 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
 
         $boardmanager->delete_column($columnids[0]);
         $this->assertEquals($columncount - 1, $DB->count_records('kanban_column', ['kanban_board' => $boardid]));
-
-        $column = $boardmanager->get_column($columnids[0]);
-        $this->assertEquals('', $column->sequence);
+        array_shift($columnids);
+        $this->assertEquals(join(',', $columnids), $boardmanager->get_board()->sequence);
     }
 }
