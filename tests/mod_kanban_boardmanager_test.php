@@ -135,7 +135,7 @@ class mod_kanban_boardmanager_test extends \advanced_testcase {
         // Add one card to each column (three columns expected).
         $cards = [];
         foreach ($columnids as $columnid){
-            $cardid = $boardmanager->add_card($columnids[0], 0, ['title' => 'Testcard']);
+            $cardid = $boardmanager->add_card($columnid, 0, ['title' => 'Testcard']);
             $cards[] = $boardmanager->get_card($cardid);
         }
         $boardmanager->move_card($cards[0]->id, 0, $columnids[2]);
