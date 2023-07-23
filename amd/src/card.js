@@ -62,10 +62,12 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Called once when state is ready, attaching event listeners and initializing drag and drop.
+     * Called once when state is ready (also if component is registered after initial state was set), attaching event
+     * isteners and initializing drag and drop.
      * @param {*} state The initial state
      */
     stateReady(state) {
+        // Get language for relative time formatting.
         let lang = 'en';
         if (state.common.lang !== undefined) {
             lang = state.common.lang;
@@ -143,11 +145,13 @@ export default class extends KanbanComponent {
         this._dueDateFormat();
     }
 
+    /**
+     * Show modal to move a column.
+     */
     _showMoveModal() {
         let data = exporter.exportStateForTemplate(this.reactive.state);
         data.cardid = this.id;
-        // eslint-disable-next-line
-        data.kanban_column = this.reactive.state.cards.get(this.id).kanban_column;
+        data.kanbancolumn = this.reactive.state.cards.get(this.id).kanban_column;
         saveCancel(
             getString('movecard', 'mod_kanban'),
             Templates.render('mod_kanban/movemodal', data),
@@ -210,6 +214,9 @@ export default class extends KanbanComponent {
         this.reactive.dispatch('getDiscussionUpdates', this.id);
     }
 
+    /**
+     * Called when discussion was updated.
+     */
     async _discussionUpdated() {
         let data = {
             discussions: exporter.exportDiscussion(this.reactive.state, this.id)
@@ -218,6 +225,7 @@ export default class extends KanbanComponent {
             this.getElement(selectors.DISCUSSION, this.id).innerHTML = html;
             this.getElement(selectors.DISCUSSIONMODAL, this.id).classList.remove('mod_kanban_loading');
             let el = this.getElement(selectors.DISCUSSIONMESSAGES);
+            // Scroll down to latest message.
             el.scrollTop = el.scrollHeight;
             data.discussions.forEach((d) => {
                 this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
@@ -234,6 +242,9 @@ export default class extends KanbanComponent {
         this.reactive.dispatch('getHistoryUpdates', this.id);
     }
 
+    /**
+     * Called when history was updated.
+     */
     async _historyUpdated() {
         let data = {
             historyitems: exporter.exportHistory(this.reactive.state, this.id)
@@ -241,6 +252,7 @@ export default class extends KanbanComponent {
         Templates.renderForPromise('mod_kanban/historyitems', data).then(({html}) => {
             this.getElement(selectors.HISTORY, this.id).innerHTML = html;
             this.getElement(selectors.HISTORYMODAL).classList.remove('mod_kanban_loading');
+            // Scroll down to latest history item.
             let el = this.getElement(selectors.HISTORYITEMS);
             el.scrollTop = el.scrollHeight;
             return true;
@@ -268,11 +280,12 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Update this card.
+     * Called when card is updated.
      * @param {*} param0
      */
     async _cardUpdated({element}) {
         const card = this.getElement();
+        // Card was moved to another column. Move the element to new card (right position is handled by column component).
         if (card.dataset.columnid != element.kanban_column) {
             const col = document.querySelector(selectors.COLUMNINNER + '[data-id="' + element.kanban_column + '"]');
             col.appendChild(card);
@@ -284,8 +297,10 @@ export default class extends KanbanComponent {
         const userids = [...assignedUsers].map(v => {
             return v.dataset.userid;
         });
+        // Update assignees.
         if (element.assignees !== undefined) {
             const additional = element.assignees.filter(x => !userids.includes(x));
+            // Remove all elements that represent users that are no longer assigned to this card.
             if (assignedUsers !== null) {
                 assignedUsers.forEach(assignedUser => {
                     if (!element.assignees.includes(assignedUser.dataset.userid)) {
@@ -294,6 +309,7 @@ export default class extends KanbanComponent {
                 });
             }
             this.toggleClass(element.assignees.length == 0, 'mod_kanban_unassigned');
+            // Add new assignees.
             if (element.assignees.length > 0) {
                 additional.forEach(async user => {
                     let userdata = this.reactive.state.users.get(user);
@@ -307,6 +323,7 @@ export default class extends KanbanComponent {
             }
         }
         this.toggleClass(element.selfassigned, 'mod_kanban_selfassigned');
+        // Set card completion state.
         if (element.completed !== undefined) {
             this.toggleClass(element.completed == 1, 'mod_kanban_closed');
             if (element.completed == 1) {
@@ -315,15 +332,18 @@ export default class extends KanbanComponent {
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
             }
         }
+        // Update title (also in modals).
         if (element.title !== undefined) {
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
             this.getElement(selectors.DESCRIPTIONMODALTITLE).innerHTML = element.title;
             this.getElement(selectors.DISCUSSIONMODALTITLE).innerHTML = element.title;
         }
+        // Update description.
         if (element.description !== undefined) {
             this.getElement(selectors.DESCRIPTIONMODALBODY).innerHTML = element.description;
         }
+        // Render attachments in description modal.
         if (element.attachments !== undefined) {
             Templates.renderForPromise('mod_kanban/attachmentitems', {attachments: element.attachments}).then(({html}) => {
                 this.getElement(selectors.DESCRIPTIONMODALFOOTER).innerHTML = html;
@@ -332,11 +352,13 @@ export default class extends KanbanComponent {
         }
         this.toggleClass(element.hasdescription, 'mod_kanban_hasdescription');
         this.toggleClass(element.hasattachment, 'mod_kanban_hasattachment');
+        // Update due date.
         if (element.duedate !== undefined) {
             this.getElement(selectors.DUEDATE).setAttribute('data-date', element.duedate);
             this._dueDateFormat();
         }
         this.toggleClass(element.discussion, 'mod_kanban_hasdiscussion');
+        // Only option for now is background color.
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
             if (options.background === undefined) {
@@ -345,6 +367,7 @@ export default class extends KanbanComponent {
                 this.getElement().setAttribute('style', 'background-color: ' + options.background);
             }
         }
+        // Enable/disable dragging (e.g. if user is not assigned to the card anymore).
         this.checkDragging();
     }
 
@@ -425,6 +448,8 @@ export default class extends KanbanComponent {
         if (state === undefined) {
             state = this.reactive.stateManager.state;
         }
+        // User may move the card if he/she has moveallcards capability or has moveassignedcards
+        // capability and is currently assigned to the card.
         if (state.capabilities.get('moveallcards').value ||
             (state.capabilities.get('moveassignedcards').value &&
             state.cards.get(this.id).assignees.includes(state.common.userid))) {
@@ -514,7 +539,7 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Format due date.
+     * Format due date using relative time.
      */
     _dueDateFormat() {
         // Convert timestamp to ms.

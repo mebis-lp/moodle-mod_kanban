@@ -143,7 +143,7 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Validate draggable data.
+     * Validate draggable data. This component accepts cards and columns.
      * @param {object} dropdata
      * @returns {boolean} if the data is valid for this drop-zone.
      */
@@ -176,7 +176,7 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Optional method to show some visual hints to the user.
+     * Show some visual hints to the user.
      * @param {object} dropdata
      * @param {object} event
      */
@@ -201,7 +201,7 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Optional method to remove visual hints to the user.
+     * Remove visual hints to the user.
      */
     hideDropZone() {
         this.getElement(selectors.ADDCOLUMNCONTAINER).classList.remove('mod_kanban_insert');
@@ -256,32 +256,38 @@ export default class extends KanbanComponent {
         const el = this.getElement(selectors.COLUMNINNER, this.id);
         if (element.sequence !== undefined) {
             let sequence = element.sequence.split(',');
+            // Remove all cards from frontend that are no longer present in the database.
             [...el.children]
             .forEach((node) => {
                 if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
                     el.removeChild(node);
                 }
             });
+            // Reorder cards according to sequence from the database.
             [...el.children]
             .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
             .forEach(node => el.appendChild(node));
         }
         if (element.locked !== undefined) {
             this.toggleClass(element.locked != 0, 'mod_kanban_locked_column');
+            // Inplace editing of the column title is disabled if the column is locked.
             if (element.locked != 0) {
                 this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
             } else {
                 this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
             }
         }
+        // Update data for inplace editing if title was updated (this is important if title was modified by another user).
         if (element.title !== undefined) {
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
         }
+        // Only autohide option is relevant for the frontend for now. autoclose option is handled by the backend.
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
             this.toggleClass(options.autohide, 'mod_kanban_autohide');
         }
+        // Enable/disable dragging (e.g. if column is locked).
         this.checkDragging();
     }
 

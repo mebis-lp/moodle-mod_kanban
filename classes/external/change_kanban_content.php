@@ -41,7 +41,6 @@ use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
 use \mod_kanban\helper;
-use \mod_kanban\updateformatter;
 
 /**
  * Class for modifying kanban content
@@ -718,7 +717,6 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function set_column_locked(int $cmid, int $boardid, array $data): array {
-        global $DB;
         $params = self::validate_parameters(self::set_column_locked_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,

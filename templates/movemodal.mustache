@@ -19,7 +19,7 @@
 }}
 <div>
 <label for="mod_kanban_move_card_column">{{#str}} column, mod_kanban {{/str}}</label>
-<select data-id="{{cardid}}" data-initial-value="{{kanban_column}}" class="mod_kanban_move_card_column" id="mod_kanban_move_card_column">
+<select data-id="{{cardid}}" data-initial-value="{{kanbancolumn}}" class="mod_kanban_move_card_column" id="mod_kanban_move_card_column">
     {{#columns}}
     <option value="{{id}}">{{title}}</option>
     {{/columns}}
@@ -31,7 +31,7 @@
     {{#columns}}
         <option value="0" data-columnid="{{id}}">{{#str}} topofcolumn, mod_kanban {{/str}}</option>
         {{#cards}}
-        <option value="{{id}}" data-columnid="{{kanban_column}}">{{title}}</option>
+        <option value="{{id}}" data-columnid="{{kanbancolumn}}">{{title}}</option>
         {{/cards}}
     {{/columns}}
 </select>

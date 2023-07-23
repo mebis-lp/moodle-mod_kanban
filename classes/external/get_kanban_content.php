@@ -386,7 +386,7 @@ class get_kanban_content extends external_api {
                 ['instance' => $kanbanboard->kanban_instance],
                 IGNORE_MISSING
             );
-            if (!$common->template) {
+            if (empty($common->template)) {
                 $common->template = 0;
             }
         }

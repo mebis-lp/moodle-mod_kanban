@@ -27,6 +27,7 @@ export default class {
             istemplate: state.board.template != 0
         }, this.exportCapabilities(state));
     }
+
     /**
      * Exports the card for one column.
      * @param {*} state
@@ -47,6 +48,7 @@ export default class {
         }
         return col;
     }
+
     /**
      * Exports a card.
      * @param {*} state
@@ -115,12 +117,14 @@ export default class {
      */
     static exportHistory(state, cardId) {
         let d = [];
+        // Only get history of this card.
         state.history.forEach((c) => {
             if (c.kanban_card == cardId) {
                 d.push(c);
             }
         });
-        d = d.sort((a, b) => parseInt(a.timecreated) > parseInt(b.timecreated));
+        // Sort by timestamp.
+        d = d.sort((a, b) => parseInt(a.timestamp) > parseInt(b.timestamp));
         return d;
     }
 }
