@@ -123,6 +123,7 @@ $string['name_help'] = 'Dieser Name wird in der Kursübersicht und als Titel des
 $string['newcard'] = 'Neue Karte';
 $string['newcolumn'] = 'Neue Spalte';
 $string['nogroupavailable'] = 'Keine Gruppe verfügbar';
+$string['nouser'] = 'Kein/e Nutzer/in';
 $string['nouserboards'] = 'Keine persönlichen Boards für die Nutzer/innen';
 $string['pluginadministration'] = 'Kanban-Administration';
 $string['pluginname'] = 'Kanban-Board';

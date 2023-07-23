@@ -20,6 +20,7 @@
 <form action="view.php" method="get">
 <input type="hidden" name="id" value="{{cmid}}">
 <select class="custom-select singleselect" name="user">
+<option value="0">{{#str}} nouser, mod_kanban {{/str}}</option>
 {{#users}}
     <option value="{{id}}">{{fullname}}</option>
 {{/users}}

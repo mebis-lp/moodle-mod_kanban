@@ -464,7 +464,7 @@ class get_kanban_content extends external_api {
         $kanbancardids = array_map(function ($v) {
             return $v->id;
         }, $kanbancards);
-        if (!empty($kanbancardids)) {
+        if (!empty($kanbancardids) || (!empty($kanban->userboards) && $capabilities['viewallboards'])) {
             $users = get_enrolled_users($context, '');
             foreach ($users as $user) {
                 $kanbanusers[$user->id] = [
@@ -473,6 +473,8 @@ class get_kanban_content extends external_api {
                     'userpicture' => $OUTPUT->user_picture($user, ['link' => false]),
                 ];
             }
+        }
+        if (!empty($kanbancardids) && !(!empty($kanban->userboards) && $capabilities['viewallboards'])) {
             [$sql, $params] = $DB->get_in_or_equal($kanbancardids);
             $sql = 'kanban_card ' . $sql;
             $kanbanassigneesraw = $DB->get_records_select('kanban_assignee', $sql, $params);
