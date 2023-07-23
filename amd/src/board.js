@@ -56,36 +56,38 @@ export default class extends KanbanComponent {
             'click',
             this._addColumn
         );
-        this.addEventListener(
-            this.getElement(selectors.LOCKBOARDCOLUMNS),
-            'click',
-            this._lockColumns
-        );
-        this.addEventListener(
-            this.getElement(selectors.UNLOCKBOARDCOLUMNS),
-            'click',
-            this._unlockColumns
-        );
-        this.addEventListener(
-            this.getElement(selectors.SAVEASTEMPLATE),
-            'click',
-            this._templateConfirm
-        );
-        this.addEventListener(
-            this.getElement(selectors.SHOWTEMPLATE),
-            'click',
-            this._showTemplate
-        );
-        this.addEventListener(
-            this.getElement(selectors.DELETEBOARD),
-            'click',
-            this._deleteConfirm
-        );
-        this.addEventListener(
-            this.getElement(selectors.DELETETEMPLATE),
-            'click',
-            this._deleteTemplateConfirm
-        );
+        if (state.capabilities.get('manageboard')) {
+            this.addEventListener(
+                this.getElement(selectors.LOCKBOARDCOLUMNS),
+                'click',
+                this._lockColumns
+            );
+            this.addEventListener(
+                this.getElement(selectors.UNLOCKBOARDCOLUMNS),
+                'click',
+                this._unlockColumns
+            );
+            this.addEventListener(
+                this.getElement(selectors.SAVEASTEMPLATE),
+                'click',
+                this._templateConfirm
+            );
+            this.addEventListener(
+                this.getElement(selectors.SHOWTEMPLATE),
+                'click',
+                this._showTemplate
+            );
+            this.addEventListener(
+                this.getElement(selectors.DELETEBOARD),
+                'click',
+                this._deleteConfirm
+            );
+            this.addEventListener(
+                this.getElement(selectors.DELETETEMPLATE),
+                'click',
+                this._deleteTemplateConfirm
+            );
+        }
         this.addEventListener(
             this.getElement(selectors.SHOWBOARD),
             'click',

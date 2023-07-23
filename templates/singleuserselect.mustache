@@ -17,3 +17,11 @@
 {{!
     @template mod_kanban/singleuserselect
 }}
+<form action="view.php" method="get">
+<input type="hidden" name="id" value="{{cmid}}">
+<select class="custom-select singleselect" name="user">
+{{#users}}
+    <option value="{{id}}">{{fullname}}</option>
+{{/users}}
+</select>
+</form>

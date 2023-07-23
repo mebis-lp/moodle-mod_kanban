@@ -36,10 +36,11 @@
 }}
 <div class="container-fluid mod_kanban_board {{#locked}}mod_kanban_board_locked_columns{{/locked}} {{#addcard}}mod_kanban_addcard{{/addcard}} {{#managecolumns}}mod_kanban_managecolumns{{/managecolumns}} {{#moveassignedcards}}mod_kanban_moveassignedcards{{/moveassignedcards}} {{#moveallcards}}mod_kanban_moveallcards{{/moveallcards}} {{#hastemplate}}mod_kanban_hastemplate{{/hastemplate}} {{#istemplate}}mod_kanban_istemplate{{/istemplate}} {{#hashistory}}mod_kanban_history{{/hashistory}}" id="mod_kanban_board-{{id}}" data-id="{{id}}" data-cmid="{{cmid}}">
     <div class="row mod_kanban_board_menu" data-id="{{id}}">
+        <div class="col-8 mod_kanban_heading">
+            <h3>{{heading}}</h3>
+        </div>
         <div class="col mod_kanban_action_menu">
             {{>mod_kanban/actionmenuboard}}
-        </div>
-        <div class="col mod_kanban_filter">
         </div>
     </div>
     <div class="row mod_kanban_main">

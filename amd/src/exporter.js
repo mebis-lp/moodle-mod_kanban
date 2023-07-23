@@ -16,6 +16,10 @@ export default class {
                 return this.exportCardsForColumn(state, value);
             });
         }
+
+        let showactionmenu = state.common.userboards == 1 || state.common.groupselector != '' ||
+            state.capabilities.get('manageboards') || (state.common.userboards == 2 && state.capabilities.get('viewallboards'));
+
         return Object.assign({
             cmid: state.common.id,
             id: state.board.id,
@@ -24,7 +28,16 @@ export default class {
             columns: columns,
             locked: state.board.locked,
             hastemplate: state.common.template != 0,
-            istemplate: state.board.template != 0
+            istemplate: state.board.template != 0,
+            heading: state.board.heading,
+            groupselector: state.common.groupselector,
+            userboards: state.common.userboards,
+            history: state.common.history,
+            groupmode: state.common.groupmode,
+            ismyuserboard: state.common.userid == state.board.userid,
+            myuserid: state.common.userid,
+            showactionmenu: showactionmenu,
+            users: JSON.parse(JSON.stringify(state.users)),
         }, this.exportCapabilities(state));
     }
 

@@ -28,7 +28,7 @@ require_once('HTML/QuickForm/input.php');
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class MoodleQuickForm_color extends HTML_QuickForm_input {
+class MoodleQuickForm_color extends HTML_QuickForm_text {
     /**
      * Constructor
      *

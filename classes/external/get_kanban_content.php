@@ -82,7 +82,11 @@ class get_kanban_content extends external_api {
                         'userid' => new external_value(PARAM_INT, 'current user id'),
                         'lang' => new external_value(PARAM_TEXT, 'language for the ui'),
                         'liveupdate' => new external_value(PARAM_INT, 'seconds between two live updates'),
-                        'template' => new external_value(PARAM_INT, 'boardid for template', VALUE_OPTIONAL, 0)
+                        'template' => new external_value(PARAM_INT, 'boardid for template', VALUE_OPTIONAL, 0),
+                        'groupmode' => new external_value(PARAM_INT, 'group mode'),
+                        'groupselector' => new external_value(PARAM_RAW, 'group selector'),
+                        'userboards' => new external_value(PARAM_INT, 'userboards'),
+                        'history' => new external_value(PARAM_INT, 'history'),
                     ]),
                     'board' => new external_single_structure([
                         'id' => new external_value(PARAM_INT, 'board id'),
@@ -91,7 +95,8 @@ class get_kanban_content extends external_api {
                         'locked' => new external_value(PARAM_INT, 'lock state'),
                         'userid' => new external_value(PARAM_INT, 'userboard for userid', VALUE_OPTIONAL, 0),
                         'groupid' => new external_value(PARAM_INT, 'groupboard for groupid', VALUE_OPTIONAL, 0),
-                        'template' => new external_value(PARAM_INT, 'board is a template', VALUE_OPTIONAL, 0)
+                        'template' => new external_value(PARAM_INT, 'board is a template', VALUE_OPTIONAL, 0),
+                        'heading' => new external_value(PARAM_TEXT, 'heading of the board'),
                     ]),
                     'columns' => new external_multiple_structure(
                         new external_single_structure(
@@ -336,12 +341,64 @@ class get_kanban_content extends external_api {
             'editallboards' => has_capability('mod/kanban:editallboards', $context),
             'manageboard' => has_capability('mod/kanban:manageboard', $context),
             'viewhistory' => has_capability('mod/kanban:viewhistory', $context),
+            'viewallboards' => has_capability('mod/kanban:viewallboards', $context),
         ];
 
         $params['board'] = $boardid;
         $params['timestamp'] = $timestamp;
 
+        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
+
         $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
+
+        $kanbanboard->heading = get_string('courseboard', 'mod_kanban');
+
+        if (!$asupdate) {
+            if (!empty($cminfo->groupmode)) {
+                $groupselector = groups_print_activity_menu(
+                    $cminfo,
+                    new \moodle_url('/mod/kanban/view.php', ['id' => $cminfo->id]),
+                    true,
+                    $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY
+                );
+                $allowedgroups = groups_get_activity_allowed_groups($cminfo);
+                if (!$allowedgroups) {
+                    if ($kanban->userboards !== MOD_KANBAN_NOUSERBOARDS) {
+                        $groupselector = '';
+                    } else {
+                        throw new \moodle_exception('nogroupavailable', 'mod_kanban');
+                    }
+                } else if (count($allowedgroups) < 2) {
+                    if (!empty($groupid)) {
+                        $groupselector = '';
+                    } else {
+                        $group = array_pop($allowedgroups);
+                        $groupselector = $OUTPUT->render_from_template(
+                            'mod_kanban/groupbutton',
+                            [
+                                'cmid' => $cminfo->id,
+                                'groupid' => $group->id,
+                                'groupname' => $group->name,
+                            ]
+                        );
+                    }
+                }
+            }
+
+            if (!empty($kanbanboard->groupid)) {
+                $kanbanboard->heading = get_string('groupboard', 'mod_kanban', groups_get_group_name($kanbanboard->groupid));
+            }
+
+            if (!empty($kanbanboard->userid)) {
+                $boarduser = \core_user::get_user($kanbanboard->userid);
+                $kanbanboard->heading = get_string('userboard', 'mod_kanban', fullname($boarduser));
+            }
+
+            if (!empty($kanbanboard->template)) {
+                $kanbanboard->heading = get_string('template', 'mod_kanban');
+            }
+        }
+
         if (!(empty($kanbanboard->userid) && empty($kanbanboard->groupid))) {
             $restrictcaps = false;
             if (!empty($kanbanboard->userid) && $kanbanboard->userid != $USER->id) {
@@ -376,6 +433,11 @@ class get_kanban_content extends external_api {
         $common->userid = $USER->id;
         $common->lang = current_language();
         $common->liveupdate = get_config('mod_kanban', 'liveupdatetime');
+        $common->userboards = $kanban->userboards;
+        $common->groupmode = $cminfo->groupmode;
+        $common->groupselector = $groupselector;
+        $common->history = $kanban->history;
+
         if (!$asupdate) {
             $common->template = $DB->get_field_sql(
                 'SELECT id

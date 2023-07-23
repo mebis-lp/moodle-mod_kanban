@@ -262,7 +262,7 @@ a.mod_kanban_attachment_item {
 
 .mod_kanban_main.row {
     margin-bottom: 100px;
-    margin-left: 5px;
+    overflow: auto;
 }
 
 .mod_kanban_discussion_input {
@@ -359,4 +359,12 @@ a.mod_kanban_attachment_item {
 
 .mod_kanban_board {
     margin-bottom: 200px;
+}
+
+.col-8.mod_kanban_heading {
+    max-width: fit-content;
+}
+
+.col.mod_kanban_action_menu {
+    top: 0;
 }

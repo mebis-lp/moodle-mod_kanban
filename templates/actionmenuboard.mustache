@@ -26,9 +26,10 @@
         "hastemplate": false
     }
 }}
-{{#manageboard}}
+{{#showactionmenu}}
 <button class="mod_kanban_action_menu_trigger btn btn-icon icon-no-margin p-0 dropdown-toggle" data-toggle="dropdown">{{#pix}} i/menu, core, {{#str}} editboard, mod_kanban {{/str}} {{/pix}}</button>
 <ul class="dropdown-menu dropdown-menu-left">
+    {{#manageboard}}
     <li class="nav-item mod_kanban_lock_board_columns">
         <a class="dropdown-item" href="#" data-action="lock_board_columns" data-id="{{id}}">{{#pix}} t/lock, core, {{#str}} lockboardcolumns, mod_kanban {{/str}} {{/pix}}{{#str}} lockboardcolumns, mod_kanban {{/str}}</a>
     </li>
@@ -44,11 +45,84 @@
     <li class="nav-item mod_kanban_delete_board">
         <a class="dropdown-item" href="#" data-action="delete_board" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deleteboard, mod_kanban {{/str}} {{/pix}}{{#str}} deleteboard, mod_kanban {{/str}}</a>
     </li>
-    <li class="nav-item mod_kanban_show_board">
-        <a class="dropdown-item" href="#" data-action="show_board" data-id="{{id}}">{{#pix}} e/backward, core, {{#str}} showboard, mod_kanban {{/str}} {{/pix}}{{#str}} showboard, mod_kanban {{/str}}</a>
-    </li>
     <li class="nav-item mod_kanban_delete_template">
         <a class="dropdown-item" href="#" data-action="delete_template" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} deletetemplate, mod_kanban {{/str}} {{/pix}}{{#str}} deletetemplate, mod_kanban {{/str}}</a>
     </li>
+    {{/manageboard}}
+    <li class="nav-item mod_kanban_show_board">
+        <a class="dropdown-item" href="#" data-action="show_board" data-id="{{id}}">{{#pix}} t/left, core, {{#str}} showboard, mod_kanban {{/str}} {{/pix}}{{#str}} showboard, mod_kanban {{/str}}</a>
+    </li>
+    {{#groupmode}}
+    <li class="nav-item mod_kanban_select_group">
+        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#mod_kanban_change_group">{{#pix}} i/group, core, {{#str}} changegroup, mod_kanban {{/str}} {{/pix}}{{#str}} changegroup, mod_kanban {{/str}}</a>
+    </li>
+    {{/groupmode}}
+    {{#userboards}}
+    {{^ismyuserboard}}
+    <li class="nav-item mod_kanban_to_personal_board">
+        <a class="dropdown-item" href="view.php?id={{cmid}}&group=0&user={{myuserid}}">{{#pix}} t/right, core, {{#str}} myuserboard, mod_kanban {{/str}} {{/pix}}{{#str}} myuserboard, mod_kanban {{/str}}</a>
+    </li>
+    {{/ismyuserboard}}
+    {{#ismyuserboard}}
+    <li class="nav-item">
+        <a class="dropdown-item" href="view.php?id={{cmid}}&group=0&user=0">{{#pix}} t/left, core, {{#str}} showboard, mod_kanban {{/str}} {{/pix}}{{#str}} showboard, mod_kanban {{/str}}</a>
+    </li>
+    {{/ismyuserboard}}
+    {{#viewallboards}}
+    <li class="nav-item mod_kanban_select_user">
+        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#mod_kanban_change_user">{{#pix}} t/user, core, {{#str}} changeuser, mod_kanban {{/str}} {{/pix}}{{#str}} changeuser, mod_kanban {{/str}}</a>
+    </li>
+    {{/viewallboards}}
+    {{/userboards}}
 </ul>
-{{/manageboard}}
+{{/showactionmenu}}
+{{#groupselector}}
+<div class="modal fade" id="mod_kanban_change_group" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{#str}} changegroup, mod_kanban {{/str}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{#str}} close, core {{/str}}">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{{groupselector}}}
+            </div>
+        </div>
+    </div>
+</div>
+{{/groupselector}}
+{{#userboards}}
+    {{#viewallboards}}
+    <div class="modal fade" id="mod_kanban_change_user" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{#str}} changeuser, mod_kanban {{/str}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{#str}} close, core {{/str}}">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{>mod_kanban/singleuserselect}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/viewallboards}}
+{{/userboards}}
+{{#js}}
+{{#groupselector}}
+document.querySelector('#mod_kanban_change_group form').addEventListener('change', (e) => {
+    e.target.closest('form').submit();
+});
+{{/groupselector}}
+{{#userboards}}
+    {{#viewallboards}}
+document.querySelector('#mod_kanban_change_user form').addEventListener('change', (e) => {
+    e.target.closest('form').submit();
+});
+    {{/viewallboards}}
+{{/userboards}}
+{{/js}}

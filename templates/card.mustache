@@ -32,9 +32,9 @@
 <li style="{{#background}}background-color: {{background}}{{/background}}" class="mod_kanban_card card{{#completed}} mod_kanban_closed{{/completed}} {{^hasassignees}}mod_kanban_unassigned{{/hasassignees}} {{#hasdescription}}mod_kanban_hasdescription{{/hasdescription}} {{#hasattachment}}mod_kanban_hasattachment{{/hasattachment}} {{#hasdiscussion}}mod_kanban_hasdiscussion{{/hasdiscussion}} {{#selfassigned}}mod_kanban_selfassigned{{/selfassigned}} {{#discussion}}mod_kanban_hasdiscussion{{/discussion}} {{#canedit}}mod_kanban_canedit{{/canedit}}" id="mod_kanban_card-{{id}}" data-id="{{id}}" data-columnid="{{kanban_column}}">
     <div class="card-body">
         <div class="mod_kanban_card_title card-title">
-            <span class="inplaceeditable inplaceeditable-text"{{#canedit}} data-inplaceeditable="1" data-component="mod_kanban" data-itemtype="card" data-itemid="{{id}}"
-        data-value="{{title}}" data-type="text"{{/canedit}}>
-                <a href="#" class="quickeditlink aalink"{{#canedit}} data-inplaceeditablelink="1"{{/canedit}}>
+            <span class="inplaceeditable inplaceeditable-text"{{#canedit}}{{^completed}} data-inplaceeditable="1" data-component="mod_kanban" data-itemtype="card" data-itemid="{{id}}"
+        data-value="{{title}}" data-type="text"{{/completed}}{{/canedit}}>
+                <a href="#" class="quickeditlink aalink"{{#canedit}}{{^completed}} data-inplaceeditablelink="1"{{/completed}}{{/canedit}}>
                 {{title}}
                 </a>
             </span>
