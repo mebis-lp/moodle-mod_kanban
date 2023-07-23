@@ -97,6 +97,7 @@ export default class extends KanbanComponent {
         if (state.common.liveupdate > 0) {
             this._continuousUpdate(state.common.liveupdate);
         }
+        this.toggleClass('ontouchstart' in document.documentElement, 'mod_kanban_touch');
     }
 
     /**

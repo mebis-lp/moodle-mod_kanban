@@ -95,6 +95,12 @@
     opacity: 1;
 }
 
+.mod_kanban_touch .mod_kanban_addcolumn_first .mod_kanban_addcolumn_container.col:last-of-type *,
+.mod_kanban_touch .mod_kanban_addcard_first .mod_kanban_addcard_container.row:last-of-type * {
+    animation: none;
+    opacity: 1;
+}
+
 .mod_kanban_addcard_container.mod_kanban_insert {
     animation: none;
     opacity: 1;
