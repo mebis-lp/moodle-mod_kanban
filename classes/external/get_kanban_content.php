@@ -474,7 +474,7 @@ class get_kanban_content extends external_api {
                 ];
             }
         }
-        if (!empty($kanbancardids) && !(!empty($kanban->userboards) && $capabilities['viewallboards'])) {
+        if (!empty($kanbancardids)) {
             [$sql, $params] = $DB->get_in_or_equal($kanbancardids);
             $sql = 'kanban_card ' . $sql;
             $kanbanassigneesraw = $DB->get_records_select('kanban_assignee', $sql, $params);

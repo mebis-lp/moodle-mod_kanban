@@ -261,8 +261,9 @@ a.mod_kanban_attachment_item {
 }
 
 .mod_kanban_main.row {
-    margin-bottom: 100px;
-    overflow: auto;
+    overflow-y: visible;
+    overflow-x: auto;
+    padding-bottom: 150px;
 }
 
 .mod_kanban_discussion_input {
