@@ -375,8 +375,6 @@ export default class extends KanbanComponent {
      * Delete this card.
      */
     _cardDeleted() {
-        const el = this.getElement();
-        el.parentNode.removeChild(el);
         this.destroy();
     }
 
