@@ -375,3 +375,9 @@ a.mod_kanban_attachment_item {
 .col.mod_kanban_action_menu {
     top: 0;
 }
+
+.mod_kanban_history_modal,
+.mod_kanban_discussion_modal,
+.mod_kanban_description_modal {
+    cursor: pointer;
+}
