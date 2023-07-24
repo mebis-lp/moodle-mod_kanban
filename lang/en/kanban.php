@@ -62,6 +62,7 @@ $string['editdetails'] = 'Edit details';
 $string['enablehistory'] = 'Enable history';
 $string['enablehistorydescription'] = 'Enabling this option will make history of changes available to the boards.';
 $string['groupboard'] = 'Group board for group "{$a}"';
+$string['hidehidden'] = 'Hide hidden cards';
 $string['history'] = 'History';
 $string['history_card_added'] = '{$a->username} added card "{$a->title}" to column "{$a->columnname}"';
 $string['history_card_assigned'] = '{$a->username} assigned card to user {$a->affectedusername}';
