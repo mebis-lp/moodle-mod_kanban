@@ -116,6 +116,7 @@ $string['messageprovider:discussion'] = 'Karte diskutiert';
 $string['messageprovider:moved'] = 'Karte verschoben';
 $string['modulename'] = 'Kanban-Board';
 $string['modulenameplural'] = 'Kanban-Boards';
+$string['moveaftercard'] = 'Verschieben hinter';
 $string['movecard'] = 'Karte verschieben';
 $string['movecolumn'] = 'Spalte verschieben';
 $string['myuserboard'] = 'Mein persönliches Board';
