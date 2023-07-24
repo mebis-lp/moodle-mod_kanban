@@ -251,6 +251,7 @@ export default class extends KanbanComponent {
      * Called to add a column.
      */
     _addColumn() {
+        document.activeElement.blur();
         // Board component only handles adding a column at the leftmost position, hence second parameter is always 0.
         this.reactive.dispatch('addColumn', 0);
     }

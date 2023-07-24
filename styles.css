@@ -19,7 +19,7 @@
 
 .mod_kanban_addcard_container.row * {
     opacity: 0;
-    background-color: lightgray;
+    background-color: inherit;
 }
 
 .mod_kanban_addcard.btn,
@@ -29,9 +29,6 @@
     top: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    border-radius: 100%;
-    width: 32px;
-    height: 32px;
     border-color: black;
     border-style: solid;
     border-width: 1px;
@@ -80,7 +77,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: lightgray;
+    background-color: inherit;
     opacity: 0;
     transition: opacity 0.1s;
 }
@@ -321,7 +318,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_board_locked_columns .mod_kanban_unlock_column,
 .mod_kanban_board_locked_columns .mod_kanban_lock_board_columns,
 .mod_kanban_board:not(.mod_kanban_board_locked_columns) .mod_kanban_unlock_board_columns,
-.mod_kanban_board:not(.mod_kanban_addcard, .mod_kanban_moveassignedcards, .mod_kanban_moveallcards) .mod_kanban_addcard_container,
+.mod_kanban_board:not(.mod_kanban_addcards, .mod_kanban_moveassignedcards, .mod_kanban_moveallcards) .mod_kanban_addcard_container,
 .mod_kanban_board:not(.mod_kanban_managecolumns) .mod_kanban_addcolumn_container,
 .mod_kanban_board:not(.mod_kanban_hastemplate) .mod_kanban_show_template,
 .mod_kanban_board.mod_kanban_istemplate .mod_kanban_show_template,
@@ -380,4 +377,8 @@ a.mod_kanban_attachment_item {
 .mod_kanban_discussion_modal,
 .mod_kanban_description_modal {
     cursor: pointer;
+}
+
+.mod_kanban_addcard {
+    background-color: lightgray;
 }

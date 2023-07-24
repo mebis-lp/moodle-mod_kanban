@@ -215,6 +215,7 @@ export default class extends KanbanComponent {
      * @param {*} event
      */
     _addColumn(event) {
+        document.activeElement.blur();
         let target = event.target.closest(selectors.ADDCOLUMN);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('addColumn', data.id);
@@ -243,6 +244,7 @@ export default class extends KanbanComponent {
      * @param {*} event
      */
     _addCard(event) {
+        document.activeElement.blur();
         let target = event.target.closest(selectors.ADDCARD);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('addCard', data.columnid, 0);
