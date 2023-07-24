@@ -32,7 +32,7 @@
                 {{content}}
             </div>
             <div class="text-right text-muted font-weight-light">{{#userdate}} {{timecreated}}, {{#str}} strftimedatemonthtimeshort, core_langconfig {{/str}} {{/userdate}}
-            {{#candelete}}<button class="btn btn-icon icon-no-margin" href="#" data-action="delete_message" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}</button>{{/candelete}}
+            {{#candelete}}<button class="btn btn-icon icon-no-margin" data-action="delete_message" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}</button>{{/candelete}}
             </div>
         </li>
     {{/discussions}}
