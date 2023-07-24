@@ -25,13 +25,14 @@
         "id": 2,
         "hascolumns": false,
         "locked": 0,
-        "addcards": true,
+        "addcard": true,
         "managecolumns": false,
         "moveassignedcards": true,
         "moveallcards": false,
         "hastemplate": false,
         "istemplate": true,
-        "hashistory": true
+        "history": true,
+        "heading": "Course board"
     }
 }}
 <div class="container-fluid mod_kanban_board {{#locked}}mod_kanban_board_locked_columns{{/locked}} {{#addcard}}mod_kanban_addcards{{/addcard}} {{#managecolumns}}mod_kanban_managecolumns{{/managecolumns}} {{#moveassignedcards}}mod_kanban_moveassignedcards{{/moveassignedcards}} {{#moveallcards}}mod_kanban_moveallcards{{/moveallcards}} {{#hastemplate}}mod_kanban_hastemplate{{/hastemplate}} {{#istemplate}}mod_kanban_istemplate{{/istemplate}} {{#history}}mod_kanban_history{{/history}}" id="mod_kanban_board-{{id}}" data-id="{{id}}" data-cmid="{{cmid}}">
@@ -44,7 +45,7 @@
         </div>
     </div>
     <div class="row mod_kanban_main">
-        <ul class="row mod_kanban_column_container" id="mod_kanban_board-{{id}}" data-id="{{id}}" data-cmid="{{cmid}}">
+        <ul class="row mod_kanban_column_container" data-id="{{id}}" data-cmid="{{cmid}}">
             <li class="mod_kanban_addcolumn_first">
                 {{>mod_kanban/addcolumn}}
             </li>

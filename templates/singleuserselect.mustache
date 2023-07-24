@@ -16,6 +16,14 @@
 }}
 {{!
     @template mod_kanban/singleuserselect
+
+    Example context (json):
+    {
+        "cmid": 130,
+        "users": [
+            {"id": 1, "fullname": "Berti Beispiel"}
+        ]
+    }
 }}
 <form action="view.php" method="get">
 <input type="hidden" name="id" value="{{cmid}}">
