@@ -867,7 +867,13 @@ class boardmanager {
         }
         $this->formatter->put('cards', $cardupdate);
 
-        $this->write_history('updated', MOD_KANBAN_CARD, $cardupdate, $card['kanban_column'], $card['id']);
+        $this->write_history(
+            'updated',
+            MOD_KANBAN_CARD,
+            array_merge(['title' => $card['title']], $cardupdate),
+            $card['kanban_column'],
+            $card['id']
+        );
     }
 
     /**
