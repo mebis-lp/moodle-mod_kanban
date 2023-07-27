@@ -603,7 +603,13 @@ class boardmanager {
                 helper::remove_calendar_event($this->kanban, $card);
                 $this->write_history('completed', constants::MOD_KANBAN_CARD, [], $columnid, $cardid);
             }
-            $this->write_history('moved', constants::MOD_KANBAN_CARD, ['columnname' => $targetcolumn->title], $card->kanban_column, $cardid);
+            $this->write_history(
+                'moved',
+                constants::MOD_KANBAN_CARD,
+                ['columnname' => $targetcolumn->title],
+                $card->kanban_column,
+                $cardid
+            );
         }
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_COLUMN, $update['timemodified']);
     }
@@ -695,7 +701,13 @@ class boardmanager {
         $card->username = fullname($USER);
         $card->boardname = $this->kanban->name;
         helper::send_notification($this->cminfo, 'closed', $assignees, $card, ($state == 0 ? 'reopened' : null));
-        $this->write_history(($state == 0 ? 'reopened' : 'completed'), constants::MOD_KANBAN_CARD, $update, $card->kanban_column, $cardid);
+        $this->write_history(
+            ($state == 0 ? 'reopened' : 'completed'),
+            constants::MOD_KANBAN_CARD,
+            $update,
+            $card->kanban_column,
+            $cardid
+        );
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
     }
 
@@ -840,7 +852,13 @@ class boardmanager {
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
                 helper::send_notification($this->cminfo, 'assigned', $todelete, (object)$carddata, 'unassigned');
                 foreach ($todelete as $user) {
-                    $this->write_history('unassigned', constants::MOD_KANBAN_CARD, ['userid' => $user], $card['kanban_column'], $card['id']);
+                    $this->write_history(
+                        'unassigned',
+                        constants::MOD_KANBAN_CARD,
+                        ['userid' => $user],
+                        $card['kanban_column'],
+                        $card['id']
+                    );
                 }
             }
             if (!empty($toinsert) || !empty($todelete)) {
@@ -864,7 +882,13 @@ class boardmanager {
                 (object)array_merge($carddata, ['boardname' => $this->cminfo->name])
             );
             foreach ($toinsert as $user) {
-                $this->write_history('assigned', constants::MOD_KANBAN_CARD, ['userid' => $user], $card['kanban_column'], $card['id']);
+                $this->write_history(
+                    'assigned',
+                    constants::MOD_KANBAN_CARD,
+                    ['userid' => $user],
+                    $card['kanban_column'],
+                    $card['id']
+                );
             }
         }
         $cardupdate['attachments'] = helper::get_attachments($context->id, $cardid);

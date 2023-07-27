@@ -164,7 +164,7 @@ export default class extends KanbanComponent {
                     this._saveAsTemplate();
                 }
             );
-        }).catch();
+        }).catch(() => {});
     }
 
     /**
@@ -191,7 +191,7 @@ export default class extends KanbanComponent {
                     this._deleteBoard();
                 }
             );
-        }).catch();
+        }).catch(() => {});
     }
 
     /**
@@ -211,7 +211,7 @@ export default class extends KanbanComponent {
                     this._deleteBoard();
                 }
             );
-        }).catch();
+        }).catch(() => {});
     }
 
     /**

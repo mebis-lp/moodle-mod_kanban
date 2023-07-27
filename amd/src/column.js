@@ -112,7 +112,7 @@ export default class extends KanbanComponent {
                     this._removeColumn(event);
                 }
             );
-        }).catch();
+        }).catch(() => {});
     }
 
     /**
