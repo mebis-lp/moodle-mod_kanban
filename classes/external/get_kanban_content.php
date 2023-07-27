@@ -479,7 +479,7 @@ class get_kanban_content extends external_api {
         } else {
             $kanbancards = [];
         }
-        
+
         $kanbancardids = array_map(function ($v) {
             return $v->id;
         }, $kanbancards);
@@ -622,7 +622,7 @@ class get_kanban_content extends external_api {
         $params['cardid'] = $cardid;
         $params['timestamp'] = $timestamp;
 
-        $discussions = $DB->get_records_select('kanban_discussion', $sql, $params);
+        $discussions = $DB->get_records_select('kanban_discussion_comment', $sql, $params);
 
         $formatter = new updateformatter();
         foreach ($discussions as $discussion) {

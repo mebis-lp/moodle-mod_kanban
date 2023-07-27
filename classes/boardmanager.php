@@ -378,7 +378,7 @@ class boardmanager {
     public function delete_card(int $cardid, bool $updatecolumn = true) {
         global $DB;
         $fs = get_file_storage();
-        $DB->delete_records('kanban_discussion', ['kanban_card' => $cardid]);
+        $DB->delete_records('kanban_discussion_comment', ['kanban_card' => $cardid]);
         $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
         $context = context_module::instance($this->cmid, IGNORE_MISSING);
         $fs->delete_area_files($context->id, 'mod_kanban', 'attachments', $cardid);
@@ -743,7 +743,7 @@ class boardmanager {
         global $DB, $USER;
         $card = $this->get_card($cardid);
         $update = ['kanban_card' => $cardid, 'content' => $message, 'userid' => $USER->id, 'timecreated' => time()];
-        $update['id'] = $DB->insert_record('kanban_discussion', $update);
+        $update['id'] = $DB->insert_record('kanban_discussion_comment', $update);
         $update['candelete'] = true;
         $update['username'] = fullname($USER);
         $this->formatter->put('discussions', $update);
@@ -773,10 +773,10 @@ class boardmanager {
         global $DB;
         $card = $this->get_card($cardid);
         $update = ['id' => $messageid];
-        $DB->delete_records('kanban_discussion', $update);
+        $DB->delete_records('kanban_discussion_comment', $update);
         $this->formatter->delete('discussions', $update);
         $this->write_history('deleted', MOD_KANBAN_DISCUSSION, $update, $card->kanban_column, $cardid);
-        if (!$DB->record_exists('kanban_discussion', ['kanban_card' => $cardid])) {
+        if (!$DB->record_exists('kanban_discussion_comment', ['kanban_card' => $cardid])) {
             $update = ['id' => $cardid, 'discussion' => 0, 'timemodified' => time()];
             $DB->update_record('kanban_card', $update);
             $this->formatter->put('cards', $update);
@@ -965,7 +965,7 @@ class boardmanager {
      */
     public function get_discussion_message(int $messageid): object {
         global $DB;
-        return $DB->get_record('kanban_discussion', ['id' => $messageid]);
+        return $DB->get_record('kanban_discussion_comment', ['id' => $messageid]);
     }
 
     /**

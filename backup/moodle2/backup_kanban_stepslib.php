@@ -86,7 +86,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
 
         $discussions = new backup_nested_element('discussions');
         $discussion = new backup_nested_element(
-            'kanban_discussion',
+            'kanban_discussion_comment',
             ['id'],
             ['kanban_card', 'userid', 'timecreated', 'content']
         );
@@ -129,7 +129,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             $assignee->annotate_ids('userid', 'userid');
             $assignee->annotate_ids('kanban_card_id', 'kanban_card');
             $card->annotate_ids('userid', 'createdby');
-            $discussion->set_source_table('kanban_discussion', ['kanban_card' => backup::VAR_PARENTID]);
+            $discussion->set_source_table('kanban_discussion_comment', ['kanban_card' => backup::VAR_PARENTID]);
             $discussion->annotate_ids('userid', 'userid');
             $discussion->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->set_source_table('kanban_history', ['kanban_board' => backup::VAR_PARENTID]);

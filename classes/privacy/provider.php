@@ -269,7 +269,7 @@ class provider implements
             $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
 
             // Delete discussion.
-            $DB->delete_records_select('kanban_discussion', 'kanban_card ' . $insql, $params);
+            $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
 
             // Delete all columns from boards that are no template boards.
             $boardids = $DB->get_fieldset_select(
@@ -340,7 +340,7 @@ class provider implements
                 // Unassign user.
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
                 // Delete discussion.
-                $DB->delete_records_select('kanban_discussion', 'kanban_card ' . $insql, $params);
+                $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
             }
 
             // Get all personal boards.
@@ -357,7 +357,7 @@ class provider implements
                 list($insql, $params) = $DB->get_in_or_equal($cardids);
                 $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
                 // Delete all discussions.
-                $DB->delete_records_select('kanban_discussion', 'kanban_card ' . $insql, $params);
+                $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
             }
 
             $DB->delete_records('kanban_card', ['kanban_board' => $boardid]);

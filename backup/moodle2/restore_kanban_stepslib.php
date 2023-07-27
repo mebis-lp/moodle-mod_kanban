@@ -192,7 +192,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         $data->userid = $this->get_mappingid('userid', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
 
-        $DB->insert_record('kanban_discussion', $data);
+        $DB->insert_record('kanban_discussion_comment', $data);
     }
 
     /**
