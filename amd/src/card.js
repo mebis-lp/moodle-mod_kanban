@@ -157,7 +157,7 @@ export default class extends KanbanComponent {
         Str.get_strings([
             {key: 'movecard', component: 'mod_kanban'},
             {key: 'move', component: 'core'},
-        ]).then(strings => {
+        ]).then((strings) => {
             return saveCancel(
                 strings[0],
                 Templates.render('mod_kanban/movemodal', data),
@@ -180,7 +180,7 @@ export default class extends KanbanComponent {
             {key: 'deletecard', component: 'mod_kanban'},
             {key: 'deletecardconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(strings => {
+        ]).then((strings) => {
             return saveCancel(
                 strings[0],
                 strings[1],
@@ -201,7 +201,7 @@ export default class extends KanbanComponent {
             {key: 'deletemessage', component: 'mod_kanban'},
             {key: 'deletemessageconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(strings => {
+        ]).then((strings) => {
             return saveCancel(
                 strings[0],
                 strings[1],

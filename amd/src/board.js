@@ -156,7 +156,7 @@ export default class extends KanbanComponent {
             {key: 'saveastemplate', component: 'mod_kanban'},
             {key: 'saveastemplateconfirm', component: 'mod_kanban'},
             {key: 'save', component: 'core'},
-        ]).then(strings => {
+        ]).then((strings) => {
             return saveCancel(
                 strings[0],
                 strings[1],
@@ -183,7 +183,7 @@ export default class extends KanbanComponent {
             {key: 'deleteboard', component: 'mod_kanban'},
             {key: 'deleteboardconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(strings => {
+        ]).then((strings) => {
             return saveCancel(
                 strings[0],
                 strings[1],
@@ -203,7 +203,7 @@ export default class extends KanbanComponent {
             {key: 'deletetemplate', component: 'mod_kanban'},
             {key: 'deletetemplateconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(strings => {
+        ]).then((strings) => {
             return saveCancel(
                 strings[0],
                 strings[1],
