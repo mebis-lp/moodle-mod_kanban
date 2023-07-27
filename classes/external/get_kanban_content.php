@@ -174,6 +174,12 @@ class get_kanban_content extends external_api {
                                     VALUE_OPTIONAL,
                                     0
                                 ),
+                                'canedit' => new external_value(
+                                    PARAM_BOOL,
+                                    'current user can edit this card?',
+                                    VALUE_OPTIONAL,
+                                    false
+                                ),
                             ],
                             '',
                             VALUE_OPTIONAL
@@ -349,7 +355,7 @@ class get_kanban_content extends external_api {
 
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
 
-        $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
+        $kanbanboard = helper::get_cached_board($boardid);
 
         $kanbanboard->heading = get_string('courseboard', 'mod_kanban');
 
@@ -490,6 +496,7 @@ class get_kanban_content extends external_api {
                 if (empty($kanbanassignees[$card->id])) {
                     $kanbanassignees[$card->id] = [];
                 }
+                $kanbancards[$key]->canedit = $capabilities['managecards'] || $card->createdby == $USER->id;
                 $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
                 $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
                 $kanbancards[$key]->hasdescription = !empty($kanbancards[$key]->description);
@@ -594,7 +601,7 @@ class get_kanban_content extends external_api {
         require_capability('mod/kanban:view', $context);
 
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
-        $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+        $kanbanboard = helper::get_cached_board($boardid);
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, helper::MOD_KANBAN_VIEW);
 
@@ -666,7 +673,7 @@ class get_kanban_content extends external_api {
         $formatter = new updateformatter();
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         if (!empty($kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))) {
-            $kanbanboard = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*', MUST_EXIST);
+            $kanbanboard = helper::get_cached_board($boardid);
 
             helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, helper::MOD_KANBAN_VIEW);
 
@@ -703,5 +710,27 @@ class get_kanban_content extends external_api {
         return [
             'update' => $formatter->format()
         ];
+    }
+
+    /**
+     * Get the timestamp of the latest entry in a db table from cache.
+     * @param int $type one of MOD_KANBAN_BOARD, MOD_KANBAN_COLUMN or MOD_KANBAN_CARD
+     * @param int $id Id of the board
+     * @return mixed timestamp or false if none found
+     */
+    public static function get_cached_timestamp(int $type, int $id): mixed {
+        $cache = \cache::make('mod_kanban', 'timestamp');
+        return $cache->get(join('-', [$type, $id]));
+    }
+
+    /**
+     * Get the timestamp of the latest entry in a db table from cache.
+     * @param int $type one of MOD_KANBAN_BOARD, MOD_KANBAN_COLUMN or MOD_KANBAN_CARD
+     * @param int $timestamp value
+     * @param int $id Id of the board
+     */
+    public static function set_cached_timestamp(int $type, int $timestamp, int $id): void {
+        $cache = \cache::make('mod_kanban', 'timestamp');
+        $cache->set(join('-', [$type, $id]), $timestamp);
     }
 }

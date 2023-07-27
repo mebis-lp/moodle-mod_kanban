@@ -174,7 +174,7 @@ export default class {
     async sendChange(method, stateManager, data) {
         const state = stateManager.state;
         const result = await Ajax.call([{
-            methodname: 'mod_kanban_change_kanban_content_' + method,
+            methodname: 'mod_kanban_' + method,
             args: {
                 cmid: state.common.id,
                 boardid: state.board.id,
