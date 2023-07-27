@@ -378,7 +378,7 @@ class helper {
         $cache = \cache::make('mod_kanban', 'timestamp');
         $timestamp = $DB->get_field_sql(
             'SELECT MAX(timemodified)
-             FROM kanban_' . MOD_KANBAN_TYPES[$type] . '
+             FROM {kanban_' . MOD_KANBAN_TYPES[$type] . '}
              WHERE kanban_board = :id',
              ['id' => $boardid]
         );
