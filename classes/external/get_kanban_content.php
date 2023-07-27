@@ -38,6 +38,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_kanban\constants;
 use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;

@@ -129,7 +129,7 @@ class helper {
         object $board,
         \context $context,
         \cm_info $cminfo,
-        int $type = self::MOD_KANBAN_EDIT
+        int $type = constants::MOD_KANBAN_EDIT
     ): void {
         global $USER;
         if (!empty($board->template)) {
@@ -137,7 +137,7 @@ class helper {
         }
         if (!(empty($board->userid) && empty($board->groupid))) {
             if (!empty($board->userid) && $board->userid != $USER->id) {
-                require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
+                require_capability(constants::MOD_KANBAN_CAPABILITY[$type], $context);
             }
             if (!empty($board->groupid)) {
                 $members = groups_get_members($board->groupid, 'u.id');
@@ -146,10 +146,10 @@ class helper {
                 }, $members);
                 $ismember = in_array($USER->id, $members);
                 if ($cminfo->groupmode == SEPARATEGROUPS && !$ismember) {
-                    require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
+                    require_capability(constants::MOD_KANBAN_CAPABILITY[$type], $context);
                 }
-                if ($cminfo->groupmode == VISIBLEGROUPS && !$ismember && $type == self::MOD_KANBAN_EDIT) {
-                    require_capability(self::MOD_KANBAN_CAPABILITY[$type], $context);
+                if ($cminfo->groupmode == VISIBLEGROUPS && !$ismember && $type == constants::MOD_KANBAN_EDIT) {
+                    require_capability(constants::MOD_KANBAN_CAPABILITY[$type], $context);
                 }
             }
         }
@@ -366,6 +366,10 @@ class helper {
              WHERE kanban_board = :id',
              ['id' => $boardid]
         );
+        if (is_null($timestamp)) {
+            // There might be no records yet.
+            $timestamp = 0;
+        }
         $cache->set($cachekey, $timestamp);
         return $timestamp;
     }

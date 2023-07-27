@@ -79,7 +79,7 @@ class constants {
     /**
      * Item type history
      */
-    public const MOD_KANBAN_HISTORY = 3;
+    public const MOD_KANBAN_HISTORY = 4;
     /**
      * Mapping of item types to strings
      */
