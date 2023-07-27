@@ -22,15 +22,11 @@
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_kanban;
 
 use context_module;
 use context_system;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/mod/kanban/lib.php');
 
 /**
  * Class to handle updating the board. It also sends notifications, but does not check permissions.
@@ -124,7 +120,6 @@ class boardmanager {
      * @return void
      */
     public function load_board(int $id) {
-        global $DB;
         $this->board = helper::get_cached_board($id);
         if (empty($this->cminfo)) {
             $this->load_instance($this->board->kanban_instance);
@@ -145,7 +140,7 @@ class boardmanager {
      *
      * @return string
      */
-    public function format():string {
+    public function format(): string {
         return $this->formatter->format();
     }
 
@@ -274,13 +269,13 @@ class boardmanager {
 
             // If it is a site wide template, we need system context to copy files.
             if ($template->kanban_instance == 0) {
-                $context = context_system::instance(0);
+                $context = context_system::instance();
             } else {
                 $context = context_module::instance($this->cmid, 'kanban');
             }
 
-            $newboard = (array)$template;
-            // By default, new board is not a template (can be overriden via $data).
+            $newboard = (array) $template;
+            // By default, new board is not a template (can be overwritten via $data).
             $newboard['template'] = 0;
             $newboard['timecreated'] = time();
             $newboard['timemodified'] = time();
@@ -317,7 +312,7 @@ class boardmanager {
                 if ($context) {
                     $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
                     foreach ($attachments as $attachment) {
-                        $newfile = (array)$attachment;
+                        $newfile = (array) $attachment;
                         $newfile['itemid'] = $newcard[$card->id]->id;
                         $fs->create_file_from_storedfile($newfile, $attachment);
                     }
@@ -395,7 +390,7 @@ class boardmanager {
             helper::update_cached_timestamp($card->kanban_board, constants::MOD_KANBAN_COLUMN);
         }
         $DB->delete_records('kanban_card', ['id' => $cardid]);
-        helper::remove_calendar_event($this->kanban, (object)['id' => $cardid]);
+        helper::remove_calendar_event($this->kanban, (object) ['id' => $cardid]);
         $this->formatter->delete('cards', ['id' => $cardid]);
         $this->write_history('deleted', constants::MOD_KANBAN_CARD, [], $card->kanban_column, $cardid);
     }
@@ -432,7 +427,6 @@ class boardmanager {
     public function add_column(int $aftercol = 0, array $data = []): int {
         global $DB;
         if (empty($this->board->locked)) {
-            $aftercol = intval($aftercol);
             $defaults = [
                 'title' => get_string('newcolumn', 'mod_kanban'),
                 'options' => '{}',
@@ -461,7 +455,6 @@ class boardmanager {
         }
         return 0;
     }
-
 
     /**
      * Adds a new card.
@@ -591,15 +584,15 @@ class boardmanager {
             $DB->update_record('kanban_card', $updatecard);
             $this->formatter->put('cards', $updatecard);
 
-            $data = array_merge((array)$card, $updatecard);
+            $data = array_merge((array) $card, $updatecard);
             $data['username'] = fullname($USER);
             $data['boardname'] = $this->kanban->name;
             $data['columnname'] = $targetcolumn->title;
             $assignees = $this->get_card_assignees($cardid);
-            helper::send_notification($this->cminfo, 'moved', $assignees, (object)$data);
+            helper::send_notification($this->cminfo, 'moved', $assignees, (object) $data);
             if (!empty($options->autoclose)) {
                 $data['title'] = $card->title;
-                helper::send_notification($this->cminfo, 'closed', $assignees, (object)$data);
+                helper::send_notification($this->cminfo, 'closed', $assignees, (object) $data);
                 helper::remove_calendar_event($this->kanban, $card);
                 $this->write_history('completed', constants::MOD_KANBAN_CARD, [], $columnid, $cardid);
             }
@@ -667,7 +660,7 @@ class boardmanager {
         ];
         $DB->update_record('kanban_card', $update);
 
-        helper::remove_calendar_event($this->kanban, (object)['id' => $cardid], [$userid]);
+        helper::remove_calendar_event($this->kanban, (object) ['id' => $cardid], [$userid]);
 
         $userids = $this->get_card_assignees($cardid);
         $userids = array_unique($userids);
@@ -770,7 +763,7 @@ class boardmanager {
         $update['boardname'] = $this->kanban->name;
         $update['title'] = $card->title;
         $assignees = $this->get_card_assignees($cardid);
-        helper::send_notification($this->cminfo, 'discussion', $assignees, (object)$update);
+        helper::send_notification($this->cminfo, 'discussion', $assignees, (object) $update);
         $this->write_history('added', constants::MOD_KANBAN_DISCUSSION, $update, $card->kanban_column, $cardid);
     }
 
@@ -821,7 +814,7 @@ class boardmanager {
         if (!empty($data['color'])) {
             $data['options'] = json_encode(['background' => $data['color']]);
         }
-        $card = (array)$this->get_card($cardid);
+        $card = (array) $this->get_card($cardid);
         $cardupdate = [];
         foreach ($cardkeys as $key) {
             if (!isset($data[$key])) {
@@ -843,14 +836,14 @@ class boardmanager {
             $toinsert = array_diff($assignees, $currentassignees);
             $todelete = array_diff($currentassignees, $assignees);
 
-            helper::add_or_update_calendar_event($this->kanban, (object)$carddata, $assignees);
+            helper::add_or_update_calendar_event($this->kanban, (object) $carddata, $assignees);
             if (!empty($todelete)) {
-                helper::remove_calendar_event($this->kanban, (object)$carddata, $todelete);
+                helper::remove_calendar_event($this->kanban, (object) $carddata, $todelete);
                 list($sql, $params) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
                 $sql = 'kanban_card = :cardid AND user ' . $sql;
                 $params['cardid'] = $cardid;
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
-                helper::send_notification($this->cminfo, 'assigned', $todelete, (object)$carddata, 'unassigned');
+                helper::send_notification($this->cminfo, 'assigned', $todelete, (object) $carddata, 'unassigned');
                 foreach ($todelete as $user) {
                     $this->write_history(
                         'unassigned',
@@ -869,9 +862,9 @@ class boardmanager {
                 $assignees[] = ['kanban_card' => $cardid, 'userid' => $assignee];
                 $user = \core_user::get_user($assignee);
                 $this->formatter->put('users', [
-                    'id' => $user->id,
-                    'fullname' => fullname($user),
-                    'userpicture' => $OUTPUT->user_picture($user, ['link' => false])]
+                        'id' => $user->id,
+                        'fullname' => fullname($user),
+                        'userpicture' => $OUTPUT->user_picture($user, ['link' => false])]
                 );
             }
             $DB->insert_records('kanban_assignee', $assignees);
@@ -879,7 +872,7 @@ class boardmanager {
                 $this->cminfo,
                 'assigned',
                 $toinsert,
-                (object)array_merge($carddata, ['boardname' => $this->cminfo->name])
+                (object) array_merge($carddata, ['boardname' => $this->cminfo->name])
             );
             foreach ($toinsert as $user) {
                 $this->write_history(
@@ -1003,6 +996,7 @@ class boardmanager {
 
     /**
      * Writes a record to the history table.
+     *
      * @param string $action Action for history
      * @param int $type Type of object affected by the entry
      * @param array $data Array of data to write
