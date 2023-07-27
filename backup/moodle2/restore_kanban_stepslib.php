@@ -214,6 +214,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
                 $seq[$key] = $this->get_mappingid('kanban_column_id', $columnid);
             }
             $DB->update_record('kanban_board', ['id' => $board->id, 'sequence' => join(',', $seq)]);
+            mod_kanban\helper::update_cached_board($board->id);
 
             $kanbancolumns = $DB->get_records('kanban_column', ['kanban_board' => $board->id]);
 

@@ -465,8 +465,21 @@ class get_kanban_content extends external_api {
 
         $sql = 'kanban_board = :board AND timemodified > :timestamp';
 
-        $kanbancolumns = $DB->get_records_select('kanban_column', $sql, $params);
-        $kanbancards = $DB->get_records_select('kanban_card', $sql, $params);
+        $timestampcolumns = helper::get_cached_timestamp($boardid, MOD_KANBAN_COLUMN);
+        $timestampcards = helper::get_cached_timestamp($boardid, MOD_KANBAN_CARD);
+
+        if ($timestamp <= $timestampcolumns) {
+            $kanbancolumns = $DB->get_records_select('kanban_column', $sql, $params);
+        } else {
+            $kanbancolumns = [];
+        }
+
+        if (!$timestampcards || $timestamp <= $timestampcards) {
+            $kanbancards = $DB->get_records_select('kanban_card', $sql, $params);
+        } else {
+            $kanbancards = [];
+        }
+        
         $kanbancardids = array_map(function ($v) {
             return $v->id;
         }, $kanbancards);

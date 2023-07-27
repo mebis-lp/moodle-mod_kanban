@@ -35,12 +35,14 @@ define('MOD_KANBAN_BOARD', 0);
 define('MOD_KANBAN_COLUMN', 1);
 define('MOD_KANBAN_CARD', 2);
 define('MOD_KANBAN_DISCUSSION', 3);
+define('MOD_KANBAN_HISTORY', 3);
 
 define('MOD_KANBAN_TYPES', [
     MOD_KANBAN_BOARD => 'board',
     MOD_KANBAN_COLUMN => 'column',
     MOD_KANBAN_CARD => 'card',
-    MOD_KANBAN_DISCUSSION => 'discussion'
+    MOD_KANBAN_DISCUSSION => 'discussion',
+    MOD_KANBAN_HISTORY => 'history',
 ]);
 
 global $CFG;
@@ -214,7 +216,7 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
 
     require_capability('mod/kanban:view', $context);
 
-    $board = $DB->get_record('kanban_board', ['id' => $boardid, 'kanban_instance' => $cm->instance], '*', MUST_EXIST);
+    $board = mod_kanban\helper::get_cached_board($boardid);
 
     mod_kanban\helper::check_permissions_for_user_or_group($board, $context, cm_info::create($cm));
 

@@ -105,7 +105,7 @@ class edit_card_form extends dynamic_form {
         $context = $this->get_context_for_dynamic_submission();
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $boardid = $this->optional_param('boardid', null, PARAM_INT);
-        $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
+        $kanbanboard = helper::get_cached_board($boardid);
         $id = $this->optional_param('id', null, PARAM_INT);
         $boardmanager = new boardmanager($cmid, $boardid);
         $card = $boardmanager->get_card($id);

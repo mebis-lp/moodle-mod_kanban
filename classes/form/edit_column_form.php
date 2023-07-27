@@ -74,11 +74,11 @@ class edit_column_form extends dynamic_form {
      * Checks if current user has access to this card, otherwise throws exception
      */
     protected function check_access_for_dynamic_submission(): void {
-        global $COURSE, $DB;
+        global $COURSE;
         $context = $this->get_context_for_dynamic_submission();
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $boardid = $this->optional_param('boardid', null, PARAM_INT);
-        $kanbanboard = $DB->get_record('kanban_board', ['id' => $boardid]);
+        $kanbanboard = helper::get_cached_board($boardid);
         $id = $this->optional_param('id', null, PARAM_INT);
         require_capability('mod/kanban:managecolumns', $context);
         $modinfo = get_fast_modinfo($COURSE);

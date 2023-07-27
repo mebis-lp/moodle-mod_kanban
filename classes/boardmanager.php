@@ -125,7 +125,7 @@ class boardmanager {
      */
     public function load_board(int $id) {
         global $DB;
-        $this->board = $DB->get_record('kanban_board', ['id' => $id]);
+        $this->board = helper::get_cached_board($id);
         if (empty($this->cminfo)) {
             $this->load_instance($this->board->kanban_instance);
         }
@@ -266,10 +266,11 @@ class boardmanager {
                 ]);
             }
             $DB->update_record('kanban_board', ['id' => $boardid, 'sequence' => join(',', $columnids)]);
+            helper::update_cached_board($boardid);
             return $boardid;
         } else {
             $fs = get_file_storage();
-            $template = $DB->get_record('kanban_board', ['id' => $templateid]);
+            $template = get_cached_board($templateid);
 
             // If it is a site wide template, we need system context to copy files.
             if ($template->kanban_instance == 0) {
@@ -325,7 +326,7 @@ class boardmanager {
 
             $newboard['sequence'] = helper::sequence_replace($newboard['sequence'], $newcolumn);
             $DB->update_record('kanban_board', $newboard);
-
+            helper::update_cached_board($newboard['id']);
             foreach ($newcolumn as $col) {
                 $col->sequence = helper::sequence_replace($col->sequence, $newcard);
                 $DB->update_record('kanban_column', $col);
@@ -391,6 +392,7 @@ class boardmanager {
             ];
             $DB->update_record('kanban_column', $update);
             $this->formatter->put('columns', $update);
+            helper::update_cached_timestamp($card->kanban_board, MOD_KANBAN_COLUMN);
         }
         $DB->delete_records('kanban_card', ['id' => $cardid]);
         helper::remove_calendar_event($this->kanban, (object)['id' => $cardid]);
@@ -415,6 +417,7 @@ class boardmanager {
             $this->board->sequence = helper::sequence_remove($this->board->sequence, $id);
             $update = ['id' => $this->board->id, 'sequence' => $this->board->sequence, 'timemodified' => time()];
             $DB->update_record('kanban_board', $update);
+            helper::update_cached_board($update['id']);
             $this->formatter->put('board', $update);
         }
     }
@@ -450,6 +453,7 @@ class boardmanager {
                 'timemodified' => time()
             ];
             $DB->update_record('kanban_board', $update);
+            helper::update_cached_board($update['id']);
 
             $this->formatter->put('board', $update);
             $this->formatter->put('columns', $data);
@@ -504,6 +508,8 @@ class boardmanager {
         $this->formatter->put('cards', $data);
         $this->formatter->put('columns', $update);
         $this->write_history('added', MOD_KANBAN_CARD, $data, $columnid, $data['id']);
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_COLUMN, $update['timemodified']);
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $update['timemodified']);
 
         return $data['id'];
     }
@@ -525,6 +531,7 @@ class boardmanager {
                 'timemodified' => time(),
             ];
             $DB->update_record('kanban_board', $update);
+            helper::update_cached_board($update['id']);
             $this->formatter->put('board', $update);
         }
     }
@@ -598,6 +605,7 @@ class boardmanager {
             }
             $this->write_history('moved', MOD_KANBAN_CARD, ['columnname' => $targetcolumn->title], $card->kanban_column, $cardid);
         }
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_COLUMN, $update['timemodified']);
     }
 
     /**
@@ -633,6 +641,7 @@ class boardmanager {
         ]);
 
         $this->write_history('assigned', MOD_KANBAN_CARD, ['userid' => $userid], $card->kanban_column, $cardid);
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $update['timemodified']);
     }
 
     /**
@@ -661,6 +670,7 @@ class boardmanager {
         $update['selfassigned'] = in_array($USER->id, $userids);
         $this->formatter->put('cards', $update);
         $this->write_history('unassigned', MOD_KANBAN_CARD, ['userid' => $userid], $card->kanban_column, $cardid);
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $update['timemodified']);
     }
 
     /**
@@ -686,6 +696,7 @@ class boardmanager {
         $card->boardname = $this->kanban->name;
         helper::send_notification($this->cminfo, 'closed', $assignees, $card, ($state == 0 ? 'reopened' : null));
         $this->write_history(($state == 0 ? 'reopened' : 'completed'), MOD_KANBAN_CARD, $update, $card->kanban_column, $cardid);
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $update['timemodified']);
     }
 
     /**
@@ -700,6 +711,7 @@ class boardmanager {
         $update = ['id' => $columnid, 'locked' => $state, 'timemodified' => time()];
         $DB->update_record('kanban_column', $update);
         $this->formatter->put('columns', $update);
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_COLUMN, $update['timemodified']);
     }
 
     /**
@@ -713,6 +725,7 @@ class boardmanager {
         $columns = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $this->board->id]);
         $update = ['id' => $this->board->id, 'locked' => $state, 'timemodified' => time()];
         $DB->update_record('kanban_board', $update);
+        helper::update_cached_board($update['id']);
         $this->formatter->put('board', $update);
         foreach ($columns as $col) {
             $this->set_column_locked($col, $state);
@@ -739,6 +752,7 @@ class boardmanager {
             $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
             $DB->update_record('kanban_card', $update);
             $this->formatter->put('cards', $update);
+            helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $update['timemodified']);
         }
 
         $update['boardname'] = $this->kanban->name;
@@ -762,10 +776,11 @@ class boardmanager {
         $DB->delete_records('kanban_discussion', $update);
         $this->formatter->delete('discussions', $update);
         $this->write_history('deleted', MOD_KANBAN_DISCUSSION, $update, $card->kanban_column, $cardid);
-        if (!$DB->record_exists('kanban_discussions', ['kanban_card' => $cardid])) {
+        if (!$DB->record_exists('kanban_discussion', ['kanban_card' => $cardid])) {
             $update = ['id' => $cardid, 'discussion' => 0, 'timemodified' => time()];
             $DB->update_record('kanban_card', $update);
             $this->formatter->put('cards', $update);
+            helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $update['timemodified']);
         }
     }
 
@@ -874,6 +889,7 @@ class boardmanager {
             $card['kanban_column'],
             $card['id']
         );
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_CARD, $cardupdate['timemodified']);
     }
 
     /**
@@ -900,6 +916,8 @@ class boardmanager {
         $DB->update_record('kanban_column', $columndata);
 
         $this->formatter->put('columns', $columndata);
+
+        helper::update_cached_timestamp($this->board->id, MOD_KANBAN_COLUMN, $columndata['timemodified']);
 
         if ($column->title != $columndata['title']) {
             $this->write_history('updated', MOD_KANBAN_COLUMN, $columndata, $columnid);
