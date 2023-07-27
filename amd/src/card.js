@@ -167,7 +167,7 @@ export default class extends KanbanComponent {
                     this.reactive.dispatch('moveCard', this.id, column, aftercard);
                 }
             );
-        });
+        }).catch();
     }
 
     /**
@@ -188,7 +188,7 @@ export default class extends KanbanComponent {
                     this._removeCard(event);
                 }
             );
-        });
+        }).catch();
     }
 
     /**
@@ -209,7 +209,7 @@ export default class extends KanbanComponent {
                     this._removeMessage(event);
                 }
             );
-        });
+        }).catch();
     }
 
     /**
