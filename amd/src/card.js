@@ -189,7 +189,7 @@ export default class extends KanbanComponent {
                     this._removeCard(event);
                 }
             );
-        }).then().catch((error) => Log.debug(error));
+        }).catch((error) => Log.debug(error));
     }
 
     /**
