@@ -156,8 +156,8 @@ export default class extends KanbanComponent {
             {key: 'saveastemplate', component: 'mod_kanban'},
             {key: 'saveastemplateconfirm', component: 'mod_kanban'},
             {key: 'save', component: 'core'},
-        ]).then((strings) => {
-            saveCancel(
+        ]).then(strings => {
+            return saveCancel(
                 strings[0],
                 strings[1],
                 strings[2],
@@ -165,7 +165,6 @@ export default class extends KanbanComponent {
                     this._saveAsTemplate();
                 }
             );
-            return 0;
         }).catch((error) => Log.debug(error));
     }
 
@@ -184,8 +183,8 @@ export default class extends KanbanComponent {
             {key: 'deleteboard', component: 'mod_kanban'},
             {key: 'deleteboardconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(function(strings) {
-            saveCancel(
+        ]).then(strings => {
+            return saveCancel(
                 strings[0],
                 strings[1],
                 strings[2],
@@ -193,7 +192,6 @@ export default class extends KanbanComponent {
                     this._deleteBoard();
                 }
             );
-            return 0;
         }).catch((error) => Log.debug(error));
     }
 
@@ -205,8 +203,8 @@ export default class extends KanbanComponent {
             {key: 'deletetemplate', component: 'mod_kanban'},
             {key: 'deletetemplateconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(function(strings) {
-            saveCancel(
+        ]).then(strings => {
+            return saveCancel(
                 strings[0],
                 strings[1],
                 strings[2],
@@ -214,7 +212,6 @@ export default class extends KanbanComponent {
                     this._deleteBoard();
                 }
             );
-            return 0;
         }).catch((error) => Log.debug(error));
     }
 

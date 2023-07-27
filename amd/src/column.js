@@ -105,7 +105,7 @@ export default class extends KanbanComponent {
             {key: 'deletecolumnconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
         ]).then(strings => {
-            saveCancel(
+            return saveCancel(
                 strings[0],
                 strings[1],
                 strings[2],
@@ -113,7 +113,6 @@ export default class extends KanbanComponent {
                     this._removeColumn(event);
                 }
             );
-            return 0;
         }).catch((error) => Log.debug(error));
     }
 

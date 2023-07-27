@@ -158,7 +158,7 @@ export default class extends KanbanComponent {
             {key: 'movecard', component: 'mod_kanban'},
             {key: 'move', component: 'core'},
         ]).then(strings => {
-            saveCancel(
+            return saveCancel(
                 strings[0],
                 Templates.render('mod_kanban/movemodal', data),
                 strings[1],
@@ -168,7 +168,6 @@ export default class extends KanbanComponent {
                     this.reactive.dispatch('moveCard', this.id, column, aftercard);
                 }
             );
-            return 0;
         }).catch((error) => Log.debug(error));
     }
 
@@ -182,7 +181,7 @@ export default class extends KanbanComponent {
             {key: 'deletecardconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
         ]).then(strings => {
-            saveCancel(
+            return saveCancel(
                 strings[0],
                 strings[1],
                 strings[2],
@@ -190,7 +189,6 @@ export default class extends KanbanComponent {
                     this._removeCard(event);
                 }
             );
-            return 0;
         }).then().catch((error) => Log.debug(error));
     }
 
@@ -204,7 +202,7 @@ export default class extends KanbanComponent {
             {key: 'deletemessageconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
         ]).then(strings => {
-            saveCancel(
+            return saveCancel(
                 strings[0],
                 strings[1],
                 strings[2],
@@ -212,7 +210,6 @@ export default class extends KanbanComponent {
                     this._removeMessage(event);
                 }
             );
-            return 0;
         }).catch((error) => Log.debug(error));
     }
 
