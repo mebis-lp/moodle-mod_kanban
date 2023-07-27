@@ -3,9 +3,10 @@ import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import {get_string as getString} from 'core/str';
-import Str from 'core/str';
+import * as Str from 'core/str';
 import ModalForm from 'core_form/modalform';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
+import Log from "core/log";
 
 /**
  * Component representing a column in a kanban board.
@@ -103,7 +104,7 @@ export default class extends KanbanComponent {
             {key: 'deletecolumn', component: 'mod_kanban'},
             {key: 'deletecolumnconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(function(strings) {
+        ]).then(strings => {
             saveCancel(
                 strings[0],
                 strings[1],
@@ -112,7 +113,8 @@ export default class extends KanbanComponent {
                     this._removeColumn(event);
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).catch((error) => Log.debug(error));
     }
 
     /**

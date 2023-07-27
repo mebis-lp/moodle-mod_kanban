@@ -4,10 +4,11 @@ import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
-import Str from 'core/str';
+import * as Str from 'core/str';
 import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
+import Log from 'core/log';
 
 
 /**
@@ -156,7 +157,7 @@ export default class extends KanbanComponent {
         Str.get_strings([
             {key: 'movecard', component: 'mod_kanban'},
             {key: 'move', component: 'core'},
-        ]).then(function(strings) {
+        ]).then(strings => {
             saveCancel(
                 strings[0],
                 Templates.render('mod_kanban/movemodal', data),
@@ -167,7 +168,8 @@ export default class extends KanbanComponent {
                     this.reactive.dispatch('moveCard', this.id, column, aftercard);
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).catch((error) => Log.debug(error));
     }
 
     /**
@@ -179,7 +181,7 @@ export default class extends KanbanComponent {
             {key: 'deletecard', component: 'mod_kanban'},
             {key: 'deletecardconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(function(strings) {
+        ]).then(strings => {
             saveCancel(
                 strings[0],
                 strings[1],
@@ -188,7 +190,8 @@ export default class extends KanbanComponent {
                     this._removeCard(event);
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).then().catch((error) => Log.debug(error));
     }
 
     /**
@@ -200,7 +203,7 @@ export default class extends KanbanComponent {
             {key: 'deletemessage', component: 'mod_kanban'},
             {key: 'deletemessageconfirm', component: 'mod_kanban'},
             {key: 'delete', component: 'core'},
-        ]).then(function(strings) {
+        ]).then(strings => {
             saveCancel(
                 strings[0],
                 strings[1],
@@ -209,7 +212,8 @@ export default class extends KanbanComponent {
                     this._removeMessage(event);
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).catch((error) => Log.debug(error));
     }
 
     /**

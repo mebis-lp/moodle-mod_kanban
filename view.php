@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-use mod_kanban\constants;
-
 /**
  * View a kanban instance
  *
@@ -29,6 +27,7 @@ require('../../config.php');
 require_once('lib.php');
 
 use mod_kanban\boardmanager;
+use mod_kanban\constants;
 use mod_kanban\helper;
 
 $id = required_param('id', PARAM_INT);

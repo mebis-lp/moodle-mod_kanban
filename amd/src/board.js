@@ -2,8 +2,9 @@ import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
+import Log from 'core/log';
 import {saveCancel} from 'core/notification';
-import Str from 'core/str';
+import * as Str from 'core/str';
 
 /**
  * Component representing a kanban board.
@@ -155,7 +156,7 @@ export default class extends KanbanComponent {
             {key: 'saveastemplate', component: 'mod_kanban'},
             {key: 'saveastemplateconfirm', component: 'mod_kanban'},
             {key: 'save', component: 'core'},
-        ]).then(function(strings) {
+        ]).then((strings) => {
             saveCancel(
                 strings[0],
                 strings[1],
@@ -164,7 +165,8 @@ export default class extends KanbanComponent {
                     this._saveAsTemplate();
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).catch((error) => Log.debug(error));
     }
 
     /**
@@ -191,7 +193,8 @@ export default class extends KanbanComponent {
                     this._deleteBoard();
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).catch((error) => Log.debug(error));
     }
 
     /**
@@ -211,7 +214,8 @@ export default class extends KanbanComponent {
                     this._deleteBoard();
                 }
             );
-        }).catch(() => {});
+            return 0;
+        }).catch((error) => Log.debug(error));
     }
 
     /**
