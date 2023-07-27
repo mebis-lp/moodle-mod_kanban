@@ -38,22 +38,6 @@ use stdClass;
  */
 class helper {
     /**
-     * Type constant for editing permissions.
-     */
-    const MOD_KANBAN_EDIT = 1;
-    /**
-     * Type constant for viewing permissions.
-     */
-    const MOD_KANBAN_VIEW = 2;
-    /**
-     * Mapping of the type constants to capabilities.
-     */
-    const MOD_KANBAN_CAPABILITY = [
-        self::MOD_KANBAN_EDIT => 'mod/kanban:editallboards',
-        self::MOD_KANBAN_VIEW => 'mod/kanban:viewallboards',
-    ];
-
-    /**
      * Adds an item to a string sequence of integer values, divided by commas.
      * @param string $sequence The original sequence
      * @param int $afteritem The item to add after
@@ -139,7 +123,7 @@ class helper {
      * @param object $board The record from the board table
      * @param \context $context The context of the course module
      * @param \cm_info $cminfo The course module info
-     * @param int $type Type of permission to check: MOD_KANBAN_EDIT(default) or MOD_KANBAN_VIEW
+     * @param int $type Type of permission to check: constants::MOD_KANBAN_EDIT(default) or constants::MOD_KANBAN_VIEW
      */
     public static function check_permissions_for_user_or_group(
         object $board,
@@ -352,11 +336,11 @@ class helper {
     /**
      * Get the latest timestamp from cache (if it is not present in the cache, get it from db).
      * @param int $boardid Id of the board
-     * @param int $type One of MOD_KANBAN_COLUMN, MOD_KANBAN_CARD
+     * @param int $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
      * @return int timestamp
      */
     public static function get_cached_timestamp(int $boardid, int $type): int {
-        $cachekey = MOD_KANBAN_TYPES[$type] . '-' . $boardid;
+        $cachekey = constants::MOD_KANBAN_TYPES[$type] . '-' . $boardid;
         $cache = \cache::make('mod_kanban', 'timestamp');
         $timestamp = $cache->get($cachekey);
         if (!$timestamp) {
@@ -368,17 +352,17 @@ class helper {
     /**
      * Update the timestamp in cache from db or from parameter.
      * @param int $boardid Id of the board
-     * @param int $type One of MOD_KANBAN_COLUMN, MOD_KANBAN_CARD
+     * @param int $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
      * @param int $timestamp Timestamp to set
      * @return int updated timestamp
      */
     public static function update_cached_timestamp(int $boardid, int $type, int $timestamp = 0): int {
         global $DB;
-        $cachekey = MOD_KANBAN_TYPES[$type] . '-' . $boardid;
+        $cachekey = constants::MOD_KANBAN_TYPES[$type] . '-' . $boardid;
         $cache = \cache::make('mod_kanban', 'timestamp');
         $timestamp = $DB->get_field_sql(
             'SELECT MAX(timemodified)
-             FROM {kanban_' . MOD_KANBAN_TYPES[$type] . '}
+             FROM {kanban_' . constants::MOD_KANBAN_TYPES[$type] . '}
              WHERE kanban_board = :id',
              ['id' => $boardid]
         );

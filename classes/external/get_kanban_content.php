@@ -365,11 +365,11 @@ class get_kanban_content extends external_api {
                     $cminfo,
                     new \moodle_url('/mod/kanban/view.php', ['id' => $cminfo->id]),
                     true,
-                    $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY
+                    $kanban->userboards == constants::MOD_KANBAN_USERBOARDS_ONLY
                 );
                 $allowedgroups = groups_get_activity_allowed_groups($cminfo);
                 if (!$allowedgroups) {
-                    if ($kanban->userboards !== MOD_KANBAN_NOUSERBOARDS) {
+                    if ($kanban->userboards !== constants::MOD_KANBAN_NOUSERBOARDS) {
                         $groupselector = '';
                     } else {
                         throw new \moodle_exception('nogroupavailable', 'mod_kanban');
@@ -465,8 +465,8 @@ class get_kanban_content extends external_api {
 
         $sql = 'kanban_board = :board AND timemodified > :timestamp';
 
-        $timestampcolumns = helper::get_cached_timestamp($boardid, MOD_KANBAN_COLUMN);
-        $timestampcards = helper::get_cached_timestamp($boardid, MOD_KANBAN_CARD);
+        $timestampcolumns = helper::get_cached_timestamp($boardid, constants::MOD_KANBAN_COLUMN);
+        $timestampcards = helper::get_cached_timestamp($boardid, constants::MOD_KANBAN_CARD);
 
         if ($timestamp <= $timestampcolumns) {
             $kanbancolumns = $DB->get_records_select('kanban_column', $sql, $params);
@@ -616,7 +616,7 @@ class get_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = helper::get_cached_board($boardid);
 
-        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, helper::MOD_KANBAN_VIEW);
+        helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, constants::MOD_KANBAN_VIEW);
 
         $sql = 'kanban_card = :cardid AND timecreated > :timestamp';
         $params['cardid'] = $cardid;
@@ -688,7 +688,7 @@ class get_kanban_content extends external_api {
         if (!empty($kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))) {
             $kanbanboard = helper::get_cached_board($boardid);
 
-            helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, helper::MOD_KANBAN_VIEW);
+            helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, constants::MOD_KANBAN_VIEW);
 
             $sql = 'kanban_card = :id AND timestamp > :time';
             $params = ['id' => $cardid, 'time' => $timestamp];
@@ -727,7 +727,7 @@ class get_kanban_content extends external_api {
 
     /**
      * Get the timestamp of the latest entry in a db table from cache.
-     * @param int $type one of MOD_KANBAN_BOARD, MOD_KANBAN_COLUMN or MOD_KANBAN_CARD
+     * @param int $type one of constants::MOD_KANBAN_BOARD, constants::MOD_KANBAN_COLUMN or constants::MOD_KANBAN_CARD
      * @param int $id Id of the board
      * @return mixed timestamp or false if none found
      */
@@ -738,7 +738,7 @@ class get_kanban_content extends external_api {
 
     /**
      * Get the timestamp of the latest entry in a db table from cache.
-     * @param int $type one of MOD_KANBAN_BOARD, MOD_KANBAN_COLUMN or MOD_KANBAN_CARD
+     * @param int $type one of constants::MOD_KANBAN_BOARD, constants::MOD_KANBAN_COLUMN or constants::MOD_KANBAN_CARD
      * @param int $timestamp value
      * @param int $id Id of the board
      */

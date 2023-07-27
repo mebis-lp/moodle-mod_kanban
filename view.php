@@ -58,7 +58,7 @@ if (!empty($cm->groupmode)) {
 
 $userid = optional_param('user', 0, PARAM_INT);
 if (
-    $kanban->userboards == MOD_KANBAN_USERBOARDS_ONLY &&
+    $kanban->userboards == constants::MOD_KANBAN_USERBOARDS_ONLY &&
     empty($groupid) &&
     empty($userid)
 ) {
@@ -93,7 +93,7 @@ if (empty($boardid)) {
     }
 } else {
     $board = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*');
-    helper::check_permissions_for_user_or_group($board, $context, $cm, helper::MOD_KANBAN_VIEW);
+    helper::check_permissions_for_user_or_group($board, $context, $cm, constants::MOD_KANBAN_VIEW);
 }
 
 echo $OUTPUT->render_from_template(

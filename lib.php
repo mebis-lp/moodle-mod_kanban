@@ -27,24 +27,6 @@ use mod_kanban\boardmanager;
 
 defined('MOODLE_INTERNAL') || die();
 
-define('MOD_KANBAN_NOUSERBOARDS', 0);
-define('MOD_KANBAN_USERBOARDS_ENABLED', 1);
-define('MOD_KANBAN_USERBOARDS_ONLY', 2);
-
-define('MOD_KANBAN_BOARD', 0);
-define('MOD_KANBAN_COLUMN', 1);
-define('MOD_KANBAN_CARD', 2);
-define('MOD_KANBAN_DISCUSSION', 3);
-define('MOD_KANBAN_HISTORY', 3);
-
-define('MOD_KANBAN_TYPES', [
-    MOD_KANBAN_BOARD => 'board',
-    MOD_KANBAN_COLUMN => 'column',
-    MOD_KANBAN_CARD => 'card',
-    MOD_KANBAN_DISCUSSION => 'discussion',
-    MOD_KANBAN_HISTORY => 'history',
-]);
-
 global $CFG;
 require_once($CFG->libdir . '/formslib.php');
 require_once('HTML/QuickForm/input.php');
