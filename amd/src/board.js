@@ -3,7 +3,7 @@ import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 import {saveCancel} from 'core/notification';
-import {get_string as getString} from 'core/str';
+import Str from 'core/str';
 
 /**
  * Component representing a kanban board.
@@ -151,14 +151,20 @@ export default class extends KanbanComponent {
      * Display confirmation modal for saving a board as template.
      */
     _templateConfirm() {
-        saveCancel(
-            getString('saveastemplate', 'mod_kanban'),
-            getString('saveastemplateconfirm', 'mod_kanban'),
-            getString('save', 'core'),
-            () => {
-                this._saveAsTemplate();
-            }
-        );
+        Str.get_strings([
+            {key: 'saveastemplate', component: 'mod_kanban'},
+            {key: 'saveastemplateconfirm', component: 'mod_kanban'},
+            {key: 'save', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._saveAsTemplate();
+                }
+            );
+        });
     }
 
     /**
@@ -172,28 +178,40 @@ export default class extends KanbanComponent {
      * Display confirmation modal for deleting a board.
      */
     _deleteConfirm() {
-        saveCancel(
-            getString('deleteboard', 'mod_kanban'),
-            getString('deleteboardconfirm', 'mod_kanban'),
-            getString('delete', 'core'),
-            () => {
-                this._deleteBoard();
-            }
-        );
+        Str.get_strings([
+            {key: 'deleteboard', component: 'mod_kanban'},
+            {key: 'deleteboardconfirm', component: 'mod_kanban'},
+            {key: 'delete', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._deleteBoard();
+                }
+            );
+        });
     }
 
     /**
      * Display confirmation modal for deleting a template.
      */
     _deleteTemplateConfirm() {
-        saveCancel(
-            getString('deletetemplate', 'mod_kanban'),
-            getString('deletetemplateconfirm', 'mod_kanban'),
-            getString('delete', 'core'),
-            () => {
-                this._deleteBoard();
-            }
-        );
+        Str.get_strings([
+            {key: 'deletetemplate', component: 'mod_kanban'},
+            {key: 'deletetemplateconfirm', component: 'mod_kanban'},
+            {key: 'delete', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._deleteBoard();
+                }
+            );
+        });
     }
 
     /**

@@ -98,7 +98,7 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="kanban_discussion" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="kanban_discussion_comment" COMMENT="Default comment for the table, please edit me">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kanban_card" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

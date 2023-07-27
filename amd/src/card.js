@@ -4,6 +4,7 @@ import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
+import Str from 'core/str';
 import {exception as displayException} from 'core/notification';
 import Templates from 'core/templates';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
@@ -152,16 +153,21 @@ export default class extends KanbanComponent {
         let data = exporter.exportStateForTemplate(this.reactive.state);
         data.cardid = this.id;
         data.kanbancolumn = this.reactive.state.cards.get(this.id).kanban_column;
-        saveCancel(
-            getString('movecard', 'mod_kanban'),
-            Templates.render('mod_kanban/movemodal', data),
-            getString('move', 'core'),
-            () => {
-                let column = document.querySelector(selectors.MOVECARDCOLUMN + `[data-id="${this.id}"]`).value;
-                let aftercard = document.querySelector(selectors.MOVECARDAFTERCARD + `[data-id="${this.id}"]`).value;
-                this.reactive.dispatch('moveCard', this.id, column, aftercard);
-            }
-        );
+        Str.get_strings([
+            {key: 'movecard', component: 'mod_kanban'},
+            {key: 'move', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                Templates.render('mod_kanban/movemodal', data),
+                strings[1],
+                () => {
+                    let column = document.querySelector(selectors.MOVECARDCOLUMN + `[data-id="${this.id}"]`).value;
+                    let aftercard = document.querySelector(selectors.MOVECARDAFTERCARD + `[data-id="${this.id}"]`).value;
+                    this.reactive.dispatch('moveCard', this.id, column, aftercard);
+                }
+            );
+        });
     }
 
     /**
@@ -169,14 +175,20 @@ export default class extends KanbanComponent {
      * @param {*} event
      */
     _removeConfirm(event) {
-        saveCancel(
-            getString('deletecard', 'mod_kanban'),
-            getString('deletecardconfirm', 'mod_kanban'),
-            getString('delete', 'core'),
-            () => {
-                this._removeCard(event);
-            }
-        );
+        Str.get_strings([
+            {key: 'deletecard', component: 'mod_kanban'},
+            {key: 'deletecardconfirm', component: 'mod_kanban'},
+            {key: 'delete', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._removeCard(event);
+                }
+            );
+        });
     }
 
     /**
@@ -184,14 +196,20 @@ export default class extends KanbanComponent {
      * @param {*} event
      */
     _removeMessageConfirm(event) {
-        saveCancel(
-            getString('deletemessage', 'mod_kanban'),
-            getString('deletemessageconfirm', 'mod_kanban'),
-            getString('delete', 'core'),
-            () => {
-                this._removeMessage(event);
-            }
-        );
+        Str.get_strings([
+            {key: 'deletemessage', component: 'mod_kanban'},
+            {key: 'deletemessageconfirm', component: 'mod_kanban'},
+            {key: 'delete', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._removeMessage(event);
+                }
+            );
+        });
     }
 
     /**

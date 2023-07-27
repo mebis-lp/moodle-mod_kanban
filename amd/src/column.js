@@ -3,6 +3,7 @@ import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import {get_string as getString} from 'core/str';
+import Str from 'core/str';
 import ModalForm from 'core_form/modalform';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 
@@ -98,14 +99,20 @@ export default class extends KanbanComponent {
      * @param {*} event
      */
     _removeConfirm(event) {
-        saveCancel(
-            getString('deletecolumn', 'mod_kanban'),
-            getString('deletecolumnconfirm', 'mod_kanban'),
-            getString('delete', 'core'),
-            () => {
-                this._removeColumn(event);
-            }
-        );
+        Str.get_strings([
+            {key: 'deletecolumn', component: 'mod_kanban'},
+            {key: 'deletecolumnconfirm', component: 'mod_kanban'},
+            {key: 'delete', component: 'core'},
+        ]).then(function(strings) {
+            saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._removeColumn(event);
+                }
+            );
+        });
     }
 
     /**
