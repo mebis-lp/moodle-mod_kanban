@@ -15,17 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Helper for formatting updates
+ * Helper for formatting updates.
  *
  * @package    mod_kanban
  * @copyright  2023 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_kanban;
 
 /**
- * Helper for formatting updates
+ * Helper for formatting updates.
+ *
+ * This class provides is used to format the data changes. They have to be in a specific format for being able
+ * to be processed easily by the reactive frontend once pushed to it by the webservice.
  *
  * @package    mod_kanban
  * @copyright  2023 ISB Bayern
@@ -42,6 +46,7 @@ class updateformatter {
 
     /**
      * Put a new value.
+     *
      * @param string $name Name of the value to update
      * @param array $data Fields to update, must contain 'id' field
      */
@@ -51,6 +56,7 @@ class updateformatter {
 
     /**
      * Delete a value.
+     *
      * @param string $name Name of the value to update
      * @param array $data Fields to identify item, must contain 'id' field
      */
@@ -60,9 +66,10 @@ class updateformatter {
 
     /**
      * Return update JSON.
+     *
      * @return string JSON encoded update string
      */
-    public function format() {
+    public function format(): string {
         return json_encode($this->updates);
     }
 }

@@ -121,8 +121,8 @@ class get_kanban_content extends external_api {
                                 'duedate' => new external_value(PARAM_INT, 'due date'),
                                 'options' => new external_value(PARAM_TEXT, 'options for the card'),
                                 'assignees' => new external_multiple_structure(
-                                        new external_value(PARAM_INT, 'user id'),
-                                        VALUE_OPTIONAL
+                                    new external_value(PARAM_INT, 'user id'),
+                                    VALUE_OPTIONAL
                                 ),
                                 'selfassigned' => new external_value(
                                     PARAM_BOOL,
@@ -295,6 +295,7 @@ class get_kanban_content extends external_api {
 
     /**
      * Same as for get_kanban_content_init().
+     *
      * @return external_function_parameters
      */
     public static function get_kanban_content_update_parameters(): external_function_parameters {
@@ -414,7 +415,7 @@ class get_kanban_content extends external_api {
             }
             if (!empty($kanbanboard->groupid)) {
                 $members = groups_get_members($kanbanboard->groupid, 'u.id');
-                $members = array_map(function ($v) {
+                $members = array_map(function($v) {
                     return intval($v->id);
                 }, $members);
                 $ismember = in_array($USER->id, $members);
@@ -481,9 +482,7 @@ class get_kanban_content extends external_api {
             $kanbancards = [];
         }
 
-        $kanbancardids = array_map(function ($v) {
-            return $v->id;
-        }, $kanbancards);
+        $kanbancardids = array_map(fn($card) => $card->id, $kanbancards);
         if (!empty($kanbancardids) || (!empty($kanban->userboards) && $capabilities['viewallboards'])) {
             $users = get_enrolled_users($context, '');
             foreach ($users as $user) {
@@ -535,19 +534,19 @@ class get_kanban_content extends external_api {
         }
 
         if ($asupdate) {
-            $formatter = new updateformatter(true);
-            $formatter->put('common', (array)$common);
+            $formatter = new updateformatter();
+            $formatter->put('common', (array) $common);
             if (intval($kanbanboard->timemodified) > $timestamp) {
-                $formatter->put('board', (array)$kanbanboard);
+                $formatter->put('board', (array) $kanbanboard);
             }
             foreach ($kanbancolumns as $column) {
-                $formatter->put('columns', (array)$column);
+                $formatter->put('columns', (array) $column);
             }
             foreach ($kanbancards as $card) {
-                $formatter->put('cards', (array)$card);
+                $formatter->put('cards', (array) $card);
             }
             foreach ($kanbanuserids as $userid) {
-                $formatter->put('users', (array)$kanbanusers[$userid]);
+                $formatter->put('users', (array) $kanbanusers[$userid]);
             }
             return [
                 'update' => $formatter->format()
@@ -629,7 +628,7 @@ class get_kanban_content extends external_api {
         foreach ($discussions as $discussion) {
             $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->userid));
-            $formatter->put('discussions', (array)$discussion);
+            $formatter->put('discussions', (array) $discussion);
         }
         return [
             'update' => $formatter->format()
@@ -712,7 +711,7 @@ class get_kanban_content extends external_api {
                 }
 
                 $type = \MOD_KANBAN_TYPES[$item->type];
-                $item = (object) array_merge((array)$item, json_decode($item->parameters, true));
+                $item = (object) array_merge((array) $item, json_decode($item->parameters, true));
                 $historyitem = [];
                 $historyitem['id'] = $item->id;
                 $historyitem['text'] = get_string('history_' . $type . '_' . $item->action, 'mod_kanban', $item);
@@ -728,6 +727,7 @@ class get_kanban_content extends external_api {
 
     /**
      * Get the timestamp of the latest entry in a db table from cache.
+     *
      * @param int $type one of constants::MOD_KANBAN_BOARD, constants::MOD_KANBAN_COLUMN or constants::MOD_KANBAN_CARD
      * @param int $id Id of the board
      * @return mixed timestamp or false if none found
@@ -739,6 +739,7 @@ class get_kanban_content extends external_api {
 
     /**
      * Get the timestamp of the latest entry in a db table from cache.
+     *
      * @param int $type one of constants::MOD_KANBAN_BOARD, constants::MOD_KANBAN_COLUMN or constants::MOD_KANBAN_CARD
      * @param int $timestamp value
      * @param int $id Id of the board
