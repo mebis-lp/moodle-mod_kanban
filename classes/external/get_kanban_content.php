@@ -27,6 +27,7 @@ namespace mod_kanban\external;
 
 // Compatibility with Moodle < 4.2.
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 require_once($CFG->dirroot . '/mod/kanban/lib.php');
 
@@ -331,7 +332,6 @@ class get_kanban_content extends external_api {
      */
     public static function execute(int $cmid, int $boardid, int $timestamp = 0, bool $asupdate = false): array {
         global $DB, $OUTPUT, $USER;
-        $fs = get_file_storage();
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
@@ -360,6 +360,7 @@ class get_kanban_content extends external_api {
         $kanbanboard = helper::get_cached_board($boardid);
 
         $kanbanboard->heading = get_string('courseboard', 'mod_kanban');
+        $groupselector = null;
 
         if (!$asupdate) {
             if (!empty($cminfo->groupmode)) {
@@ -453,17 +454,15 @@ class get_kanban_content extends external_api {
                  WHERE template = 1 AND kanban_instance = :instance
                  ORDER BY timemodified DESC
                  LIMIT 0,1',
-                ['instance' => $kanbanboard->kanban_instance],
-                IGNORE_MISSING
+                ['instance' => $kanbanboard->kanban_instance]
             );
             if (empty($common->template)) {
                 $common->template = 0;
             }
         }
 
-        $kanbancards = [];
-        $kanbanassignees = [];
         $kanbanusers = [];
+        $kanbanuserids = [];
 
         $sql = 'kanban_board = :board AND timemodified > :timestamp';
 
@@ -484,7 +483,7 @@ class get_kanban_content extends external_api {
 
         $kanbancardids = array_map(fn($card) => $card->id, $kanbancards);
         if (!empty($kanbancardids) || (!empty($kanban->userboards) && $capabilities['viewallboards'])) {
-            $users = get_enrolled_users($context, '');
+            $users = get_enrolled_users($context);
             foreach ($users as $user) {
                 $kanbanusers[$user->id] = [
                     'id' => $user->id,
@@ -505,25 +504,25 @@ class get_kanban_content extends external_api {
                     $kanbanuserids[] = $assignee->userid;
                 }
             }
-            foreach ($kanbancards as $key => $card) {
+            foreach ($kanbancards as $card) {
                 if (empty($kanbanassignees[$card->id])) {
                     $kanbanassignees[$card->id] = [];
                 }
-                $kanbancards[$key]->canedit = $capabilities['managecards'] || $card->createdby == $USER->id;
-                $kanbancards[$key]->assignees = $kanbanassignees[$card->id];
-                $kanbancards[$key]->selfassigned = in_array($USER->id, $kanbancards[$key]->assignees);
-                $kanbancards[$key]->hasdescription = !empty($kanbancards[$key]->description);
-                $kanbancards[$key]->discussions = [];
-                $kanbancards[$key]->description = file_rewrite_pluginfile_urls(
-                    $kanbancards[$key]->description,
+                $card->canedit = $capabilities['managecards'] || $card->createdby == $USER->id;
+                $card->assignees = $kanbanassignees[$card->id];
+                $card->selfassigned = in_array($USER->id, $card->assignees);
+                $card->hasdescription = !empty($card->description);
+                $card->discussions = [];
+                $card->description = file_rewrite_pluginfile_urls(
+                    $card->description,
                     'pluginfile.php',
                     $context->id,
                     'mod_kanban',
                     'attachments',
                     $card->id
                 );
-                $kanbancards[$key]->attachments = helper::get_attachments($context->id, $card->id);
-                $kanbancards[$key]->hasattachment = count($kanbancards[$key]->attachments) > 0;
+                $card->attachments = helper::get_attachments($context->id, $card->id);
+                $card->hasattachment = count($card->attachments) > 0;
             }
         }
 
@@ -613,7 +612,6 @@ class get_kanban_content extends external_api {
         self::validate_context($context);
         require_capability('mod/kanban:view', $context);
 
-        $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
         $kanbanboard = helper::get_cached_board($boardid);
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, constants::MOD_KANBAN_VIEW);
@@ -698,19 +696,19 @@ class get_kanban_content extends external_api {
                 $item->affectedusername = get_string('unknownuser');
                 $item->username = get_string('unknownuser');
                 if (!empty($item->userid)) {
-                    $user = \core_user::get_user($item->userid, '*', IGNORE_MISSING);
+                    $user = \core_user::get_user($item->userid);
                     if ($user) {
                         $item->username = fullname($user);
                     }
                 }
                 if (!empty($item->affecteduser)) {
-                    $affecteduser = \core_user::get_user($item->affected_userid, '*', IGNORE_MISSING);
+                    $affecteduser = \core_user::get_user($item->affected_userid);
                     if ($affecteduser) {
                         $item->affectedusername = fullname($affecteduser);
                     }
                 }
 
-                $type = \MOD_KANBAN_TYPES[$item->type];
+                $type = constants::MOD_KANBAN_TYPES[$item->type];
                 $item = (object) array_merge((array) $item, json_decode($item->parameters, true));
                 $historyitem = [];
                 $historyitem['id'] = $item->id;
