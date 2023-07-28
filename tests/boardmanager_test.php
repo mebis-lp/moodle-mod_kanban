@@ -25,25 +25,13 @@ namespace mod_kanban;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers      \mod_kanban\boardmanager
  */
-class mod_kanban_boardmanager_test extends \advanced_testcase {
-    /**
-     * The course used for testing
-     *
-     * @var \stdClass
-     */
-    protected $course;
-    /**
-     * The kanban used for testing
-     *
-     * @var \stdClass
-     */
-    protected $kanban;
-    /**
-     * The users used for testing
-     *
-     * @var array
-     */
-    protected $users;
+class boardmanager_test extends \advanced_testcase {
+    /** @var \stdClass The course used for testing */
+    private $course;
+    /** @var \stdClass The kanban used for testing */
+    private $kanban;
+    /** @var array The users used for testing */
+    private $users;
 
     /**
      * Prepare testing environment

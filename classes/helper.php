@@ -24,7 +24,6 @@
  */
 namespace mod_kanban;
 
-use context_module;
 use calendar_event;
 use stdClass;
 
@@ -306,14 +305,14 @@ class helper {
     /**
      * Get the board record from cache (if it is not present in the cache, get it from db).
      * @param int $id Id of the board
-     * @return object board record
+     * @return stdClass board record
      */
-    public static function get_cached_board(int $id): object {
+    public static function get_cached_board(int $id): stdClass {
         $cachekey = 'board-' . $id;
         $cache = \cache::make('mod_kanban', 'board');
         $board = $cache->get($cachekey);
         if (!$board) {
-            self::update_cached_board($id);
+            $board = self::update_cached_board($id);
         } else {
             $board = unserialize($board);
         }
@@ -323,14 +322,15 @@ class helper {
     /**
      * Update the board record in cache from db.
      * @param int $id Id of the board
-     * @return void
+     * @return stdClass The updated board record
      */
-    public static function update_cached_board(int $id): void {
+    public static function update_cached_board(int $id): stdClass {
         global $DB;
         $cachekey = 'board-' . $id;
         $cache = \cache::make('mod_kanban', 'board');
         $board = $DB->get_record('kanban_board', ['id' => $id]);
         $cache->set($cachekey, serialize($board));
+        return $board;
     }
 
     /**

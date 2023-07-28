@@ -25,8 +25,10 @@
 
 namespace mod_kanban;
 
+use cm_info;
 use context_module;
 use context_system;
+use stdClass;
 
 /**
  * Class to handle updating the board. It also sends notifications, but does not check permissions.
@@ -37,47 +39,23 @@ use context_system;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class boardmanager {
-    /**
-     * Course module id
-     *
-     * @var int
-     */
+    /** @var int Course module id */
     private int $cmid;
 
-    /**
-     * The kanban instance record.
-     *
-     * @var object
-     */
-    private object $kanban;
+    /** @var stdClass The kanban instance record. */
+    private stdClass $kanban;
 
-    /**
-     * The current board
-     *
-     * @var object
-     */
-    private object $board;
+    /** @var stdClass The current board */
+    private stdClass $board;
 
-    /**
-     * Shared update formatter collecting all updates.
-     *
-     * @var updateformatter
-     */
+    /** @var updateformatter Shared update formatter collecting all updates. */
     private updateformatter $formatter;
 
-    /**
-     * Course module info
-     *
-     * @var object
-     */
-    private object $cminfo;
+    /** @var cm_info Course module info */
+    private cm_info $cminfo;
 
-    /**
-     * Course
-     *
-     * @var object
-     */
-    private object $course;
+    /** @var stdClass Course */
+    private stdClass $course;
 
     /**
      * Constructor
@@ -1005,31 +983,34 @@ class boardmanager {
      */
     public function write_history(string $action, int $type, array $data = [], int $columnid = 0, int $cardid = 0) {
         global $DB, $USER;
-        if (!empty($this->kanban->history) && !empty(get_config('mod_kanban', 'enablehistory'))) {
-            $affecteduser = null;
-            // Affected user must be written to a separate column (for privacy provider).
-            if (!empty($data['userid'])) {
-                $affecteduser = $data['userid'];
-                unset($data['userid']);
-            }
-            // Unset unused data.
-            unset($data['timemodified']);
-            unset($data['timecreated']);
-            unset($data['createdby']);
-            unset($data['canedit']);
-            unset($data['id']);
-            $record = [
-                'action' => $action,
-                'kanban_board' => $this->board->id,
-                'userid' => $USER->id,
-                'kanban_column' => $columnid,
-                'kanban_card' => $cardid,
-                'parameters' => json_encode($data),
-                'affected_userid' => $affecteduser,
-                'timestamp' => time(),
-                'type' => $type,
-            ];
-            $DB->insert_record('kanban_history', $record);
+
+        if (empty($this->kanban->history) || empty(get_config('mod_kanban', 'enablehistory'))) {
+            return;
         }
+
+        $affecteduser = null;
+        // Affected user must be written to a separate column (for privacy provider).
+        if (!empty($data['userid'])) {
+            $affecteduser = $data['userid'];
+            unset($data['userid']);
+        }
+        // Unset unused data.
+        unset($data['timemodified']);
+        unset($data['timecreated']);
+        unset($data['createdby']);
+        unset($data['canedit']);
+        unset($data['id']);
+        $record = [
+            'action' => $action,
+            'kanban_board' => $this->board->id,
+            'userid' => $USER->id,
+            'kanban_column' => $columnid,
+            'kanban_card' => $cardid,
+            'parameters' => json_encode($data),
+            'affected_userid' => $affecteduser,
+            'timestamp' => time(),
+            'type' => $type,
+        ];
+        $DB->insert_record('kanban_history', $record);
     }
 }

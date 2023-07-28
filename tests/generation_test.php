@@ -25,7 +25,7 @@ namespace mod_kanban;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers      \mod_kanban_generator
  */
-class mod_kanban_generation_test extends \advanced_testcase {
+class generation_test extends \advanced_testcase {
     /**
      * Tests the data generator for this module
      *
