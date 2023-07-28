@@ -62,8 +62,8 @@ class provider implements
                   JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
                   JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                   JOIN {kanban_board} b ON b.kanban_instance = cm.instance
-                  JOIN {kanban_card} c ON c.kanban_board = b.id
-                  JOIN {kanban_assignee} a ON a.kanban_card = c.id
+                  JOIN {kanban_card} ca ON ca.kanban_board = b.id
+                  JOIN {kanban_assignee} a ON a.kanban_card = ca.id
                  WHERE a.userid = :userid
         ";
         $contextlist->add_from_sql($sql, $params);
