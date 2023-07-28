@@ -65,7 +65,7 @@ class get_kanban_content extends external_api {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
-            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_OPTIONAL, 0),
+            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -574,7 +574,7 @@ class get_kanban_content extends external_api {
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'cardid' => new external_value(PARAM_INT, 'card id', VALUE_REQUIRED),
-            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_OPTIONAL, 0),
+            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -643,7 +643,7 @@ class get_kanban_content extends external_api {
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'cardid' => new external_value(PARAM_INT, 'card id', VALUE_REQUIRED),
-            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_OPTIONAL, 0),
+            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_DEFAULT, 0),
         ]);
     }
 
