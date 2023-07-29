@@ -146,8 +146,8 @@ class change_kanban_content_test extends \advanced_testcase {
         $update = json_decode($returnvalue['update'], true);
 
         $this->assertCount(2, $update);
-        $this->assertEquals('columns', $update[0]['fields']['name']);
-        $this->assertEquals('cards', $update[1]['fields']['name']);
+        $this->assertEquals('columns', $update[0]['name']);
+        $this->assertEquals('cards', $update[1]['name']);
         $cardid = $update[1]['fields']['id'];
 
         $card = $boardmanager->get_card($cardid);
@@ -168,8 +168,59 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $update = json_decode($returnvalue['update'], true);
         $this->assertCount(2, $update);
-        $this->assertEquals('columns', $update[0]['fields']['name']);
-        $this->assertEquals('cards', $update[1]['fields']['name']);
+        $this->assertEquals('columns', $update[0]['name']);
+        $this->assertEquals('cards', $update[1]['name']);
         $this->assertEquals(join(',', [$cardid, $card2id]), $update[0]['fields']['sequence']);
+    }
+
+    /**
+     * Test for moving a column.
+     *
+     * @return void
+     */
+    public function test_move_column() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/lib/externallib.php');
+
+        $this->resetAfterTest();
+        $this->setUser($this->users[2]);
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+        $returnvalue = \mod_kanban\external\change_kanban_content::move_column(
+            $this->kanban->cmid,
+            $boardid,
+            ['aftercol' => 0, 'columnid' => $columnids[2]]
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::move_column_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+
+        $this->assertCount(1, $update);
+        $this->assertEquals('board', $update[0]['name']);
+
+        $this->assertEquals(join(',', [$columnids[2], $columnids[0], $columnids[1]]), $update[0]['fields']['sequence']);
+
+        $returnvalue = \mod_kanban\external\change_kanban_content::move_column(
+            $this->kanban->cmid,
+            $boardid,
+            ['aftercol' => $columnids[1], 'columnid' => $columnids[0]]
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::move_column_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+
+        $this->assertCount(1, $update);
+        $this->assertEquals('board', $update[0]['name']);
+
+        $this->assertEquals(join(',', [$columnids[2], $columnids[1], $columnids[0]]), $update[0]['fields']['sequence']);
     }
 }
