@@ -146,15 +146,15 @@ class change_kanban_content_test extends \advanced_testcase {
         $update = json_decode($returnvalue['update'], true);
 
         $this->assertCount(2, $update);
-        $this->assertEquals('columns', $update[0]['name']);
-        $this->assertEquals('cards', $update[1]['name']);
+        $this->assertEquals('cards', $update[0]['name']);
+        $this->assertEquals('columns', $update[1]['name']);
         $cardid = $update[1]['fields']['id'];
 
         $card = $boardmanager->get_card($cardid);
         $this->assertEquals('Testcard', $card->title);
         $this->assertEquals($boardid, $update[1]['fields']['kanban_board']);
         $this->assertEquals($columnid, $update[1]['fields']['kanban_column']);
-        $this->assertEquals($cardid, $update[0]['fields']['sequence']);
+        $this->assertEquals($cardid, $update[1]['fields']['sequence']);
 
         $returnvalue = \mod_kanban\external\change_kanban_content::add_card(
             $this->kanban->cmid,
@@ -168,9 +168,9 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $update = json_decode($returnvalue['update'], true);
         $this->assertCount(2, $update);
-        $this->assertEquals('columns', $update[0]['name']);
-        $this->assertEquals('cards', $update[1]['name']);
-        $this->assertEquals(join(',', [$cardid, $card2id]), $update[0]['fields']['sequence']);
+        $this->assertEquals('cards', $update[0]['name']);
+        $this->assertEquals('columns', $update[1]['name']);
+        $this->assertEquals(join(',', [$cardid, $card2id]), $update[1]['fields']['sequence']);
     }
 
     /**
