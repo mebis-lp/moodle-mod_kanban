@@ -355,8 +355,8 @@ class boardmanager {
         $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
         $context = context_module::instance($this->cmid, IGNORE_MISSING);
         $fs->delete_area_files($context->id, 'mod_kanban', 'attachments', $cardid);
+        $card = $this->get_card($cardid);
         if ($updatecolumn) {
-            $card = $this->get_card($cardid);
             $column = $DB->get_record('kanban_column', ['id' => $card->kanban_column]);
             $update = [
                 'id' => $column->id,
