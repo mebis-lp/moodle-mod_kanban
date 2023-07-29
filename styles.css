@@ -344,10 +344,6 @@ a.mod_kanban_attachment_item {
     cursor: not-allowed;
 }
 
-.mod_kanban_board_menu {
-    height: 50px;
-}
-
 @keyframes glow {
     from {
         box-shadow: 0 0 5px -2px #ffc400;
@@ -366,7 +362,8 @@ a.mod_kanban_attachment_item {
 }
 
 .col-8.mod_kanban_heading {
-    max-width: fit-content;
+    flex: 0 0 90%;
+    max-width: 90%;
 }
 
 .col.mod_kanban_action_menu {
