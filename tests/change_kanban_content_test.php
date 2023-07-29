@@ -17,6 +17,7 @@
 namespace mod_kanban;
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/lib/externallib.php');
 
 /**
@@ -77,7 +78,10 @@ class change_kanban_content_test extends \advanced_testcase {
         $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
 
         $returnvalue = \mod_kanban\external\change_kanban_content::add_column($this->kanban->cmid, $boardid, ['aftercol' => 0]);
-        $returnvalue = external_api::clean_returnvalue(\mod_kanban\external\change_kanban_content::add_column_returns(), $returnvalue);
+        $returnvalue = external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::add_column_returns(),
+            $returnvalue
+        );
 
         $update = json_decode($returnvalue)['update'];
 
@@ -92,7 +96,10 @@ class change_kanban_content_test extends \advanced_testcase {
         $this->assertEquals(1, $DB->count_records('kanban_column', ['id' => $columnid]));
 
         $returnvalue = \mod_kanban\external\change_kanban_content::add_column($this->kanban->cmid, $boardid, ['aftercol' => 0]);
-        $returnvalue = external_api::clean_returnvalue(\mod_kanban\external\change_kanban_content::add_column_returns(), $returnvalue);
+        $returnvalue = external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::add_column_returns(),
+            $returnvalue
+        );
 
         $update = json_decode($returnvalue)['update'];
         $this->assertCount(2, $update);
