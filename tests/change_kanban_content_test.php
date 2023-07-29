@@ -28,6 +28,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers      \mod_kanban\external\change_kanban_content
+ * @runTestsInSeparateProcesses
  */
 class change_kanban_content_test extends \advanced_testcase {
     /** @var \stdClass The course used for testing */
