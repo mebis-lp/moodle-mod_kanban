@@ -193,6 +193,8 @@ class boardmanager_test extends \advanced_testcase {
 
         $column = $boardmanager->get_column($columnids[0]);
         $this->assertEquals('', $column->sequence);
+
+        // ToDo: Test deleting history / discussion here.
     }
 
     /**

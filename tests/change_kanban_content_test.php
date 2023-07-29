@@ -270,7 +270,7 @@ class change_kanban_content_test extends \advanced_testcase {
         $returnvalue = \mod_kanban\external\change_kanban_content::move_card(
             $this->kanban->cmid,
             $boardid,
-            ['cardid' => $cards[0]->id, 'aftercard' => $cards[2]->id]
+            ['cardid' => $cards[0]->id, 'aftercard' => $cards[2]->id, 'columnid' => $columnids[2]]
         );
         $returnvalue = \external_api::clean_returnvalue(
             \mod_kanban\external\change_kanban_content::move_card_returns(),
@@ -305,5 +305,48 @@ class change_kanban_content_test extends \advanced_testcase {
         $this->assertEquals(join(',', [$cards[2]->id, $cards[1]->id, $cards[0]->id]), $update[1]['fields']['sequence']);
         $this->assertEquals('', $update[0]['fields']['sequence']);
         $this->assertEquals($columnids[2], $update[2]['fields']['kanban_column']);
+    }
+
+    /**
+     * Test for deleting a card.
+     *
+     * @return void
+     */
+    public function test_delete_card() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/lib/externallib.php');
+
+        $this->resetAfterTest();
+        $this->setUser($this->users[2]);
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+        $cards = [];
+        foreach ($columnids as $columnid) {
+            $cardid = $boardmanager->add_card($columnid, 0, ['title' => 'Testcard']);
+            $cards[] = $boardmanager->get_card($cardid);
+        }
+        $returnvalue = \mod_kanban\external\change_kanban_content::delete_card(
+            $this->kanban->cmid,
+            $boardid,
+            ['cardid' => $cards[0]->id]
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::move_card_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+
+        $this->assertCount(2, $update);
+        $this->assertEquals('columns', $update[0]['name']);
+        $this->assertEquals('cards', $update[2]['name']);
+
+        $this->assertEquals('', $update[0]['fields']['sequence']);
+        $this->assertEquals($cards[0]->id, $update[1]['fields']['id']);
+
+        // ToDo: Test deleting history / discussion here.
     }
 }
