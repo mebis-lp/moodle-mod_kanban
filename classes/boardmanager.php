@@ -408,6 +408,7 @@ class boardmanager {
             $defaults = [
                 'title' => get_string('newcolumn', 'mod_kanban'),
                 'options' => '{}',
+                'locked' => 0,
             ];
             $defaultsfixed = [
                 'kanban_board' => $this->board->id,
