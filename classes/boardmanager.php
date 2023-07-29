@@ -581,6 +581,7 @@ class boardmanager {
                 $card->kanban_column,
                 $cardid
             );
+            helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
         }
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_COLUMN, $update['timemodified']);
     }
