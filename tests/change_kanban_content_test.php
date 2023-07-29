@@ -441,11 +441,11 @@ class change_kanban_content_test extends \advanced_testcase {
     }
 
     /**
-     * Test for assigning an user to a card.
+     * Test for (un-)assigning an user to a card.
      *
      * @return void
      */
-    public function test_assign_user() {
+    public function test_assign_unassign_user() {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -492,5 +492,37 @@ class change_kanban_content_test extends \advanced_testcase {
         $this->assertCount(1, $update);
         $this->assertEquals('cards', $update[0]['name']);
         $this->assertEquals([$this->users[0]->id, $this->users[2]->id], $update[0]['fields']['assignees']);
+
+        $returnvalue = \mod_kanban\external\change_kanban_content::unassign_user(
+            $this->kanban->cmid,
+            $boardid,
+            ['cardid' => $cards[2]->id, 'userid' => $this->users[0]->id]
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::unassign_user_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+
+        $this->assertCount(1, $update);
+        $this->assertEquals('cards', $update[0]['name']);
+        $this->assertEquals([$this->users[2]->id], $update[0]['fields']['assignees']);
+
+        $returnvalue = \mod_kanban\external\change_kanban_content::unassign_user(
+            $this->kanban->cmid,
+            $boardid,
+            ['cardid' => $cards[2]->id, 'userid' => $this->users[2]->id]
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::unassign_user_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+
+        $this->assertCount(1, $update);
+        $this->assertEquals('cards', $update[0]['name']);
+        $this->assertEquals([], $update[0]['fields']['assignees']);
     }
 }
