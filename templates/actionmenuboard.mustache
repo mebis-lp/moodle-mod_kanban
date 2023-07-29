@@ -74,11 +74,6 @@
         <a class="dropdown-item" href="view.php?id={{cmid}}&group=0&user={{myuserid}}">{{#pix}} t/right, core, {{#str}} myuserboard, mod_kanban {{/str}} {{/pix}}{{#str}} myuserboard, mod_kanban {{/str}}</a>
     </li>
     {{/ismyuserboard}}
-    {{#ismyuserboard}}
-    <li class="nav-item">
-        <a class="dropdown-item" href="view.php?id={{cmid}}&group=0&user=0">{{#pix}} t/left, core, {{#str}} showboard, mod_kanban {{/str}} {{/pix}}{{#str}} showboard, mod_kanban {{/str}}</a>
-    </li>
-    {{/ismyuserboard}}
     {{#viewallboards}}
     <li class="nav-item mod_kanban_select_user">
         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#mod_kanban_change_user">{{#pix}} t/user, core, {{#str}} changeuser, mod_kanban {{/str}} {{/pix}}{{#str}} changeuser, mod_kanban {{/str}}</a>

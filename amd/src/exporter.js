@@ -37,6 +37,8 @@ export default class {
             ismyuserboard: state.common.userid == state.board.userid,
             myuserid: state.common.userid,
             showactionmenu: showactionmenu,
+            userboardsonly: state.common.userboards == 2,
+            iscourseboard: state.board.userid == 0 && state.board.groupid == 0,
             users: JSON.parse(JSON.stringify(state.users)),
         }, this.exportCapabilities(state));
     }
