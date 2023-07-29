@@ -81,7 +81,7 @@ class change_kanban_content_test extends \advanced_testcase {
             $returnvalue
         );
 
-        $update = json_decode($returnvalue)['update'];
+        $update = json_decode($returnvalue['update']);
 
         $this->assertCount(2, $update);
         $this->assertEquals('board', $update[0]['name']);
