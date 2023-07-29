@@ -305,8 +305,6 @@ export default class extends KanbanComponent {
      * Called when this column is deleted.
      */
     _columnDeleted() {
-        const el = this.getElement();
-        el.parentNode.removeChild(el);
         this.destroy();
     }
 
