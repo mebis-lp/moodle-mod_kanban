@@ -116,4 +116,60 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $this->assertEquals(1, $DB->count_records('kanban_column', ['id' => $columnid]));
     }
+
+    /**
+     * Test for creating a card.
+     *
+     * @return void
+     */
+    public function test_add_card() {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/lib/externallib.php');
+
+        $this->resetAfterTest();
+        $this->setUser($this->users[2]);
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnid = $DB->get_field('kanban_column', 'id', ['kanban_board' => $boardid], IGNORE_MULTIPLE);
+        $returnvalue = \mod_kanban\external\change_kanban_content::add_card(
+            $this->kanban->cmid,
+            $boardid,
+            ['aftercard' => 0, 'columnid' => $columnid, 'title' => 'Testcard']
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::add_card_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+
+        $this->assertCount(2, $update);
+        $this->assertEquals('columns', $update[0]['fields']['name']);
+        $this->assertEquals('cards', $update[1]['fields']['name']);
+        $cardid = $update[1]['fields']['id'];
+
+        $card = $boardmanager->get_card($cardid);
+        $this->assertEquals('Testcard', $card->title);
+        $this->assertEquals($boardid, $update[1]['fields']['kanban_board']);
+        $this->assertEquals($columnid, $update[1]['fields']['kanban_column']);
+        $this->assertEquals($cardid, $update[0]['fields']['sequence']);
+
+        $returnvalue = \mod_kanban\external\change_kanban_content::add_card(
+            $this->kanban->cmid,
+            $boardid,
+            ['aftercard' => $cardid, 'columnid' => $columnid, 'title' => 'Testcard 2']
+        );
+        $returnvalue = \external_api::clean_returnvalue(
+            \mod_kanban\external\change_kanban_content::add_card_returns(),
+            $returnvalue
+        );
+
+        $update = json_decode($returnvalue['update'], true);
+        $this->assertCount(2, $update);
+        $this->assertEquals('columns', $update[0]['fields']['name']);
+        $this->assertEquals('cards', $update[1]['fields']['name']);
+        $this->assertEquals(join(',', [$cardid, $card2id]), $update[0]['fields']['sequence']);
+    }
 }
