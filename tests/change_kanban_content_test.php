@@ -279,9 +279,8 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $update = json_decode($returnvalue['update'], true);
 
-        $this->assertCount(2, $update);
+        $this->assertCount(1, $update);
         $this->assertEquals('columns', $update[0]['name']);
-        $this->assertEquals('cards', $update[1]['name']);
 
         $this->assertEquals(join(',', [$cards[2]->id, $cards[0]->id]), $update[0]['fields']['sequence']);
 
@@ -384,11 +383,13 @@ class change_kanban_content_test extends \advanced_testcase {
         $update = json_decode($returnvalue['update'], true);
 
         $this->assertCount(2, $update);
-        $this->assertEquals('columns', $update[0]['name']);
+        $this->assertEquals('cards', $update[0]['name']);
+        $this->assertEquals('columns', $update[1]['name']);
         $this->assertEquals('board', $update[2]['name']);
 
+        $this->assertEquals($cards[0]->id, $update[0]['fields']['id']);
         $this->assertEquals($columnids[0], $update[1]['fields']['id']);
-        $this->assertEquals(join(',', [$columnids[1], $columnids[2]]), $update[1]['fields']['sequence']);
+        $this->assertEquals(join(',', [$columnids[1], $columnids[2]]), $update[2]['fields']['sequence']);
     }
 
     /**
@@ -424,8 +425,9 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $update = json_decode($returnvalue['update'], true);
 
-        $this->assertCount(1, $update);
+        $this->assertCount(2, $update);
         $this->assertEquals('cards', $update[0]['name']);
+        $this->assertEquals('users', $update[1]['name']);
         $this->assertEquals([$this->users[0]->id], $update[0]['fields']['assignees']);
 
         $returnvalue = \mod_kanban\external\change_kanban_content::assign_user(
