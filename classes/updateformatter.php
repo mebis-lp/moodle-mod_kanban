@@ -51,6 +51,13 @@ class updateformatter {
      * @param array $data Fields to update, must contain 'id' field
      */
     public function put(string $name, array $data) {
+        // Find int values covered as string.
+        foreach ($data as $key => $value) {
+            $intdata = filter_var($value, FILTER_VALIDATE_INT);
+            if ($intdata !== false) {
+                $data[$key] = $intdata;
+            }
+        }
         $this->updates[] = ['name' => $name, 'action' => 'put', 'fields' => $data];
     }
 
