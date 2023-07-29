@@ -99,7 +99,7 @@ class change_kanban_content_test extends \advanced_testcase {
             $returnvalue
         );
 
-        $update = json_decode($returnvalue)['update'];
+        $update = json_decode($returnvalue['update'], true);
         $this->assertCount(2, $update);
         $columnid = $update[1]['fields']['id'];
 
