@@ -53,6 +53,9 @@ class updateformatter {
     public function put(string $name, array $data) {
         // Find int values covered as string.
         foreach ($data as $key => $value) {
+            if ($key == 'sequence') {
+                continue;
+            }
             $intdata = filter_var($value, FILTER_VALIDATE_INT);
             if ($intdata !== false) {
                 $data[$key] = $intdata;
