@@ -76,7 +76,7 @@ class change_kanban_content_test extends \advanced_testcase {
         $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
 
         $returnvalue = \mod_kanban\external\change_kanban_content::add_column($this->kanban->cmid, $boardid, ['aftercol' => 0]);
-        $returnvalue = external_api::clean_returnvalue(
+        $returnvalue = \external_api::clean_returnvalue(
             \mod_kanban\external\change_kanban_content::add_column_returns(),
             $returnvalue
         );
@@ -94,7 +94,7 @@ class change_kanban_content_test extends \advanced_testcase {
         $this->assertEquals(1, $DB->count_records('kanban_column', ['id' => $columnid]));
 
         $returnvalue = \mod_kanban\external\change_kanban_content::add_column($this->kanban->cmid, $boardid, ['aftercol' => 0]);
-        $returnvalue = external_api::clean_returnvalue(
+        $returnvalue = \external_api::clean_returnvalue(
             \mod_kanban\external\change_kanban_content::add_column_returns(),
             $returnvalue
         );
