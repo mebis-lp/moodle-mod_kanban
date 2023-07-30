@@ -26,12 +26,19 @@
 .mod_kanban_addcolumn.btn {
     position: absolute;
     left: 50%;
-    top: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     border-color: black;
     border-style: solid;
     border-width: 1px;
+}
+
+.mod_kanban_addcard.btn {
+    top: 50%;
+}
+
+.mod_kanban_addcolumn.btn {
+    top: 30px;
 }
 
 .mod_kanban_addcard_container:hover,
@@ -74,10 +81,7 @@
 
 .mod_kanban_addcolumn_container.col * {
     position: absolute;
-    top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
-    background-color: inherit;
     opacity: 0;
     transition: opacity 0.1s;
 }
