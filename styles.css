@@ -384,3 +384,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_addcard {
     background-color: lightgray;
 }
+
+.mod_kanban_board .btn {
+    background-color: white;
+}
