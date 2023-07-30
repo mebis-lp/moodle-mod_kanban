@@ -548,7 +548,7 @@ class get_kanban_content extends external_api {
                 $formatter->put('users', (array) $kanbanusers[$userid]);
             }
             return [
-                'update' => $formatter->format()
+                'update' => $formatter->get_formatted_updates()
             ];
         }
 
@@ -629,7 +629,7 @@ class get_kanban_content extends external_api {
             $formatter->put('discussions', (array) $discussion);
         }
         return [
-            'update' => $formatter->format()
+            'update' => $formatter->get_formatted_updates()
         ];
     }
 
@@ -719,7 +719,7 @@ class get_kanban_content extends external_api {
             }
         }
         return [
-            'update' => $formatter->format()
+            'update' => $formatter->get_formatted_updates()
         ];
     }
 

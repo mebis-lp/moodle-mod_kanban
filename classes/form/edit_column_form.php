@@ -107,7 +107,7 @@ class edit_column_form extends dynamic_form {
         $boardmanager->update_column($formdata->id, (array)$formdata);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 

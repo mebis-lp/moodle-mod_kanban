@@ -117,7 +117,7 @@ class change_kanban_content extends external_api {
         $boardmanager->add_column($aftercol, $data);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -189,7 +189,7 @@ class change_kanban_content extends external_api {
         $boardmanager->add_card($columnid, $aftercard, $data);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -254,7 +254,7 @@ class change_kanban_content extends external_api {
         $boardmanager->move_column($columnid, $aftercol);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -326,7 +326,7 @@ class change_kanban_content extends external_api {
         $boardmanager->move_card($cardid, $aftercard, $columnid);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -392,7 +392,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_card($cardid);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -452,7 +452,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_column($columnid);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -520,7 +520,7 @@ class change_kanban_content extends external_api {
         $boardmanager->assign_user($cardid, $userid);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -591,7 +591,7 @@ class change_kanban_content extends external_api {
         $boardmanager->unassign_user($cardid, $userid);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -661,7 +661,7 @@ class change_kanban_content extends external_api {
         $boardmanager->set_card_complete($cardid, $state);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -726,7 +726,7 @@ class change_kanban_content extends external_api {
         $boardmanager->set_column_locked($columnid, $state);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -788,7 +788,7 @@ class change_kanban_content extends external_api {
         $boardmanager->set_board_columns_locked($state);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -852,7 +852,7 @@ class change_kanban_content extends external_api {
         $boardmanager->add_discussion_message($cardid, $message);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
 
     }
@@ -922,7 +922,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_discussion_message($messageid, $message->kanban_card);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -977,7 +977,7 @@ class change_kanban_content extends external_api {
         $boardmanager->create_template();
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 
@@ -1034,7 +1034,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_board($boardid);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
     }
 

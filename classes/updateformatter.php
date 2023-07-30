@@ -79,7 +79,7 @@ class updateformatter {
      *
      * @return string JSON encoded update string
      */
-    public function format(): string {
+    public function get_formatted_updates(): string {
         return json_encode($this->updates);
     }
 }

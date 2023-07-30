@@ -151,7 +151,7 @@ class edit_card_form extends dynamic_form {
         $boardmanager->update_card($formdata->id, (array)$formdata);
 
         return [
-            'update' => $boardmanager->format()
+            'update' => $boardmanager->get_formatted_updates()
         ];
 
     }

@@ -118,8 +118,8 @@ class boardmanager {
      *
      * @return string
      */
-    public function format(): string {
-        return $this->formatter->format();
+    public function get_formatted_updates(): string {
+        return $this->formatter->get_formatted_updates();
     }
 
     /**
