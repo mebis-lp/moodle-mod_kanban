@@ -361,9 +361,14 @@ a.mod_kanban_attachment_item {
     margin-bottom: 200px;
 }
 
-.col-8.mod_kanban_heading {
-    flex: 0 0 90%;
-    max-width: 90%;
+.col.mod_kanban_heading {
+    max-width: max-content;
+}
+
+.mod_kanban_heading .mod_kanban_action_menu_trigger {
+    position: absolute;
+    top: 5px;
+    right: -30px;
 }
 
 .col.mod_kanban_action_menu {
@@ -379,3 +384,4 @@ a.mod_kanban_attachment_item {
 .mod_kanban_addcard {
     background-color: lightgray;
 }
+
