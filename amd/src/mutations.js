@@ -5,7 +5,7 @@ import Ajax from 'core/ajax';
  */
 export default class {
     async saveAsTemplate(stateManager) {
-        await this.sendChange('save_as_template', stateManager);
+        await this._sendChange('save_as_template', stateManager);
     }
 
     /**
@@ -14,7 +14,7 @@ export default class {
      * @param {number} cardId Id of the card to be deleted
      */
     async deleteCard(stateManager, cardId) {
-        await this.sendChange('delete_card', stateManager, {cardid: cardId});
+        await this._sendChange('delete_card', stateManager, {cardid: cardId});
     }
 
     /**
@@ -22,7 +22,7 @@ export default class {
      * @param {*} stateManager StateManager instance
      */
     async deleteBoard(stateManager) {
-        await this.sendChange('delete_board', stateManager);
+        await this._sendChange('delete_board', stateManager);
     }
 
     /**
@@ -32,7 +32,7 @@ export default class {
      * @param {number} afterCard Id of the card before (0 means to insert at the top of the column)
      */
     async addCard(stateManager, columnId, afterCard) {
-        await this.sendChange('add_card', stateManager, {columnid: columnId, aftercard: afterCard});
+        await this._sendChange('add_card', stateManager, {columnid: columnId, aftercard: afterCard});
     }
 
     /**
@@ -43,7 +43,7 @@ export default class {
      * @param {number} afterCard Id of the card before (0 means to move at the top of the column)
      */
     async moveCard(stateManager, cardId, columnId, afterCard) {
-        await this.sendChange('move_card', stateManager, {cardid: cardId, columnid: columnId, aftercard: afterCard});
+        await this._sendChange('move_card', stateManager, {cardid: cardId, columnid: columnId, aftercard: afterCard});
     }
 
     /**
@@ -52,7 +52,7 @@ export default class {
      * @param {number} columnId Id of the column to delete
      */
     async deleteColumn(stateManager, columnId) {
-        await this.sendChange('delete_column', stateManager, {columnid: columnId});
+        await this._sendChange('delete_column', stateManager, {columnid: columnId});
     }
 
     /**
@@ -61,7 +61,7 @@ export default class {
      * @param {number} afterColumn Id of the column before (0 means to insert at the left of the board)
      */
     async addColumn(stateManager, afterColumn) {
-        await this.sendChange('add_column', stateManager, {aftercol: afterColumn});
+        await this._sendChange('add_column', stateManager, {aftercol: afterColumn});
     }
 
     /**
@@ -71,7 +71,7 @@ export default class {
      * @param {number} afterColumn Id of the column before (0 means to insert at the left of the board)
      */
     async moveColumn(stateManager, columnId, afterColumn) {
-        await this.sendChange('move_column', stateManager, {columnid: columnId, aftercol: afterColumn});
+        await this._sendChange('move_column', stateManager, {columnid: columnId, aftercol: afterColumn});
     }
 
     /**
@@ -81,7 +81,7 @@ export default class {
      * @param {number} userId Id of the user to assign (0 means to assign the current user)
      */
     async assignUser(stateManager, cardId, userId = 0) {
-        await this.sendChange('assign_user', stateManager, {cardid: cardId, userid: userId});
+        await this._sendChange('assign_user', stateManager, {cardid: cardId, userid: userId});
     }
 
     /**
@@ -90,7 +90,7 @@ export default class {
      * @param {number} cardId Id of the card
      */
     async completeCard(stateManager, cardId) {
-        await this.sendChange('set_card_complete', stateManager, {cardid: cardId, state: 1});
+        await this._sendChange('set_card_complete', stateManager, {cardid: cardId, state: 1});
     }
 
     /**
@@ -99,7 +99,7 @@ export default class {
      * @param {number} cardId Id of the card
      */
     async uncompleteCard(stateManager, cardId) {
-        await this.sendChange('set_card_complete', stateManager, {cardid: cardId, state: 0});
+        await this._sendChange('set_card_complete', stateManager, {cardid: cardId, state: 0});
     }
 
     /**
@@ -109,7 +109,7 @@ export default class {
      * @param {number} userId Id of the user to unassign, defaults to 0 (current user)
      */
     async unassignUser(stateManager, cardId, userId = 0) {
-        await this.sendChange('unassign_user', stateManager, {cardid: cardId, userid: userId});
+        await this._sendChange('unassign_user', stateManager, {cardid: cardId, userid: userId});
     }
 
     /**
@@ -118,7 +118,7 @@ export default class {
      * @param {number} columnId Id of the column to lock
      */
     async lockColumn(stateManager, columnId) {
-        await this.sendChange('set_column_locked', stateManager, {columnid: columnId, state: 1});
+        await this._sendChange('set_column_locked', stateManager, {columnid: columnId, state: 1});
     }
 
     /**
@@ -127,7 +127,7 @@ export default class {
      * @param {number} columnId Id of the column to unlock
      */
     async unlockColumn(stateManager, columnId) {
-        await this.sendChange('set_column_locked', stateManager, {columnid: columnId, state: 0});
+        await this._sendChange('set_column_locked', stateManager, {columnid: columnId, state: 0});
     }
 
     /**
@@ -135,7 +135,7 @@ export default class {
      * @param {*} stateManager StateManager instance
      */
     async lockColumns(stateManager) {
-        await this.sendChange('set_board_columns_locked', stateManager, {state: 1});
+        await this._sendChange('set_board_columns_locked', stateManager, {state: 1});
     }
 
     /**
@@ -143,7 +143,7 @@ export default class {
      * @param {*} stateManager StateManager instance
      */
     async unlockColumns(stateManager) {
-        await this.sendChange('set_board_columns_locked', stateManager, {state: 0});
+        await this._sendChange('set_board_columns_locked', stateManager, {state: 0});
     }
 
     /**
@@ -153,7 +153,7 @@ export default class {
      * @param {*} message
      */
     async sendDiscussionMessage(stateManager, cardId, message) {
-        await this.sendChange('add_discussion_message', stateManager, {cardid: cardId, message: message});
+        await this._sendChange('add_discussion_message', stateManager, {cardid: cardId, message: message});
     }
 
     /**
@@ -162,7 +162,7 @@ export default class {
      * @param {number} messageId Id of the message to be deleted
      */
     async deleteMessage(stateManager, messageId) {
-        await this.sendChange('delete_discussion_message', stateManager, {messageid: messageId});
+        await this._sendChange('delete_discussion_message', stateManager, {messageid: messageId});
     }
 
     /**
@@ -171,7 +171,7 @@ export default class {
      * @param {*} stateManager StateManager instance
      * @param {object} data Data to send
      */
-    async sendChange(method, stateManager, data) {
+    async _sendChange(method, stateManager, data) {
         const state = stateManager.state;
         const result = await Ajax.call([{
             methodname: 'mod_kanban_' + method,

@@ -1,6 +1,8 @@
 import Reactive from 'mod_kanban/reactive';
-import KanbanComponent from 'mod_kanban/kanban';
+import KanbanParent from 'mod_kanban/kanban';
 import KanbanMutations from 'mod_kanban/mutations';
+
+const stateChangedEventName = 'mod_kanban:stateChanged';
 
 /**
  * Create reactive instance for kanban, load initial state.
@@ -18,13 +20,11 @@ export const init = (domElementId, cmId, boardId) => {
         mutations: new KanbanMutations(),
     });
     reactiveInstance.loadBoard(cmId, boardId);
-    return new KanbanComponent({
+    return new KanbanParent({
         element: document.getElementById(domElementId),
         reactive: reactiveInstance,
     });
 };
-
-const stateChangedEventName = 'mod_kanban:stateChanged';
 
 /**
  * Internal state changed event.

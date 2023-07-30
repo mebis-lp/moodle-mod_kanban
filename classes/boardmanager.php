@@ -325,7 +325,7 @@ class boardmanager {
         $DB->delete_records('kanban_card', ['kanban_board' => $id]);
         $DB->delete_records('kanban_board', ['id' => $id]);
         // The rest of the elements is skipped in the update message.
-        $this->get_board($id);
+        $this->load_board($id);
         $this->formatter->delete('board', ['id' => $id]);
     }
 
@@ -484,7 +484,7 @@ class boardmanager {
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_COLUMN, $update['timemodified']);
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
 
-        $this->update_completion($USER->id);
+        $this->update_completion([$USER->id]);
 
         return $data['id'];
     }
