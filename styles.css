@@ -367,7 +367,7 @@ a.mod_kanban_attachment_item {
 
 .mod_kanban_heading .mod_kanban_action_menu_trigger {
     position: absolute;
-    top: 5px;
+    top: 0;
     right: -30px;
 }
 
@@ -384,4 +384,3 @@ a.mod_kanban_attachment_item {
 .mod_kanban_addcard {
     background-color: lightgray;
 }
-
