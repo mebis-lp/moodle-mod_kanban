@@ -293,3 +293,31 @@ function kanban_reset_userdata($data) {
     }
     return $status;
 }
+
+/**
+ * Add custom completion.
+ *
+ * @param stdClass $cm coursemodule record.
+ * @return cached_cm_info
+ */
+function kanban_get_coursemodule_info(stdClass $cm): cached_cm_info {
+    global $DB;
+
+    if (!$kanban = $DB->get_record('kanban', ['id' => $cm->instance])) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $kanban->name;
+
+    if ($cm->showdescription) {
+        $result->content = format_module_intro('kanban', $kanban, $cm->id, false);
+    }
+
+    if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completioncreate'] = $kanban->completioncreate;
+        $result->customdata['customcompletionrules']['completioncomplete'] = $kanban->completioncomplete;
+    }
+
+    return $result;
+}

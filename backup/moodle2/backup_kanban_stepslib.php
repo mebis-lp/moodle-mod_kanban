@@ -34,7 +34,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         $kanban = new backup_nested_element(
             'kanban',
             ['id'],
-            ['course', 'name', 'intro', 'introformat', 'userboards', 'history']
+            ['course', 'name', 'intro', 'introformat', 'userboards', 'history', 'completioncreate', 'completioncomplete']
         );
         $kanban->set_source_table('kanban', ['id' => backup::VAR_ACTIVITYID]);
         $kanban->annotate_files('kanban', 'intro', null);

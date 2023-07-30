@@ -325,6 +325,7 @@ class boardmanager {
         $DB->delete_records('kanban_card', ['kanban_board' => $id]);
         $DB->delete_records('kanban_board', ['id' => $id]);
         // The rest of the elements is skipped in the update message.
+        $this->get_board($id);
         $this->formatter->delete('board', ['id' => $id]);
     }
 
@@ -483,6 +484,8 @@ class boardmanager {
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_COLUMN, $update['timemodified']);
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
 
+        $this->update_completion($USER->id);
+
         return $data['id'];
     }
 
@@ -569,11 +572,12 @@ class boardmanager {
             $data['columnname'] = $targetcolumn->title;
             $assignees = $this->get_card_assignees($cardid);
             helper::send_notification($this->cminfo, 'moved', $assignees, (object) $data);
-            if (!empty($options->autoclose)) {
+            if (!empty($options->autoclose) && $card->completed == 0) {
                 $data['title'] = $card->title;
                 helper::send_notification($this->cminfo, 'closed', $assignees, (object) $data);
                 helper::remove_calendar_event($this->kanban, $card);
                 $this->write_history('completed', constants::MOD_KANBAN_CARD, [], $columnid, $cardid);
+                $this->update_completion($assignees);
             }
             $this->write_history(
                 'moved',
@@ -621,6 +625,9 @@ class boardmanager {
 
         $this->write_history('assigned', constants::MOD_KANBAN_CARD, ['userid' => $userid], $card->kanban_column, $cardid);
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
+        if (!empty($card->completed)) {
+            $this->update_completion([$userid]);
+        }
     }
 
     /**
@@ -650,6 +657,9 @@ class boardmanager {
         $this->formatter->put('cards', $update);
         $this->write_history('unassigned', constants::MOD_KANBAN_CARD, ['userid' => $userid], $card->kanban_column, $cardid);
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
+        if (!empty($card->completed)) {
+            $this->update_completion([$userid]);
+        }
     }
 
     /**
@@ -674,6 +684,7 @@ class boardmanager {
         $card->username = fullname($USER);
         $card->boardname = $this->kanban->name;
         helper::send_notification($this->cminfo, 'closed', $assignees, $card, ($state == 0 ? 'reopened' : null));
+        $this->update_completion($assignees);
         $this->write_history(
             ($state == 0 ? 'reopened' : 'completed'),
             constants::MOD_KANBAN_CARD,
@@ -834,6 +845,9 @@ class boardmanager {
                     );
                 }
             }
+            if (!empty($card['completed'])) {
+                $this->update_completion($todelete);
+            }
             if (!empty($toinsert) || !empty($todelete)) {
                 $cardupdate['assignees'] = $assignees;
             }
@@ -854,6 +868,9 @@ class boardmanager {
                 $toinsert,
                 (object) array_merge($carddata, ['boardname' => $this->cminfo->name])
             );
+            if (!empty($card['completed'])) {
+                $this->update_completion($toinsert);
+            }
             foreach ($toinsert as $user) {
                 $this->write_history(
                     'assigned',
@@ -1014,5 +1031,37 @@ class boardmanager {
             'type' => $type,
         ];
         $DB->insert_record('kanban_history', $record);
+    }
+
+    /**
+     * Update completion state
+     *
+     * @param array $users Array of userids or user records (if empty, current user is used)
+     * @return void
+     */
+    public function update_completion(array $users = []): void {
+        global $USER;
+        if (empty($users)) {
+            $users = [$USER->id];
+        }
+        if ($this->completion_enabled()) {
+            $completion = new \completion_info($this->course);
+            foreach ($users as $user) {
+                if (is_object($user)) {
+                    $completion->update_state($this->cminfo, COMPLETION_UNKNOWN, $user->id);
+                } else {
+                    $completion->update_state($this->cminfo, COMPLETION_UNKNOWN, $user);
+                }
+            }
+        }
+    }
+
+    /**
+     * Whether the custom completion rules are enabled for this board.
+     *
+     * @return bool
+     */
+    public function completion_enabled(): bool {
+        return !empty($this->kanban->completioncreate) || !empty($this->kanban->completioncomplete);
     }
 }

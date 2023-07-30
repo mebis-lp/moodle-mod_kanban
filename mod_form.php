@@ -61,4 +61,41 @@ class mod_kanban_mod_form extends moodleform_mod {
 
         $this->add_action_buttons(true, false, null);
     }
+
+    /**
+     * Returns whether the custom completion rules are enabled.
+     *
+     * @param array $data form data
+     * @return bool
+     */
+    public function completion_rule_enabled($data) : bool {
+        return (!empty($data['completioncreate']) || !empty($data['completioncomplete']));
+    }
+
+    /**
+     * Adds the custom completion rules for mod_kanban
+     *
+     * @return array
+     */
+    public function add_completion_rules() : array {
+        $mform = $this->_form;
+
+        $mform->addElement(
+            'text',
+            'completioncreate',
+            get_string('completioncreate', 'kanban'),
+            ['size' => 3]
+        );
+        $mform->setType('completioncreate', PARAM_INT);
+
+        $mform->addElement(
+            'text',
+            'completioncomplete',
+            get_string('completioncomplete', 'kanban'),
+            ['size' => 3]
+        );
+        $mform->setType('completioncomplete', PARAM_INT);
+
+        return(['completioncreate', 'completioncomplete']);
+    }
 }
