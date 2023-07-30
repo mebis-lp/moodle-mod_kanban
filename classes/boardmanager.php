@@ -243,7 +243,7 @@ class boardmanager {
             return $boardid;
         } else {
             $fs = get_file_storage();
-            $template = get_cached_board($templateid);
+            $template = helper::get_cached_board($templateid);
 
             // If it is a site wide template, we need system context to copy files.
             if ($template->kanban_instance == 0) {
