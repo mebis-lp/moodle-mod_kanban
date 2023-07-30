@@ -136,6 +136,11 @@ export default class extends KanbanComponent {
             'click',
             this._showMoveModal
         );
+        this.addEventListener(
+            this.getElement(selectors.PUSHCARD),
+            'click',
+            this._pushCardConfirm
+        );
 
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
@@ -166,6 +171,27 @@ export default class extends KanbanComponent {
                     let column = document.querySelector(selectors.MOVECARDCOLUMN + `[data-id="${this.id}"]`).value;
                     let aftercard = document.querySelector(selectors.MOVECARDAFTERCARD + `[data-id="${this.id}"]`).value;
                     this.reactive.dispatch('moveCard', this.id, column, aftercard);
+                }
+            );
+        }).catch((error) => Log.debug(error));
+    }
+
+    /**
+     * Display confirmation modal for pushing a card.
+     * @param {*} event
+     */
+    _pushCardConfirm(event) {
+        Str.get_strings([
+            {key: 'pushcard', component: 'mod_kanban'},
+            {key: 'pushcardconfirm', component: 'mod_kanban'},
+            {key: 'copy', component: 'core'},
+        ]).then((strings) => {
+            return saveCancel(
+                strings[0],
+                strings[1],
+                strings[2],
+                () => {
+                    this._pushCard(event);
                 }
             );
         }).catch((error) => Log.debug(error));
@@ -406,6 +432,16 @@ export default class extends KanbanComponent {
         let target = event.target.closest(selectors.DELETECARD);
         let data = Object.assign({}, target.dataset);
         this.reactive.dispatch('deleteCard', data.id);
+    }
+
+    /**
+     * Dispatch event to push this card.
+     * @param {*} event
+     */
+    _pushCard(event) {
+        let target = event.target.closest(selectors.PUSHCARD);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('pushCard', data.id);
     }
 
     /**

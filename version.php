@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_kanban';
 $plugin->release = '0.1';
-$plugin->version = 2023072901;
+$plugin->version = 2023073001;
 $plugin->requires = 2022041900;
 $plugin->supported = [401, 403];
 $plugin->maturity = MATURITY_BETA;

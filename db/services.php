@@ -178,4 +178,12 @@ $functions = [
         'ajax'        => true,
         'capabilities' => 'mod/kanban:manageboard',
     ],
+    'mod_kanban_push_card_copy' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'push_card_copy',
+        'description' => 'Pushes a copy of a card to all boards',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities' => 'mod/kanban:manageboard',
+    ],
 ];

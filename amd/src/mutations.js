@@ -166,6 +166,15 @@ export default class {
     }
 
     /**
+     * Push a copy of a card to all boards.
+     * @param {*} stateManager StateManager instance
+     * @param {number} cardId Id of the card to be pushed
+     */
+    async pushCard(stateManager, cardId) {
+        await this._sendChange('push_card_copy', stateManager, {cardid: cardId});
+    }
+
+    /**
      * Send change request to webservice
      * @param {string} method Name of the method
      * @param {*} stateManager StateManager instance

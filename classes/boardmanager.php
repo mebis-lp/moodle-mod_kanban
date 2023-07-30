@@ -282,6 +282,7 @@ class boardmanager {
                 $newcard[$card->id]->timecreated = time();
                 $newcard[$card->id]->timemodified = time();
                 $newcard[$card->id]->kanban_column = $newcolumn[$card->kanban_column]->id;
+                $newcard[$card->id]->originalid = $card->id;
                 unset($newcard[$card->id]->id);
                 // Remove user id of original creator.
                 unset($newcard[$card->id]->createdby);
@@ -935,6 +936,73 @@ class boardmanager {
 
         if ($column->title != $columndata['title']) {
             $this->write_history('updated', constants::MOD_KANBAN_COLUMN, $columndata, $columnid);
+        }
+    }
+
+    /**
+     * Push a copy of this card to other boards. If target boards array is empty, card is pushed to all boards in this kanban
+     * activity (including templates) to the leftmost column (if there is none, card is not copied). If there is already a copy
+     * of this card, it is replaced. History, assignees and discussion are not copied.
+     * For now, only boards inside the same kanban are supported.
+     *
+     * @param integer $cardid Id of the card to push
+     * @param array $boardids Array of ids of the target boards
+     * @return void
+     */
+    public function push_card_copy(int $cardid, array $boardids = []): void {
+        global $DB;
+        $allboardids = $DB->get_fieldset_select('kanban_board', 'id', 'kanban_instance = :id', ['id' => $this->kanban->id]);
+        if (empty($boards)) {
+            $boardids = $allboardids;
+        } else {
+            $boardids = array_intersect($boards, $allboardids);
+        }
+        $card = $this->get_card($cardid);
+        $originalboard = $card->kanban_board;
+        unset($card->id);
+        unset($card->createdby);
+        unset($card->kanban_board);
+        unset($card->kanban_column);
+        unset($card->completed);
+        unset($card->discussion);
+        $card->originalid = $cardid;
+        $card->timemodified = time();
+        foreach ($boardids as $boardid) {
+            if ($originalboard == $boardid) {
+                continue;
+            }
+            $existingcard = $DB->get_record('kanban_card', ['kanban_board' => $boardid, 'originalid' => $cardid]);
+            if (!$existingcard) {
+                $sequence = $DB->get_field('kanban_board', 'sequence', ['id' => $boardid]);
+                if (!$sequence) {
+                    continue;
+                } else {
+                    $columnids = explode(',', $sequence, 2);
+                    $newcard = (array)$card;
+                    $newcard['kanban_column'] = $columnids[0];
+                    $newcard['kanban_board'] = $boardid;
+                    $newcard['timecreated'] = time();
+                    $newcard['id'] = $DB->insert_record('kanban_card', $newcard);
+                    $column = $DB->get_record('kanban_column', ['id' => $columnids[0]]);
+                    $DB->update_record(
+                        'kanban_column',
+                        [
+                            'id' => $columnids[0],
+                            'sequence' => helper::sequence_add_after($column->sequence, 0, $newcard['id']),
+                            'timemodified' => time()
+                        ]
+                    );
+                    $newcard['columnname'] = $column->title;
+                    $this->write_history('added', constants::MOD_KANBAN_CARD, $newcard, $newcard['kanban_column']);
+                    helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_CARD, $newcard['timemodified']);
+                    helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_COLUMN, $newcard['timemodified']);
+                }
+            } else {
+                $newcard = array_merge((array)$existingcard, (array)$card);
+                $DB->update_record('kanban_card', $newcard);
+                $this->write_history('updated', constants::MOD_KANBAN_CARD, $newcard, $newcard['kanban_column']);
+                helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_CARD, $newcard['timemodified']);
+            }
         }
     }
 

@@ -51,6 +51,7 @@ export default {
     MOVECARDAFTERCARD: `.mod_kanban_move_card_aftercard`,
     MOVECARDCOLUMN: `.mod_kanban_move_card_column`,
     MOVEMODALTRIGGER: `[data-action="move_card"]`,
+    PUSHCARD: `[data-action="push_card"]`,
     SAVEASTEMPLATE: `[data-action="create_template"]`,
     SHOWBOARD: `[data-action="show_board"]`,
     SHOWHIDDEN: `[data-action="show_hidden"]`,
