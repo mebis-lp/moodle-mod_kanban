@@ -82,9 +82,9 @@ class boardmanager {
      * @param bool $dontloadcm Don't load course module data - only needed at instance creation time
      * @return void
      */
-    public function load_instance(int $instance, bool $dontloadcm = false) {
+    public function load_instance(int $instance, bool $dontloadcm = false): void {
         global $DB;
-        $this->kanban = $DB->get_record('kanban', ['id' => $instance]);
+        $this->kanban = $DB->get_record('kanban', ['id' => $instance], '*', MUST_EXIST);
         if (!$dontloadcm) {
             list ($this->course, $this->cminfo) = get_course_and_cm_from_instance($this->kanban->id, 'kanban');
             $this->cmid = $this->cminfo->id;
@@ -97,7 +97,7 @@ class boardmanager {
      * @param int $id Id of the board
      * @return void
      */
-    public function load_board(int $id) {
+    public function load_board(int $id): void {
         $this->board = helper::get_cached_board($id);
         if (empty($this->cminfo)) {
             $this->load_instance($this->board->kanban_instance);
@@ -107,9 +107,9 @@ class boardmanager {
     /**
      * Get the current board record.
      *
-     * @return object The current board
+     * @return stdClass The current board
      */
-    public function get_board() {
+    public function get_board(): stdClass {
         return $this->board;
     }
 
@@ -222,13 +222,13 @@ class boardmanager {
             // Replace / append data.
             $boarddata = array_merge($boarddata, $data);
             $boardid = $DB->insert_record('kanban_board', $boarddata);
-            $columnnames = [
+            $columns = [
                 get_string('todo', 'kanban') => '{}',
                 get_string('doing', 'kanban') => '{}',
                 get_string('done', 'kanban') => '{"autoclose": true}',
             ];
             $columnids = [];
-            foreach ($columnnames as $columnname => $options) {
+            foreach ($columns as $columnname => $options) {
                 $columnids[] = $DB->insert_record('kanban_column', [
                     'title' => $columnname,
                     'sequence' => '',
@@ -335,7 +335,7 @@ class boardmanager {
      * @param bool $updatecolumn Whether to update the column sequence (can be set to false, if column is going to be deleted)
      * @return void
      */
-    public function delete_cards(array $ids, bool $updatecolumn = true) {
+    public function delete_cards(array $ids, bool $updatecolumn = true): void {
         foreach ($ids as $id) {
             $this->delete_card($id, $updatecolumn);
         }
@@ -348,7 +348,7 @@ class boardmanager {
      * @param bool $updatecolumn Whether to update the column sequence (can be set to false, if column is going to be deleted)
      * @return void
      */
-    public function delete_card(int $cardid, bool $updatecolumn = true) {
+    public function delete_card(int $cardid, bool $updatecolumn = true): void {
         global $DB;
         $fs = get_file_storage();
         $DB->delete_records('kanban_discussion_comment', ['kanban_card' => $cardid]);
@@ -380,7 +380,7 @@ class boardmanager {
      * @param bool $updateboard Whether to update the board sequence (can be set to false, if board is going to be deleted)
      * @return void
      */
-    public function delete_column(int $id, bool $updateboard = true) {
+    public function delete_column(int $id, bool $updateboard = true): void {
         global $DB;
         $cardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_column = :id', ['id' => $id]);
         $this->delete_cards($cardids, false);
@@ -493,7 +493,7 @@ class boardmanager {
      * @param int $aftercol Id of the (future) column before (0 means to move at the leftmost position)
      * @return void
      */
-    public function move_column(int $columnid, int $aftercol) {
+    public function move_column(int $columnid, int $aftercol): void {
         global $DB;
         $column = $DB->get_record('kanban_column', ['id' => $columnid]);
         if (!$this->board->locked && !$column->locked) {
@@ -516,7 +516,7 @@ class boardmanager {
      * @param int $columnid Id of the column to move to (if 0, use current column)
      * @return void
      */
-    public function move_card(int $cardid, int $aftercard, int $columnid = 0) {
+    public function move_card(int $cardid, int $aftercard, int $columnid = 0): void {
         global $DB, $USER;
         $card = $this->get_card($cardid);
         if (empty($columnid)) {
@@ -594,7 +594,7 @@ class boardmanager {
      * @param int $userid Id of the user
      * @return void
      */
-    public function assign_user(int $cardid, int $userid) {
+    public function assign_user(int $cardid, int $userid): void {
         global $DB, $OUTPUT, $USER;
         $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'userid' => $userid]);
         $card = $this->get_card($cardid);
@@ -630,7 +630,7 @@ class boardmanager {
      * @param int $userid Id of the user
      * @return void
      */
-    public function unassign_user(int $cardid, int $userid) {
+    public function unassign_user(int $cardid, int $userid): void {
         global $DB, $USER;
         $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid, 'userid' => $userid]);
         $card = $this->get_card($cardid);
@@ -659,7 +659,7 @@ class boardmanager {
      * @param int $state State
      * @return void
      */
-    public function set_card_complete(int $cardid, int $state) {
+    public function set_card_complete(int $cardid, int $state): void {
         global $DB, $USER;
         $card = $this->get_card($cardid);
         $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
@@ -691,7 +691,7 @@ class boardmanager {
      * @param int $state State
      * @return void
      */
-    public function set_column_locked(int $columnid, int $state) {
+    public function set_column_locked(int $columnid, int $state): void {
         global $DB;
         $update = ['id' => $columnid, 'locked' => $state, 'timemodified' => time()];
         $DB->update_record('kanban_column', $update);
@@ -705,7 +705,7 @@ class boardmanager {
      * @param int $state State
      * @return void
      */
-    public function set_board_columns_locked(int $state) {
+    public function set_board_columns_locked(int $state): void {
         global $DB;
         $columns = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $this->board->id]);
         $update = ['id' => $this->board->id, 'locked' => $state, 'timemodified' => time()];
@@ -724,7 +724,7 @@ class boardmanager {
      * @param string $message Message
      * @return void
      */
-    public function add_discussion_message(int $cardid, string $message) {
+    public function add_discussion_message(int $cardid, string $message): void {
         global $DB, $USER;
         $card = $this->get_card($cardid);
         $update = ['kanban_card' => $cardid, 'content' => $message, 'userid' => $USER->id, 'timecreated' => time()];
@@ -754,7 +754,7 @@ class boardmanager {
      * @param int $cardid Id of the card
      * @return void
      */
-    public function delete_discussion_message(int $messageid, int $cardid) {
+    public function delete_discussion_message(int $messageid, int $cardid): void {
         global $DB;
         $card = $this->get_card($cardid);
         $update = ['id' => $messageid];
@@ -776,7 +776,7 @@ class boardmanager {
      * @param array $data Data to update
      * @return void
      */
-    public function update_card(int $cardid, array $data) {
+    public function update_card(int $cardid, array $data): void {
         global $DB, $OUTPUT;
         $context = context_module::instance($this->cmid);
         $cardkeys = [
@@ -896,7 +896,7 @@ class boardmanager {
      * @param array $data Data to update
      * @return void
      */
-    public function update_column(int $columnid, array $data) {
+    public function update_column(int $columnid, array $data): void {
         global $DB;
         $column = $this->get_column($columnid);
         $options = [
@@ -936,41 +936,41 @@ class boardmanager {
      * Get a card record.
      *
      * @param int $cardid Id of the card
-     * @return object
+     * @return stdClass
      */
-    public function get_card(int $cardid): object {
+    public function get_card(int $cardid): stdClass {
         global $DB;
-        return $DB->get_record('kanban_card', ['id' => $cardid]);
+        return $DB->get_record('kanban_card', ['id' => $cardid], '*', MUST_EXIST);
     }
 
     /**
      * Get a column record.
      *
      * @param int $columnid Id of the card
-     * @return object
+     * @return stdClass
      */
-    public function get_column(int $columnid): object {
+    public function get_column(int $columnid): stdClass {
         global $DB;
-        return $DB->get_record('kanban_column', ['id' => $columnid]);
+        return $DB->get_record('kanban_column', ['id' => $columnid], '*', MUST_EXIST);
     }
 
     /**
      * Get a discussion record.
      *
      * @param int $messageid Id of the message
-     * @return object
+     * @return stdClass
      */
-    public function get_discussion_message(int $messageid): object {
+    public function get_discussion_message(int $messageid): stdClass {
         global $DB;
-        return $DB->get_record('kanban_discussion_comment', ['id' => $messageid]);
+        return $DB->get_record('kanban_discussion_comment', ['id' => $messageid], '*', MUST_EXIST);
     }
 
     /**
      * Get cm_info object to current instance.
      *
-     * @return object
+     * @return cm_info
      */
-    public function get_cminfo(): object {
+    public function get_cminfo(): cm_info {
         return $this->cminfo;
     }
 
@@ -983,7 +983,7 @@ class boardmanager {
      * @param int $columnid Id of the column
      * @param int $cardid Id of the card
      */
-    public function write_history(string $action, int $type, array $data = [], int $columnid = 0, int $cardid = 0) {
+    public function write_history(string $action, int $type, array $data = [], int $columnid = 0, int $cardid = 0): void {
         global $DB, $USER;
 
         if (empty($this->kanban->history) || empty(get_config('mod_kanban', 'enablehistory'))) {
