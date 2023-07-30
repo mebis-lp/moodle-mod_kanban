@@ -945,7 +945,7 @@ class boardmanager {
      * of this card, it is replaced. History, assignees and discussion are not copied.
      * For now, only boards inside the same kanban are supported.
      *
-     * @param integer $cardid Id of the card to push
+     * @param int $cardid Id of the card to push
      * @param array $boardids Array of ids of the target boards
      * @return void
      */
