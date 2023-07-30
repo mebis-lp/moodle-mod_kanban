@@ -470,7 +470,7 @@ export default class extends KanbanComponent {
         // capability and is currently assigned to the card.
         if (state.capabilities.get('moveallcards').value ||
             (state.capabilities.get('moveassignedcards').value &&
-            state.cards.get(this.id).assignees.includes(state.common.userid))) {
+            state.cards.get(this.id).selfassigned)) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);
         } else {

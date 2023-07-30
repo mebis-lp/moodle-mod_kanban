@@ -32,7 +32,7 @@ export default class {
             heading: state.board.heading,
             groupselector: state.common.groupselector,
             userboards: state.common.userboards,
-            history: state.common.history,
+            history: state.common.history && state.capabilities.get('viewhistory').value,
             groupmode: state.common.groupmode,
             ismyuserboard: state.common.userid == state.board.userid,
             myuserid: state.common.userid,

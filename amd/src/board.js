@@ -57,7 +57,7 @@ export default class extends KanbanComponent {
             'click',
             this._addColumn
         );
-        if (state.capabilities.get('manageboard')) {
+        if (state.capabilities.get('manageboard').value == true) {
             this.addEventListener(
                 this.getElement(selectors.LOCKBOARDCOLUMNS),
                 'click',
