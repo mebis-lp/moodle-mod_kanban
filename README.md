@@ -35,6 +35,12 @@ While working with the board, it always fetches changes from the server to allow
 
 The plugin supports automatic completion by a certain amount of created and / or completed cards.
 
+## Requirements
+
+The plugin requires at least Moodle 4.1. Support for outdated Moodle versions will be dropped automatically - you will have to use a recent Moodle version, if you want to use the latest version of this plugin. 
+
+Javascript has to be enabled as the plugin uses the reactive components of Moodle. There is no replacement, if Javascript is disabled.
+
 ## Installing via uploaded ZIP file ##
 
 1. Log in to your Moodle site as an admin and go to _Site administration >
