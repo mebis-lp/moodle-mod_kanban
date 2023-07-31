@@ -33,6 +33,8 @@ You can also move a particular map to all maps (including the template) in the a
 
 While working with the board, it always fetches changes from the server to allow concurrent access (there is no locking mechanism, so race conditions may occur in some cases). Live update can be disabled on the server, and the pull interval can be changed (default is 10 seconds).
 
+The plugin supports automatic completion by a certain amount of created and / or completed cards.
+
 ## Installing via uploaded ZIP file ##
 
 1. Log in to your Moodle site as an admin and go to _Site administration >
