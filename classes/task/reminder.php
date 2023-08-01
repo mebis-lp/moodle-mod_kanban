@@ -53,14 +53,14 @@ class reminder extends \core\task\scheduled_task {
         $kanbancards = $DB->get_records_sql(
             'SELECT ' . $DB->sql_concat('c.id', '"-"', 'a.userid') . ' as uniqid,
                     c.id as id, c.title as title, k.name as boardname, c.duedate as duedate, a.userid as userid, k.id as instance
-             FROM {kanban_card} c
-             JOIN {kanban_assignee} a ON a.kanban_card = c.id
-             JOIN {kanban_board} b ON b.id = c.kanban_board
-             JOIN {kanban} k ON b.kanban_instance = k.id
-             WHERE c.duedate != 0
+               FROM {kanban_card} c
+         INNER JOIN {kanban_assignee} a ON a.kanban_card = c.id
+                AND c.duedate != 0
                 AND c.reminder_sent = 0
                 AND c.completed = 0
-                AND (c.duedate < now() OR (c.reminderdate !=0 AND c.reminderdate < now()))'
+                AND (c.duedate < now() OR (c.reminderdate != 0 AND c.reminderdate < now()))
+         INNER JOIN {kanban_board} b ON b.id = c.kanban_board
+         INNER JOIN {kanban} k ON b.kanban_instance = k.id'
         );
         foreach ($kanbancards as $kanbancard) {
             list($course, $cminfo) = get_course_and_cm_from_instance($kanbancard->instance, 'kanban');

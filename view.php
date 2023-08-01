@@ -32,6 +32,7 @@ use mod_kanban\helper;
 
 $id = required_param('id', PARAM_INT);
 $boardid = optional_param('boardid', 0, PARAM_INT);
+$userid = optional_param('user', 0, PARAM_INT);
 
 list ($course, $cm) = get_course_and_cm_from_cmid($id, 'kanban');
 
@@ -57,7 +58,6 @@ if (!empty($cm->groupmode)) {
     $groupid = groups_get_activity_group($cm, true);
 }
 
-$userid = optional_param('user', 0, PARAM_INT);
 if (
     $kanban->userboards == constants::MOD_KANBAN_USERBOARDS_ONLY &&
     empty($groupid) &&
@@ -93,7 +93,7 @@ if (empty($boardid)) {
         $boardid = $board->id;
     }
 } else {
-    $board = $DB->get_record('kanban_board', ['kanban_instance' => $kanban->id, 'id' => $boardid], '*');
+    $board = $DB->get_record('kanban_board', ['id' => $boardid, 'kanban_instance' => $kanban->id]);
     helper::check_permissions_for_user_or_group($board, $context, $cm, constants::MOD_KANBAN_VIEW);
 }
 

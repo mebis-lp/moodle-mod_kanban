@@ -43,8 +43,8 @@ class custom_completion extends \core_completion\activity_custom_completion {
                 $count = $DB->get_field_sql('
                     SELECT COUNT(DISTINCT c.id)
                     FROM {kanban_board} b
-                    INNER JOIN {kanban_card} c ON c.kanban_board = b.id
-                    WHERE b.kanban_instance = :kanbanid AND c.createdby = :userid',
+                    INNER JOIN {kanban_card} c ON b.kanban_instance = :kanbanid AND c.kanban_board = b.id
+                    WHERE c.createdby = :userid',
                     ['userid' => $this->userid, 'kanbanid' => $this->cm->instance]
                 );
                 return ($count >= $kanban->completioncreate ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE);
@@ -55,9 +55,9 @@ class custom_completion extends \core_completion\activity_custom_completion {
                 $count = $DB->get_field_sql('
                     SELECT COUNT(DISTINCT c.id)
                     FROM {kanban_board} b
-                    INNER JOIN {kanban_card} c ON c.kanban_board = b.id
+                    INNER JOIN {kanban_card} c ON b.kanban_instance = :kanbanid AND c.kanban_board = b.id AND c.completed != 0
                     INNER JOIN {kanban_assignee} a ON a.kanban_card = c.id
-                    WHERE b.kanban_instance = :kanbanid AND a.userid = :userid AND c.completed != 0',
+                    WHERE a.userid = :userid',
                     ['userid' => $this->userid, 'kanbanid' => $this->cm->instance]
                 );
                 return ($count >= $kanban->completioncomplete ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE);

@@ -59,11 +59,11 @@ class provider implements
         // Get contexts with assigned cards.
         $sql = "SELECT c.id
                   FROM {context} c
-                  JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                  JOIN {kanban_board} b ON b.kanban_instance = cm.instance
-                  JOIN {kanban_card} ca ON ca.kanban_board = b.id
-                  JOIN {kanban_assignee} a ON a.kanban_card = ca.id
+                  INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                  INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                  INNER JOIN {kanban_board} b ON b.kanban_instance = cm.instance
+                  INNER JOIN {kanban_card} ca ON ca.kanban_board = b.id
+                  INNER JOIN {kanban_assignee} a ON a.kanban_card = ca.id
                  WHERE a.userid = :userid
         ";
         $contextlist->add_from_sql($sql, $params);
@@ -71,9 +71,9 @@ class provider implements
         // Get contexts with private boards. This feature is not implemented yet.
         $sql = "SELECT c.id
                   FROM {context} c
-                  JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                  JOIN {kanban_board} b ON b.kanban_instance = cm.instance
+                  INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                  INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                  INNER JOIN {kanban_board} b ON b.kanban_instance = cm.instance
                  WHERE b.userid = :userid
         ";
         $contextlist->add_from_sql($sql, $params);
@@ -145,14 +145,13 @@ class provider implements
                        h.action AS columntitle
                        ca.title AS cardtitle,
                        h.timestamp
-                FROM {context} c
-                INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                INNER JOIN {kanban} k ON k.id = cm.instance
-                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
-                LEFT JOIN {kanban_history} h ON h.kanban_board = b.id
-                WHERE c.id {$contextsql} AND (h.userid = :userid OR h.affected_userid = :userid
-                ORDER BY h.timestamp";
+                  FROM {context} c
+            INNER JOIN {course_modules} cm ON c.id {$contextsql} AND cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
+            INNER JOIN {kanban_history} h ON h.kanban_board = b.id AND (h.userid = :userid OR h.affected_userid = :userid
+              ORDER BY h.timestamp";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
@@ -165,16 +164,15 @@ class provider implements
                        d.action AS columntitle
                        ca.title AS cardtitle,
                        h.timestamp
-                FROM {context} c
-                INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                INNER JOIN {kanban} k ON k.id = cm.instance
-                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
-                INNER JOIN {kanban_column} co ON co.kanban_board = b.id
-                LEFT JOIN {kanban_card} ca ON ca.kanban_column = co.id
-                LEFT JOIN {kanban_discussion} d ON d.kanban_card = ca.id
-                WHERE c.id {$contextsql} AND d.userid = :userid
-                ORDER BY d.timecreated";
+                  FROM {context} c
+            INNER JOIN {course_modules} cm ON c.id {$contextsql} AND cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id
+            INNER JOIN {kanban_column} co ON co.kanban_board = b.id
+            INNER JOIN {kanban_card} ca ON ca.kanban_column = co.id
+            INNER JOIN {kanban_discussion} d ON d.kanban_card = ca.id AND d.userid = :userid
+              ORDER BY d.timecreated";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
@@ -186,16 +184,15 @@ class provider implements
                        co.title AS columntitle
                        ca.title as cardtitle,
                        ca.timemodified
-                FROM {context} c
-                INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                INNER JOIN {kanban} k ON k.id = cm.instance
-                INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND k.userid = :userid
-                INNER JOIN {kanban_column} co ON co.kanban_board = b.id
-                LEFT JOIN {kanban_card} ca ON ca.kanban_column = co.id
-                LEFT JOIN {kanban_assignee} a ON a.kanban_card = ca.id AND a.userid = :userid
-                WHERE c.id {$contextsql}
-                ORDER BY cm.id";
+                  FROM {context} c
+            INNER JOIN {course_modules} cm ON c.id {$contextsql} AND cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON b.kanban_instance = k.id AND k.userid = :userid
+            INNER JOIN {kanban_column} co ON co.kanban_board = b.id
+             LEFT JOIN {kanban_card} ca ON ca.kanban_column = co.id
+             LEFT JOIN {kanban_assignee} a ON a.kanban_card = ca.id AND a.userid = :userid
+              ORDER BY cm.id";
 
         $params = ['modname' => 'kanban', 'contextlevel' => CONTEXT_MODULE, 'userid' => $userid] + $contextparams;
 
