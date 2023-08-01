@@ -33,6 +33,7 @@ use mod_kanban\helper;
 $id = required_param('id', PARAM_INT);
 $boardid = optional_param('boardid', 0, PARAM_INT);
 $userid = optional_param('user', 0, PARAM_INT);
+$group = optional_param('group', -1, PARAM_INT);
 
 list ($course, $cm) = get_course_and_cm_from_cmid($id, 'kanban');
 
@@ -54,8 +55,9 @@ echo $OUTPUT->header();
 $groupselector = '';
 $groupid = 0;
 
-if (!empty($cm->groupmode)) {
+if (!empty($cm->groupmode) && $group != 0) {
     $groupid = groups_get_activity_group($cm, true);
+
 }
 
 if (
