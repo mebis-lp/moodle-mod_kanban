@@ -358,6 +358,7 @@ class get_kanban_content extends external_api {
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
 
         $kanbanboard = helper::get_cached_board($boardid);
+        $groupid = $kanbanboard->groupid;
 
         $kanbanboard->heading = get_string('courseboard', 'mod_kanban');
         $groupselector = null;
