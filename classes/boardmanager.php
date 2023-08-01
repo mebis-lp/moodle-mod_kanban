@@ -1133,11 +1133,11 @@ class boardmanager {
     }
 
     /**
-     * Copy attachment files from one card to another.
+     * Copy attachment files from one card to another (works only inside the same kanban instance).
      *
-     * @param integer $contextid
-     * @param integer $cardid
-     * @param integer $newcardid
+     * @param int $contextid Context id of the instance
+     * @param int $cardid Card id (original)
+     * @param int $newcardid Card id (target)
      * @return void
      */
     public function copy_attachment_files(int $contextid, int $cardid, int $newcardid): void {
