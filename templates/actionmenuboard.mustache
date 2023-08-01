@@ -122,15 +122,21 @@
 {{/userboards}}
 {{#js}}
 {{#groupselector}}
-document.querySelector('#mod_kanban_change_group form').addEventListener('change', (e) => {
-    e.target.closest('form').submit();
-});
+let gs = document.querySelector('#mod_kanban_change_group form');
+if (gs) {
+    gs.addEventListener('change', (e) => {
+        e.target.closest('form').submit();
+    });
+}
 {{/groupselector}}
 {{#userboards}}
     {{#viewallboards}}
-document.querySelector('#mod_kanban_change_user form').addEventListener('change', (e) => {
-    e.target.closest('form').submit();
-});
+let us = document.querySelector('#mod_kanban_change_user form');
+if (us) {
+    us.addEventListener('change', (e) => {
+        e.target.closest('form').submit();
+    });
+}
     {{/viewallboards}}
 {{/userboards}}
 {{/js}}
