@@ -308,8 +308,8 @@ class helper {
      * @return stdClass board record
      */
     public static function get_cached_board(int $id): stdClass {
-        $cachekey = 'board-' . $id;
-        $cache = \cache::make('mod_kanban', 'board');
+        $cachekey = self::get_cache_key(constants::MOD_KANBAN_BOARD, $id);
+        $cache = \cache::make('mod_kanban', constants::MOD_KANBAN_TYPES[constants::MOD_KANBAN_BOARD]);
         $board = $cache->get($cachekey);
         if (!$board) {
             $board = self::update_cached_board($id);
@@ -326,8 +326,8 @@ class helper {
      */
     public static function update_cached_board(int $id): stdClass {
         global $DB;
-        $cachekey = 'board-' . $id;
-        $cache = \cache::make('mod_kanban', 'board');
+        $cachekey = self::get_cache_key(constants::MOD_KANBAN_BOARD, $id);
+        $cache = \cache::make('mod_kanban', constants::MOD_KANBAN_TYPES[constants::MOD_KANBAN_BOARD]);
         $board = $DB->get_record('kanban_board', ['id' => $id]);
         $cache->set($cachekey, serialize($board));
         return $board;
@@ -340,8 +340,8 @@ class helper {
      * @return int timestamp
      */
     public static function get_cached_timestamp(int $boardid, int $type): int {
-        $cachekey = constants::MOD_KANBAN_TYPES[$type] . '-' . $boardid;
-        $cache = \cache::make('mod_kanban', 'timestamp');
+        $cachekey = self::get_cache_key($type, $boardid);
+        $cache = self::get_timestamp_cache();
         $timestamp = $cache->get($cachekey);
         if (!$timestamp) {
             $timestamp = self::update_cached_timestamp($boardid, $type);
@@ -358,8 +358,8 @@ class helper {
      */
     public static function update_cached_timestamp(int $boardid, int $type, int $timestamp = 0): int {
         global $DB;
-        $cachekey = constants::MOD_KANBAN_TYPES[$type] . '-' . $boardid;
-        $cache = \cache::make('mod_kanban', 'timestamp');
+        $cachekey = self::get_cache_key($type, $boardid);
+        $cache = self::get_timestamp_cache();
         $timestamp = $DB->get_field_sql(
             'SELECT MAX(timemodified)
              FROM {kanban_' . constants::MOD_KANBAN_TYPES[$type] . '}
@@ -372,5 +372,25 @@ class helper {
         }
         $cache->set($cachekey, $timestamp);
         return $timestamp;
+    }
+
+    /**
+     * Returns the cache key for getting a timestamp from cache
+     *
+     * @param integer $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
+     * @param integer $boardid Id of the board
+     * @return string
+     */
+    public static function get_cache_key(int $type, int $boardid): string {
+        return constants::MOD_KANBAN_TYPES[$type] . '-' . $boardid;
+    }
+
+    /**
+     * Get the timestamp cache.
+     *
+     * @return cache_application
+     */
+    public static function get_timestamp_cache(): \cache_application {
+        return \cache::make('mod_kanban', 'timestamp');
     }
 }

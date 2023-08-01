@@ -143,9 +143,8 @@ class boardmanager {
         }
         if (!$result) {
             return 0;
-        } else {
-            return array_pop($result)->id;
         }
+        return array_pop($result)->id;
     }
 
     /**
@@ -1006,7 +1005,7 @@ class boardmanager {
     }
 
     /**
-     * Returns the ids of all users assignes to a card.
+     * Returns the ids of all users assignees to a card.
      *
      * @param int $cardid Id of the card
      * @return array Array of userids
@@ -1111,7 +1110,7 @@ class boardmanager {
         if (empty($users)) {
             $users = [$USER->id];
         }
-        if ($this->completion_enabled()) {
+        if ($this->custom_completion_enabled()) {
             $completion = new \completion_info($this->course);
             foreach ($users as $user) {
                 if (is_object($user)) {
@@ -1128,7 +1127,7 @@ class boardmanager {
      *
      * @return bool
      */
-    public function completion_enabled(): bool {
+    public function custom_completion_enabled(): bool {
         return !empty($this->kanban->completioncreate) || !empty($this->kanban->completioncomplete);
     }
 

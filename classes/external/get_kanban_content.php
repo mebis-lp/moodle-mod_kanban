@@ -57,11 +57,37 @@ use stdClass;
 class get_kanban_content extends external_api {
 
     /**
-     * Returns description of method parameters for the get_kanban_content webservice function.
+     * Returns description of method parameters for the execute webservice function.
      *
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_DEFAULT, 0),
+        ]);
+    }
+
+    /**
+     * Returns description of method parameters for the get_kanban_content_init webservice function.
+     *
+     * @return external_function_parameters
+     */
+    public static function get_kanban_content_init_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'timestamp' => new external_value(PARAM_INT, 'only get values modified after this timestamp', VALUE_DEFAULT, 0),
+        ]);
+    }
+
+    /**
+     * Returns description of method parameters for the get_kanban_content_update webservice function.
+     *
+     * @return external_function_parameters
+     */
+    public static function get_kanban_content_update_parameters(): external_function_parameters {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
