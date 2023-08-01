@@ -1,5 +1,5 @@
 import Reactive from 'mod_kanban/reactive';
-import KanbanParent from 'mod_kanban/kanban';
+import KanbanParent from 'mod_kanban/kanbanparent';
 import KanbanMutations from 'mod_kanban/mutations';
 
 const stateChangedEventName = 'mod_kanban:stateChanged';

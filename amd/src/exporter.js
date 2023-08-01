@@ -18,7 +18,8 @@ export default class {
         }
 
         let showactionmenu = state.common.userboards == 1 || state.common.groupselector != '' ||
-            state.capabilities.get('manageboards') || (state.common.userboards == 2 && state.capabilities.get('viewallboards'));
+            state.capabilities.get('manageboards').value ||
+            (state.common.userboards == 2 && state.capabilities.get('viewallboards').value);
 
         return Object.assign({
             cmid: state.common.id,
