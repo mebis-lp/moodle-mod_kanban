@@ -321,6 +321,7 @@ class boardmanager {
         // The rest of the elements is skipped in the update message.
         $this->load_board($id);
         $this->formatter->delete('board', ['id' => $id]);
+        helper::invalidate_cached_board($id);
     }
 
     /**

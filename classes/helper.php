@@ -334,6 +334,18 @@ class helper {
     }
 
     /**
+     * Remove board record from cache.
+     * @param int $id Id of the board
+     * @return void
+     */
+    public static function invalidate_cached_board(int $id): void {
+        global $DB;
+        $cachekey = self::get_cache_key(constants::MOD_KANBAN_BOARD, $id);
+        $cache = \cache::make('mod_kanban', constants::MOD_KANBAN_TYPES[constants::MOD_KANBAN_BOARD]);
+        $cache->delete($cachekey);
+    }
+
+    /**
      * Get the latest timestamp from cache (if it is not present in the cache, get it from db).
      * @param int $boardid Id of the board
      * @param int $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
