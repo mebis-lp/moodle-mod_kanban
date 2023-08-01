@@ -1015,6 +1015,7 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function delete_board(int $cmid, int $boardid): array {
+        global $USER;
         $params = self::validate_parameters(self::delete_board_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
@@ -1025,9 +1026,11 @@ class change_kanban_content extends external_api {
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
-        require_capability('mod/kanban:manageboard', $context);
-
         $boardmanager = new boardmanager($cmid, $boardid);
+
+        if ($boardmanager->get_board()->userid != $USER->id) {
+            require_capability('mod/kanban:manageboard', $context);
+        }
 
         helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 

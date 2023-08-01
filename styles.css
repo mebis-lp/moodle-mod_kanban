@@ -327,6 +327,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_board:not(.mod_kanban_hastemplate) .mod_kanban_show_template,
 .mod_kanban_board.mod_kanban_istemplate .mod_kanban_show_template,
 .mod_kanban_board.mod_kanban_istemplate .mod_kanban_delete_board,
+.mod_kanban_board:not(.mod_kanban_ismyuserboard, .mod_kanban_manageboard) .mod_kanban_delete_board,
 .mod_kanban_board.mod_kanban_iscourseboard:not(.mod_kanban_userboards_only) .mod_kanban_show_board,
 .mod_kanban_board:not(.mod_kanban_istemplate) .mod_kanban_delete_template,
 .mod_kanban_column.mod_kanban_locked_column .mod_kanban_lock_column,
