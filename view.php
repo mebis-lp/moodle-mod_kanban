@@ -57,7 +57,6 @@ $groupid = 0;
 
 if (!empty($cm->groupmode) && $group != 0) {
     $groupid = groups_get_activity_group($cm, true);
-
 }
 
 if (
