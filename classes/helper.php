@@ -389,8 +389,8 @@ class helper {
     /**
      * Returns the cache key for getting a timestamp from cache
      *
-     * @param integer $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
-     * @param integer $boardid Id of the board
+     * @param int $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
+     * @param int $boardid Id of the board
      * @return string
      */
     public static function get_cache_key(int $type, int $boardid): string {
