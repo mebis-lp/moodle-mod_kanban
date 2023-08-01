@@ -220,8 +220,8 @@ function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownl
  */
 function kanban_reset_course_form_definition(&$mform): void {
     $mform->addElement('header', 'kanbanactivityheader', get_string('modulenameplural', 'mod_kanban'));
-    $mform->addElement('advcheckbox', 'reset_kanban_personal', get_string('reset_kanban_personal', 'mod_kanban'));
-    $mform->addElement('advcheckbox', 'reset_kanban_group', get_string('reset_kanban_group', 'mod_kanban'));
+    $mform->addElement('advcheckbox', 'reset_kanban_personal', get_string('reset_personal', 'mod_kanban'));
+    $mform->addElement('advcheckbox', 'reset_kanban_group', get_string('reset_group', 'mod_kanban'));
     $mform->addElement('advcheckbox', 'reset_kanban', get_string('reset_kanban', 'mod_kanban'));
 
 }
