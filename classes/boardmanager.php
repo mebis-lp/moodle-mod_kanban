@@ -366,7 +366,9 @@ class boardmanager {
         $DB->delete_records('kanban_card', ['id' => $cardid]);
         helper::remove_calendar_event($this->kanban, (object) ['id' => $cardid]);
         $this->formatter->delete('cards', ['id' => $cardid]);
-        $this->write_history('deleted', constants::MOD_KANBAN_CARD, [], $card->kanban_column, $cardid);
+        // As long as history is only attached to cards, it will be deleted here.
+        // ToDo if this will be changed: Replace the following line with history writer (deletion of card).
+        $DB->delete_records('kanban_history', ['kanban_card' => $cardid]);
     }
 
     /**
