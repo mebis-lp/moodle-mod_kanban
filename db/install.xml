@@ -56,7 +56,7 @@
         <KEY NAME="board" TYPE="foreign" FIELDS="kanban_board" REFTABLE="kanban_board" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_board, timemodified"/>
+        <INDEX NAME="kanbcolu_kantim_ix" UNIQUE="false" FIELDS="kanban_board, timemodified"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="kanban_card" COMMENT="Cards">
@@ -86,7 +86,7 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_board, timemodified"/>
+        <INDEX NAME="kanbcard_kantim_ix" UNIQUE="false" FIELDS="kanban_board, timemodified"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="kanban_assignee" COMMENT="Users assigned to cards">
@@ -115,7 +115,7 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_card, timecreated"/>
+        <INDEX NAME="kanbdisccomm_kantim_ix" UNIQUE="false" FIELDS="kanban_card, timecreated"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="kanban_history" COMMENT="History of board items">
@@ -140,7 +140,7 @@
         <KEY NAME="affected_userid" TYPE="foreign" FIELDS="affected_userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_card, timestamp"/>
+        <INDEX NAME="kanbhist_kantim_ix" UNIQUE="false" FIELDS="kanban_card, timestamp"/>
       </INDEXES>
     </TABLE>
   </TABLES>
