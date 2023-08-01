@@ -89,11 +89,6 @@ export default class extends KanbanComponent {
                 this._deleteTemplateConfirm
             );
         }
-        this.addEventListener(
-            this.getElement(selectors.SHOWBOARD),
-            'click',
-            this._reload
-        );
         this.dragdrop = new DragDrop(this);
         if (state.common.liveupdate > 0) {
             this._continuousUpdate(state.common.liveupdate);
