@@ -242,7 +242,6 @@ class boardmanager {
             helper::update_cached_board($boardid);
             return $boardid;
         } else {
-            $fs = get_file_storage();
             $template = helper::get_cached_board($templateid);
 
             // If it is a site wide template, we need system context to copy files.
@@ -289,12 +288,7 @@ class boardmanager {
                 $newcard[$card->id]->id = $DB->insert_record('kanban_card', $newcard[$card->id]);
                 // Copy attachment files.
                 if ($context) {
-                    $attachments = $fs->get_area_files($context->id, 'mod_kanban', 'attachments', $card->id, 'filename', false);
-                    foreach ($attachments as $attachment) {
-                        $newfile = (array) $attachment;
-                        $newfile['itemid'] = $newcard[$card->id]->id;
-                        $fs->create_file_from_storedfile($newfile, $attachment);
-                    }
+                    $this->copy_attachment_files($context->id, $card->id, $newcard[$card->id]->id);
                 }
             }
 
@@ -967,6 +961,9 @@ class boardmanager {
         unset($card->discussion);
         $card->originalid = $cardid;
         $card->timemodified = time();
+
+        $context = context_module::instance($this->cmid, 'kanban');
+
         foreach ($boardids as $boardid) {
             if ($originalboard == $boardid) {
                 continue;
@@ -983,6 +980,7 @@ class boardmanager {
                     $newcard['kanban_board'] = $boardid;
                     $newcard['timecreated'] = time();
                     $newcard['id'] = $DB->insert_record('kanban_card', $newcard);
+                    $this->copy_attachment_files($context->id, $card->id, $newcard['id']);
                     $column = $DB->get_record('kanban_column', ['id' => $columnids[0]]);
                     $DB->update_record(
                         'kanban_column',
@@ -1000,6 +998,7 @@ class boardmanager {
             } else {
                 $newcard = array_merge((array)$existingcard, (array)$card);
                 $DB->update_record('kanban_card', $newcard);
+                $this->copy_attachment_files($context->id, $card->id, $newcard['id']);
                 $this->write_history('updated', constants::MOD_KANBAN_CARD, $newcard, $newcard['kanban_column']);
                 helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_CARD, $newcard['timemodified']);
             }
@@ -1131,5 +1130,23 @@ class boardmanager {
      */
     public function completion_enabled(): bool {
         return !empty($this->kanban->completioncreate) || !empty($this->kanban->completioncomplete);
+    }
+
+    /**
+     * Copy attachment files from one card to another.
+     *
+     * @param integer $contextid
+     * @param integer $cardid
+     * @param integer $newcardid
+     * @return void
+     */
+    public function copy_attachment_files(int $contextid, int $cardid, int $newcardid): void {
+        $fs = get_file_storage();
+        $attachments = $fs->get_area_files($contextid, 'mod_kanban', 'attachments', $cardid, 'filename', false);
+        foreach ($attachments as $attachment) {
+            $newfile = (array) $attachment;
+            $newfile['itemid'] = $newcardid;
+            $fs->create_file_from_storedfile($newfile, $attachment);
+        }
     }
 }
