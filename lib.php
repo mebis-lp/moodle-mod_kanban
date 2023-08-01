@@ -64,11 +64,10 @@ function kanban_update_instance($data) : int {
  * Deletes a kanban instance, all boards and all associated data (e.g. files)
  *
  * @param integer $id kanban record
- * @return void
+ * @return bool
  */
-function kanban_delete_instance($id): void {
+function kanban_delete_instance($id): bool {
     global $DB;
-    $transaction = $DB->start_delegated_transaction();
     $boards = $DB->get_fieldset_sql('SELECT id FROM {kanban_board} WHERE kanban_instance = :id', ['id' => $id]);
 
     foreach ($boards as $board) {
@@ -77,8 +76,7 @@ function kanban_delete_instance($id): void {
         $boardmanager->delete_board($board);
     }
 
-    $DB->delete_records('kanban', ['id' => $id]);
-    $transaction->allow_commit();
+    return $DB->delete_records('kanban', ['id' => $id]);
 }
 
 /**
