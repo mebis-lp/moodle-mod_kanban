@@ -58,6 +58,7 @@ $string['deletetemplate'] = 'Vorlage löschen';
 $string['deletetemplateconfirm'] = 'Möchten Sie diese Vorlage wirklich löschen?';
 $string['doing'] = 'In Arbeit';
 $string['done'] = 'Erledigt';
+$string['due'] = 'Fällig';
 $string['duedate'] = 'Fälligkeitsdatum';
 $string['editboard'] = 'Board bearbeiten';
 $string['editcard'] = 'Karte bearbeiten';

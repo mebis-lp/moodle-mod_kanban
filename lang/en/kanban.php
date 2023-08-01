@@ -58,6 +58,7 @@ $string['deletetemplate'] = 'Delete template';
 $string['deletetemplateconfirm'] = 'Are you sure you want to delete this template?';
 $string['doing'] = 'Doing';
 $string['done'] = 'Done';
+$string['due'] = 'Due';
 $string['duedate'] = 'Due date';
 $string['editboard'] = 'Edit board';
 $string['editcard'] = 'Edit card';

@@ -22,7 +22,8 @@
         "id": 4,
         "kanban_column": 1,
         "title": "Task",
-        "hasattachment": false
+        "hasattachment": false,
+        "duedate": 123456789
     }
 }}
 <div class="mod_kanban_description_modal modal fade" id="mod_kanban_description_modal_{{id}}" aria-hidden="true">
@@ -36,6 +37,10 @@
             </div>
             <div class="modal-body">
                 {{{description}}}
+                {{#duedate}}
+                    <br/>
+                    {{#str}} due, mod_kanban {{/str}}: {{#userdate}} {{duedate}}, {{#str}} strftimedate, core_langconfig {{/str}} {{/userdate}}
+                {{/duedate}}
             </div>
             <div class="modal-footer list-group">
                 {{#hasattachment}}

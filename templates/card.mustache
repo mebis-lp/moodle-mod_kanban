@@ -26,7 +26,8 @@
         "title": "Task",
         "hasassignees": false,
         "completed": true,
-        "canedit": true
+        "canedit": true,
+        "duedate": 123456778
     }
 }}
 <li style="{{#background}}background-color: {{background}}{{/background}}" class="mod_kanban_card card{{#completed}} mod_kanban_closed{{/completed}} {{^hasassignees}}mod_kanban_unassigned{{/hasassignees}} {{#hasdescription}}mod_kanban_hasdescription{{/hasdescription}} {{#hasattachment}}mod_kanban_hasattachment{{/hasattachment}} {{#hasdiscussion}}mod_kanban_hasdiscussion{{/hasdiscussion}} {{#selfassigned}}mod_kanban_selfassigned{{/selfassigned}} {{#discussion}}mod_kanban_hasdiscussion{{/discussion}} {{#canedit}}mod_kanban_canedit{{/canedit}}" id="mod_kanban_card-{{id}}" data-id="{{id}}" data-columnid="{{kanban_column}}">
@@ -43,7 +44,7 @@
             {{#pix}} t/check, core, {{#str}} completed, core {{/str}} {{/pix}}
         </div>
         {{>mod_kanban/actionmenucard}}
-        <div class="mod_kanban_duedate" data-date="{{duedate}}">
+        <div class="mod_kanban_duedate" data-date="{{duedate}}"{{#duedate}} title="{{#str}} due, mod_kanban {{/str}}: {{#userdate}} {{duedate}}, {{#str}} strftimedate, core_langconfig {{/str}} {{/userdate}}"{{/duedate}}>
         {{#duedate}}
             {{#userdate}} {{duedate}}, {{#str}} strftimedate, core_langconfig {{/str}} {{/userdate}}
         {{/duedate}}
