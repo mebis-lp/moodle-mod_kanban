@@ -219,7 +219,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
             $kanbancolumns = $DB->get_records('kanban_column', ['kanban_board' => $board->id]);
 
             foreach ($kanbancolumns as $column) {
-                if ($column->sequence = '') {
+                if ($column->sequence == '') {
                     continue;
                 }
                 $seqcard = explode(',', $column->sequence);
