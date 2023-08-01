@@ -79,16 +79,16 @@ export default class extends KanbanComponent {
                 this._showTemplate
             );
             this.addEventListener(
-                this.getElement(selectors.DELETEBOARD),
-                'click',
-                this._deleteConfirm
-            );
-            this.addEventListener(
                 this.getElement(selectors.DELETETEMPLATE),
                 'click',
                 this._deleteTemplateConfirm
             );
         }
+        this.addEventListener(
+            this.getElement(selectors.DELETEBOARD),
+            'click',
+            this._deleteConfirm
+        );
         this.dragdrop = new DragDrop(this);
         if (state.common.liveupdate > 0) {
             this._continuousUpdate(state.common.liveupdate);
@@ -112,7 +112,9 @@ export default class extends KanbanComponent {
      * Reload current page.
      */
     _reload() {
-        window.location.replace(M.cfg.wwwroot + '/mod/kanban/view.php?id=' + this.reactive.state.common.id);
+        window.location.replace(
+            M.cfg.wwwroot + '/mod/kanban/view.php?id=' + this.reactive.state.common.id +
+            '&userid=' + this.reactive.state.common.userid);
     }
 
     /**
