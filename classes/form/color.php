@@ -28,7 +28,10 @@ require_once('HTML/QuickForm/input.php');
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class MoodleQuickForm_color extends MoodleQuickForm_text {
+class MoodleQuickForm_color extends HTML_QuickForm_text implements templatable {
+    use templatable_form_element {
+        export_for_template as export_for_template_base;
+    }
     /**
      * Constructor
      *
@@ -39,6 +42,19 @@ class MoodleQuickForm_color extends MoodleQuickForm_text {
      */
     public function __construct($name = null, $label = null, $attributes = null) {
         parent::__construct($name, $label, $attributes);
-        $this->setType('color');
+        $this->setType('static');
+    }
+
+    /**
+     * Export for template
+     *
+     * @param renderer_base $output
+     * @return void
+     */
+    public function export_for_template(renderer_base $output) {
+        $context = $this->export_for_template_base($output);
+        $context['html'] = $output->render_from_template('mod_kanban/color-input', ['element' => $context]);
+        $context['staticlabel'] = false;
+        return $context;
     }
 }

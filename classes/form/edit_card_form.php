@@ -82,7 +82,7 @@ class edit_card_form extends dynamic_form {
 
         $mform->addElement('filemanager', 'attachments', get_string('attachments', 'kanban'));
 
-        $mform->addElement('color', 'color', get_string('color', 'mod_kanban'));
+        $mform->addElement('color', 'color', get_string('color', 'mod_kanban'), ['size' => 5]);
         $mform->setType('color', PARAM_TEXT);
         $mform->setDefault('color', '#ffffff');
     }
