@@ -303,9 +303,7 @@ function kanban_reset_userdata($data) {
 function kanban_get_coursemodule_info(stdClass $cm): cached_cm_info {
     global $DB;
 
-    if (!$kanban = $DB->get_record('kanban', ['id' => $cm->instance])) {
-        return false;
-    }
+    $kanban = $DB->get_record('kanban', ['id' => $cm->instance], '*', MUST_EXIST);
 
     $result = new cached_cm_info();
     $result->name = $kanban->name;
