@@ -40,7 +40,7 @@
         <KEY NAME="groupid" TYPE="foreign" FIELDS="groupid" REFTABLE="groups" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="kanban_column" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="kanban_column" COMMENT="Columns">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kanban_board" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -56,10 +56,10 @@
         <KEY NAME="board" TYPE="foreign" FIELDS="kanban_board" REFTABLE="kanban_board" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timemodified"/>
+        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_board, timemodified"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="kanban_card" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="kanban_card" COMMENT="Cards">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
@@ -86,10 +86,10 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timemodified"/>
+        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_board, timemodified"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="kanban_assignee" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="kanban_assignee" COMMENT="Users assigned to cards">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kanban_card" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -101,7 +101,7 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="kanban_discussion_comment" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="kanban_discussion_comment" COMMENT="Discussion comments for cards">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="kanban_card" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -115,10 +115,10 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="timemodified" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_card, timecreated"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="kanban_history" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="kanban_history" COMMENT="History of board items">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -139,6 +139,9 @@
         <KEY NAME="card" TYPE="foreign" FIELDS="kanban_card" REFTABLE="kanban_card" REFFIELDS="id"/>
         <KEY NAME="affected_userid" TYPE="foreign" FIELDS="affected_userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="default_index" UNIQUE="false" FIELDS="kanban_card, timestamp"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
