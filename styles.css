@@ -270,7 +270,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_main.row {
     overflow-y: visible;
     overflow-x: auto;
-    padding-bottom: 150px;
+    padding-bottom: 200px;
 }
 
 .mod_kanban_discussion_input {
@@ -361,10 +361,6 @@ a.mod_kanban_attachment_item {
 
 .mod_kanban_updated {
     animation: glow 3s 1 ease-out;
-}
-
-.mod_kanban_board {
-    margin-bottom: 200px;
 }
 
 .col.mod_kanban_heading {
