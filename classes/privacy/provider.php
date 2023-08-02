@@ -22,15 +22,16 @@
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_kanban\privacy;
 
-use \core_privacy\local\request\approved_contextlist;
-use \core_privacy\local\request\contextlist;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use stdClass;
-use core_privacy\local\request\userlist;
-use core_privacy\local\request\approved_userlist;
 
 /**
  * Privacy provider for mod_kanban.
@@ -127,7 +128,7 @@ class provider implements
     /**
      * Get the list of users who have data within a context.
      *
-     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
@@ -137,8 +138,8 @@ class provider implements
         }
 
         $params = [
-            'cmid'      => $context->instanceid,
-            'modname'   => 'kanban',
+            'cmid' => $context->instanceid,
+            'modname' => 'kanban',
         ];
 
         // Personal boards.
@@ -212,16 +213,16 @@ class provider implements
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
-     * @param   int         $userid     The user to search.
+     * @param int $userid The user to search.
      * @return  contextlist   $contextlist  The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
 
         $params = [
-            'modname'       => 'forum',
-            'contextlevel'  => CONTEXT_MODULE,
-            'userid'        => $userid,
+            'modname' => 'forum',
+            'contextlevel' => CONTEXT_MODULE,
+            'userid' => $userid,
         ];
 
         // Get contexts with assigned cards.
@@ -252,7 +253,7 @@ class provider implements
     /**
      * Export all user data for the specified user, in the specified contexts.
      *
-     * @param   approved_contextlist    $contextlist    The approved contexts to export information for.
+     * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
@@ -383,7 +384,7 @@ class provider implements
                 if (!empty($data)) {
                     $context = \context_module::instance($lastcmid);
                     $contextdata = helper::get_context_data($context, $user);
-                    $contextdata = (object)array_merge((array)$contextdata, $data);
+                    $contextdata = (object) array_merge((array) $contextdata, $data);
                     writer::with_context($context)->export_data([], $contextdata);
                     helper::export_context_files($context, $user);
                 }
@@ -401,7 +402,7 @@ class provider implements
         if (!empty($data)) {
             $context = \context_module::instance($lastcmid);
             $contextdata = helper::get_context_data($context, $user);
-            $contextdata = (object)array_merge((array)$contextdata, $data);
+            $contextdata = (object) array_merge((array) $contextdata, $data);
             writer::with_context($context)->export_data([], $contextdata);
             helper::export_context_files($context, $user);
         }
@@ -410,7 +411,7 @@ class provider implements
     /**
      * Delete all data for all users in the specified context.
      *
-     * @param   context                 $context   The specific context to delete data for.
+     * @param context $context The specific context to delete data for.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
@@ -456,7 +457,7 @@ class provider implements
     /**
      * Delete all user data for the specified user, in the specified contexts.
      *
-     * @param   approved_contextlist    $contextlist    The approved contexts and user information to delete information for.
+     * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;

@@ -40,11 +40,11 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_kanban\constants;
+use mod_kanban\helper;
+use mod_kanban\updateformatter;
 use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
-use mod_kanban\updateformatter;
-use mod_kanban\helper;
 use stdClass;
 
 /**

@@ -2,8 +2,8 @@ import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
-import {get_string as getString} from 'core/str';
 import * as Str from 'core/str';
+import {get_string as getString} from 'core/str';
 import ModalForm from 'core_form/modalform';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 import Log from "core/log";
@@ -268,15 +268,15 @@ export default class extends KanbanComponent {
             let sequence = element.sequence.split(',');
             // Remove all cards from frontend that are no longer present in the database.
             [...el.children]
-            .forEach((node) => {
-                if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
-                    el.removeChild(node);
-                }
-            });
+                .forEach((node) => {
+                    if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
+                        el.removeChild(node);
+                    }
+                });
             // Reorder cards according to sequence from the database.
             [...el.children]
-            .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
-            .forEach(node => el.appendChild(node));
+                .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
+                .forEach(node => el.appendChild(node));
         }
         if (element.locked !== undefined) {
             this.toggleClass(element.locked != 0, 'mod_kanban_locked_column');

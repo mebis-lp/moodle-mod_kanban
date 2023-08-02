@@ -977,7 +977,7 @@ class boardmanager {
                     continue;
                 } else {
                     $columnids = explode(',', $sequence, 2);
-                    $newcard = (array)$card;
+                    $newcard = (array) $card;
                     $newcard['kanban_column'] = $columnids[0];
                     $newcard['kanban_board'] = $boardid;
                     $newcard['timecreated'] = time();
@@ -998,7 +998,7 @@ class boardmanager {
                     helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_COLUMN, $newcard['timemodified']);
                 }
             } else {
-                $newcard = array_merge((array)$existingcard, (array)$card);
+                $newcard = array_merge((array) $existingcard, (array) $card);
                 $DB->update_record('kanban_card', $newcard);
                 $this->copy_attachment_files($context->id, $card->id, $newcard['id']);
                 $this->write_history('updated', constants::MOD_KANBAN_CARD, $newcard, $newcard['kanban_column']);

@@ -37,10 +37,10 @@ use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 use mod_kanban\boardmanager;
+use mod_kanban\helper;
 use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
-use \mod_kanban\helper;
 
 /**
  * Class for modifying kanban content.
@@ -523,7 +523,6 @@ class change_kanban_content extends external_api {
             'update' => $boardmanager->get_formatted_updates()
         ];
     }
-
 
     /**
      * Returns description of method parameters for the unassign_user function.

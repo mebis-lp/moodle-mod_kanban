@@ -16,12 +16,12 @@
 
 namespace mod_kanban\form;
 
-use core_form\dynamic_form;
-use moodle_url;
 use context;
 use context_module;
+use core_form\dynamic_form;
 use mod_kanban\boardmanager;
 use mod_kanban\helper;
+use moodle_url;
 
 /**
  * From for editing a card.
@@ -148,7 +148,7 @@ class edit_card_form extends dynamic_form {
 
         $boardmanager = new boardmanager($cmid, $boardid);
 
-        $boardmanager->update_card($formdata->id, (array)$formdata);
+        $boardmanager->update_card($formdata->id, (array) $formdata);
 
         return [
             'update' => $boardmanager->get_formatted_updates()

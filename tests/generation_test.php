@@ -31,7 +31,7 @@ class generation_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_create_instance() : void {
+    public function test_create_instance(): void {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();

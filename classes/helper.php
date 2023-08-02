@@ -22,6 +22,7 @@
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_kanban;
 
 use calendar_event;
@@ -38,6 +39,7 @@ use stdClass;
 class helper {
     /**
      * Adds an item to a string sequence of integer values, divided by commas.
+     *
      * @param string $sequence The original sequence
      * @param int $afteritem The item to add after
      * @param int $newitem The item to add
@@ -60,8 +62,10 @@ class helper {
         }
         return join(',', $seq);
     }
+
     /**
      * Removes an item from a string sequence of integer values, divided by commas.
+     *
      * @param string $sequence The original sequence
      * @param int $item The item to remove
      * @return string The new sequence
@@ -79,8 +83,10 @@ class helper {
 
         return join(',', $seq);
     }
+
     /**
      * Moves an item inside a string sequence of integer values, divided by commas.
+     *
      * @param string $sequence The original sequence
      * @param int $afteritem The item to move after
      * @param int $item The item to move
@@ -90,8 +96,10 @@ class helper {
         $seq = self::sequence_remove($sequence, $item);
         return self::sequence_add_after($seq, $afteritem, $item);
     }
+
     /**
      * Replaces items in a string sequence of integer values, divided by commas.
+     *
      * @param string $sequence The original sequence
      * @param array $replace An array of $key => $value replacing rules ($key is replaced by $value or $value->id if $value is an
      *                      object)
@@ -140,7 +148,7 @@ class helper {
             }
             if (!empty($board->groupid)) {
                 $members = groups_get_members($board->groupid, 'u.id');
-                $members = array_map(function ($v) {
+                $members = array_map(function($v) {
                     return intval($v->id);
                 }, $members);
                 $ismember = in_array($USER->id, $members);
@@ -240,6 +248,7 @@ class helper {
 
     /**
      * Adds or updates a calendar event.
+     *
      * @param stdClass $kanban The kanban record from the database
      * @param stdClass $card The card record from the database
      * @param array $users The usersthat should have the event in their calendar
@@ -284,6 +293,7 @@ class helper {
 
     /**
      * Removes a calendar event.
+     *
      * @param stdClass $kanban The kanban record from the database
      * @param stdClass $card The card record from the database
      * @param array $users The users that should have the event deleted from their calendar. If empty, all events of this
@@ -304,6 +314,7 @@ class helper {
 
     /**
      * Get the board record from cache (if it is not present in the cache, get it from db).
+     *
      * @param int $id Id of the board
      * @return stdClass board record
      */
@@ -321,6 +332,7 @@ class helper {
 
     /**
      * Update the board record in cache from db.
+     *
      * @param int $id Id of the board
      * @return stdClass The updated board record
      */
@@ -335,6 +347,7 @@ class helper {
 
     /**
      * Remove board record from cache.
+     *
      * @param int $id Id of the board
      * @return void
      */
@@ -347,6 +360,7 @@ class helper {
 
     /**
      * Get the latest timestamp from cache (if it is not present in the cache, get it from db).
+     *
      * @param int $boardid Id of the board
      * @param int $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
      * @return int timestamp
@@ -363,6 +377,7 @@ class helper {
 
     /**
      * Update the timestamp in cache from db or from parameter.
+     *
      * @param int $boardid Id of the board
      * @param int $type One of constants::MOD_KANBAN_COLUMN, constants::MOD_KANBAN_CARD
      * @param int $timestamp Timestamp to set
@@ -376,7 +391,7 @@ class helper {
             'SELECT MAX(timemodified)
              FROM {kanban_' . constants::MOD_KANBAN_TYPES[$type] . '}
              WHERE kanban_board = :id',
-             ['id' => $boardid]
+            ['id' => $boardid]
         );
         if (is_null($timestamp)) {
             // There might be no records yet.

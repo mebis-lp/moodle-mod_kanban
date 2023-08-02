@@ -1,4 +1,5 @@
 import Ajax from 'core/ajax';
+
 /**
  * Mutations library for mod_kanban.
  * The functions are just used to forward data to the webservice.

@@ -39,7 +39,7 @@ MoodleQuickForm::registerElementType('color', $CFG->dirroot . '/mod/kanban/class
  * @param stdClass $data kanban record
  * @return int
  */
-function kanban_add_instance($data) : int {
+function kanban_add_instance($data): int {
     global $DB;
     $kanbanid = $DB->insert_record("kanban", $data);
     $boardmanager = new boardmanager();
@@ -54,7 +54,7 @@ function kanban_add_instance($data) : int {
  * @param stdClass $data kanban record
  * @return int
  */
-function kanban_update_instance($data) : int {
+function kanban_update_instance($data): int {
     global $DB;
     $data->id = $data->instance;
     return $DB->update_record("kanban", $data);
@@ -81,18 +81,19 @@ function kanban_delete_instance($id): bool {
 
 /**
  * Returns whether a feature is supported by this module.
- * @uses FEATURE_IDNUMBER
- * @uses FEATURE_GROUPS
+ *
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  * @uses FEATURE_GROUPINGS
  * @uses FEATURE_MOD_INTRO
  * @uses FEATURE_COMPLETION_TRACKS_VIEWS
  * @uses FEATURE_GRADE_HAS_GRADE
  * @uses FEATURE_GRADE_OUTCOMES
- * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
+ * @uses FEATURE_IDNUMBER
+ * @uses FEATURE_GROUPS
  */
 function kanban_supports($feature) {
-    switch($feature) {
+    switch ($feature) {
         case FEATURE_IDNUMBER:
             return true;
         case FEATURE_GROUPS:
@@ -131,7 +132,7 @@ function kanban_supports($feature) {
  */
 function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
     global $CFG, $USER;
-    require_once($CFG->libdir. '/externallib.php');
+    require_once($CFG->libdir . '/externallib.php');
     $boardmanager = new boardmanager();
 
     if ($itemtype == 'card') {
@@ -183,7 +184,7 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - justsend the file
  */
-function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=[]) : ?bool {
+function kanban_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []): ?bool {
     global $DB;
     require_course_login($course, true, $cm);
 

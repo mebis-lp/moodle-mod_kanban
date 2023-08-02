@@ -75,7 +75,7 @@ if (empty($boardid)) {
     $board = $DB->get_record(
         'kanban_board',
         ['kanban_instance' => $kanban->id, 'userid' => $userid, 'groupid' => $groupid, 'template' => 0],
-         '*'
+        '*'
     );
     if (!$board) {
         $boardmanager = new boardmanager($cm->id);

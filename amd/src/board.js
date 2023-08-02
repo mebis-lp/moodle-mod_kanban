@@ -229,15 +229,15 @@ export default class extends KanbanComponent {
             let sequence = element.sequence.split(',');
             // Remove all columns from frontend that are no longer present in the database.
             [...colcontainer.children]
-            .forEach((node) => {
-                if (node.classList.contains('mod_kanban_column') && !sequence.includes(node.dataset.id)) {
-                    colcontainer.removeChild(node);
-                }
-            });
+                .forEach((node) => {
+                    if (node.classList.contains('mod_kanban_column') && !sequence.includes(node.dataset.id)) {
+                        colcontainer.removeChild(node);
+                    }
+                });
             // Reorder columns according to sequence from the database.
             [...colcontainer.children]
-            .sort((a, b)=>sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
-            .forEach(node=>colcontainer.appendChild(node));
+                .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
+                .forEach(node => colcontainer.appendChild(node));
         }
         // Set CSS classes to show/hide action menu items.
         this.toggleClass(element.locked, 'mod_kanban_board_locked_columns');

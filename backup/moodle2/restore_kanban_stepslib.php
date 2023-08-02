@@ -26,10 +26,11 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * List of elements that can be restored
+     *
      * @return array
      * @throws base_step_exception
      */
-    protected function define_structure() : array {
+    protected function define_structure(): array {
         $paths = [];
         $paths[] = new restore_path_element('kanban', '/activity/kanban');
         $userinfo = $this->get_setting_value('userinfo');
@@ -55,12 +56,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore a kanban record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_kanban($data) : void {
+    protected function process_kanban($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -74,12 +76,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore a board record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_board($data) : void {
+    protected function process_board($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -95,12 +98,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore a column record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_column($data) : void {
+    protected function process_column($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -114,12 +118,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore a card record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_card($data) : void {
+    protected function process_card($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -140,12 +145,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore an assignes record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_assignee($data) : void {
+    protected function process_assignee($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -158,12 +164,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore an historyitem record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_historyitem($data) : void {
+    protected function process_historyitem($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -179,12 +186,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
     /**
      * Restore an discussion record.
+     *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_discussion($data) : void {
+    protected function process_discussion($data): void {
         global $DB;
 
         $data = (object) $data;
@@ -198,7 +206,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
     /**
      * Extra actions to take once restore is complete.
      */
-    protected function after_execute() : void {
+    protected function after_execute(): void {
         global $DB;
         $this->add_related_files('mod_kanban', 'intro', null);
         $this->add_related_files('mod_kanban', 'attachments', 'kanban_card_id');

@@ -16,12 +16,12 @@
 
 namespace mod_kanban\form;
 
-use core_form\dynamic_form;
-use moodle_url;
 use context;
 use context_module;
+use core_form\dynamic_form;
 use mod_kanban\boardmanager;
 use mod_kanban\helper;
+use moodle_url;
 
 /**
  * From for editing a column.
@@ -104,7 +104,7 @@ class edit_column_form extends dynamic_form {
 
         helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
 
-        $boardmanager->update_column($formdata->id, (array)$formdata);
+        $boardmanager->update_column($formdata->id, (array) $formdata);
 
         return [
             'update' => $boardmanager->get_formatted_updates()

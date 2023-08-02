@@ -1,11 +1,10 @@
 import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
-import {saveCancel} from 'core/notification';
+import {exception as displayException, saveCancel} from 'core/notification';
 import ModalForm from 'core_form/modalform';
-import {get_string as getString} from 'core/str';
 import * as Str from 'core/str';
-import {exception as displayException} from 'core/notification';
+import {get_string as getString} from 'core/str';
 import Templates from 'core/templates';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 import Log from 'core/log';
@@ -506,7 +505,7 @@ export default class extends KanbanComponent {
         // capability and is currently assigned to the card.
         if (state.capabilities.get('moveallcards').value ||
             (state.capabilities.get('moveassignedcards').value &&
-            state.cards.get(this.id).selfassigned)) {
+                state.cards.get(this.id).selfassigned)) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);
         } else {

@@ -31,13 +31,13 @@ class backup_kanban_activity_task extends backup_activity_task {
     /**
      * No specific settings for this activity
      */
-    protected function define_my_settings() : void {
+    protected function define_my_settings(): void {
     }
 
     /**
      * Defines a backup step to store the instance data in the kanban.xml file
      */
-    protected function define_my_steps() : void {
+    protected function define_my_steps(): void {
         $this->add_step(new backup_kanban_activity_structure_step('kanban_structure', 'kanban.xml'));
     }
 
@@ -47,12 +47,12 @@ class backup_kanban_activity_task extends backup_activity_task {
      * @param string $content
      * @return string
      */
-    public static function encode_content_links($content) : string {
+    public static function encode_content_links($content): string {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/kanban', '#');
+        $base = preg_quote($CFG->wwwroot . '/mod/kanban', '#');
 
-        $pattern = "#(".$base."\/view.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/view.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@KANBANVIEWBYID*$2@$', $content);
         return $content;
     }

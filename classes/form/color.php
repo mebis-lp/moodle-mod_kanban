@@ -32,6 +32,7 @@ class MoodleQuickForm_color extends HTML_QuickForm_text implements templatable {
     use templatable_form_element {
         export_for_template as export_for_template_base;
     }
+
     /**
      * Constructor
      *

@@ -27,17 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext(
-        'mod_kanban/liveupdatetime',
-        get_string('liveupdatetime', 'kanban'),
-        get_string('liveupdatetimedescription', 'kanban'),
-        10,
-        PARAM_INT)
+            'mod_kanban/liveupdatetime',
+            get_string('liveupdatetime', 'kanban'),
+            get_string('liveupdatetimedescription', 'kanban'),
+            10,
+            PARAM_INT)
     );
     $settings->add(new admin_setting_configcheckbox(
-        'mod_kanban/enablehistory',
-        get_string('enablehistory', 'kanban'),
-        get_string('enablehistorydescription', 'kanban'),
-        true,
-        PARAM_BOOL)
+            'mod_kanban/enablehistory',
+            get_string('enablehistory', 'kanban'),
+            get_string('enablehistorydescription', 'kanban'),
+            true,
+            PARAM_BOOL)
     );
 }

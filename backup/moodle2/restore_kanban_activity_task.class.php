@@ -33,7 +33,7 @@ class restore_kanban_activity_task extends restore_activity_task {
      *
      * @return void
      */
-    protected function define_my_settings() : void {
+    protected function define_my_settings(): void {
     }
 
     /**
@@ -41,7 +41,7 @@ class restore_kanban_activity_task extends restore_activity_task {
      *
      * @return void
      */
-    protected function define_my_steps() : void {
+    protected function define_my_steps(): void {
         $this->add_step(new restore_kanban_activity_structure_step('kanban_structure', 'kanban.xml'));
     }
 
@@ -50,7 +50,7 @@ class restore_kanban_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    public static function define_decode_contents() : array {
+    public static function define_decode_contents(): array {
         $contents = [];
         $contents[] = new restore_decode_content('kanban', ['intro'], 'kanban');
         return $contents;
@@ -61,7 +61,7 @@ class restore_kanban_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    public static function define_decode_rules() : array {
+    public static function define_decode_rules(): array {
         $rules = [];
         $rules[] = new restore_decode_rule('KANBANVIEWBYID', '/mod/kanban/view.php?id=$1', 'course_module');
         return $rules;

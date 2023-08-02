@@ -28,7 +28,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
      *
      * @return backup_nested_element
      */
-    protected function define_structure() : backup_nested_element {
+    protected function define_structure(): backup_nested_element {
         $userinfo = $this->get_setting_value('userinfo');
 
         $kanban = new backup_nested_element(
@@ -144,7 +144,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             SELECT *
               FROM {kanban_board}
              WHERE kanban_instance = ? AND userid = 0 AND groupid = 0 AND template = 1',
-            [backup::VAR_PARENTID]);
+                [backup::VAR_PARENTID]);
         }
         $column->set_source_table('kanban_column', ['kanban_board' => backup::VAR_PARENTID]);
         $card->set_source_table('kanban_card', ['kanban_column' => backup::VAR_PARENTID]);

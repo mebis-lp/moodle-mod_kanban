@@ -34,7 +34,7 @@ class mod_kanban_mod_form extends moodleform_mod {
      *
      * @return void
      */
-    public function definition() : void {
+    public function definition(): void {
         $mform = $this->_form;
 
         $mform->addElement('header', 'generalhdr', get_string('general'));
@@ -68,7 +68,7 @@ class mod_kanban_mod_form extends moodleform_mod {
      * @param array $data form data
      * @return bool
      */
-    public function completion_rule_enabled($data) : bool {
+    public function completion_rule_enabled($data): bool {
         return (!empty($data['completioncreate']) || !empty($data['completioncomplete']));
     }
 
@@ -77,7 +77,7 @@ class mod_kanban_mod_form extends moodleform_mod {
      *
      * @return array
      */
-    public function add_completion_rules() : array {
+    public function add_completion_rules(): array {
         $mform = $this->_form;
 
         $mform->addElement(
@@ -96,6 +96,6 @@ class mod_kanban_mod_form extends moodleform_mod {
         );
         $mform->setType('completioncomplete', PARAM_INT);
 
-        return(['completioncreate', 'completioncomplete']);
+        return (['completioncreate', 'completioncomplete']);
     }
 }

@@ -31,13 +31,13 @@ class mod_kanban_generator extends testing_module_generator {
      * @param array|null $options
      * @return stdClass kanban instance
      */
-    public function create_instance($record = null, array $options = null) : stdClass {
-        $record = (array)$record + [
-            'name' => 'test kanban',
-            'intro' => '',
-            'introformat' => 1,
-        ];
+    public function create_instance($record = null, array $options = null): stdClass {
+        $record = (array) $record + [
+                'name' => 'test kanban',
+                'intro' => '',
+                'introformat' => 1,
+            ];
 
-        return parent::create_instance($record, (array)$options);
+        return parent::create_instance($record, (array) $options);
     }
 }
