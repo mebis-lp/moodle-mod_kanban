@@ -1,0 +1,30 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_kanban/addcolumn
+
+    Template for the whole kanban board.
+
+    Example context (json):
+    {
+        "id": 17,
+        "managecolumns": false
+    }
+}}
+<div class="mod_kanban_addcolumn_container col">
+    <button class="mod_kanban_addcolumn btn btn-icon icon-no-margin p-0{{^managecolumns}} hidden{{/managecolumns}}" id="mod_kanban_addcolumn_{{id}}" data-action="add_column"{{#id}} data-id="{{id}}"{{/id}}>{{#pix}} t/add, core, {{#str}} addcolumn, mod_kanban {{/str}} {{/pix}}</button>
+</div>

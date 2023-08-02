@@ -1,0 +1,392 @@
+.mod_kanban_column_container.row {
+    flex-wrap: nowrap;
+}
+
+.mod_kanban_board * {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mod_kanban_addcard_container.row {
+    position: absolute;
+    z-index: 2;
+    height: 10px;
+    width: 100%;
+    border-radius: .5rem;
+    margin: 0;
+}
+
+.mod_kanban_addcard_container.row * {
+    opacity: 0;
+    background-color: inherit;
+}
+
+.mod_kanban_addcard.btn,
+.mod_kanban_addcolumn.btn {
+    position: absolute;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.mod_kanban_addcard.btn {
+    top: 50%;
+}
+
+.mod_kanban_addcolumn.btn {
+    top: 30px;
+}
+
+.mod_kanban_addcard_container:hover,
+.mod_kanban_addcard_container:focus,
+.mod_kanban_addcard_container:focus-within,
+.dragover > .mod_kanban_addcard_container,
+.mod_kanban_addcard_container.mod_kanban_insert,
+.mod_kanban_addcolumn_container:hover,
+.mod_kanban_addcolumn_container:focus,
+.mod_kanban_addcolumn_container:focus-within,
+.mod_kanban_addcolumn_container.mod_kanban_insert {
+    background-color: darkgray;
+}
+
+.mod_kanban_card:hover,
+.mod_kanban_card:focus {
+    box-shadow: 0 0 3px;
+}
+
+.mod_kanban_addcolumn_container.col:not(:first-child) {
+    right: -10px;
+}
+
+.mod_kanban_addcolumn_container.col:first-child {
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+.mod_kanban_addcolumn_container.col {
+    list-style: none;
+    max-width: 10px;
+    padding: 0;
+    z-index: 2;
+    border-radius: .5rem;
+    position: absolute;
+    min-height: 100px;
+    height: 100%;
+}
+
+.mod_kanban_addcolumn_container.col * {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.mod_kanban_addcolumn_container:hover *,
+.mod_kanban_addcolumn_container:focus *,
+.mod_kanban_addcolumn_container:focus-within *,
+.mod_kanban_addcard_container:hover *,
+.mod_kanban_addcard_container:focus *,
+.mod_kanban_addcard_container:focus-within * {
+    animation: none;
+    opacity: 1;
+}
+
+.mod_kanban_touch .mod_kanban_addcolumn_first .mod_kanban_addcolumn_container.col:last-of-type *,
+.mod_kanban_touch .mod_kanban_addcard_first .mod_kanban_addcard_container.row:last-of-type * {
+    animation: none;
+    opacity: 1;
+}
+
+.mod_kanban_addcard_container.mod_kanban_insert {
+    animation: none;
+    opacity: 1;
+}
+
+.mod_kanban_column.card {
+    min-width: 20rem;
+    max-width: 20rem;
+    margin: 3px;
+}
+
+.mod_kanban_addcolumn_first + .mod_kanban_column.card {
+    margin-left: 0;
+}
+
+.mod_kanban_card.card {
+    margin-bottom: 10px;
+    width: 18rem;
+    transition: margin 0.5s;
+}
+
+.mod_kanban_card > .mod_kanban_addcard_container.row {
+    bottom: -11px;
+}
+
+.mod_kanban_column > .mod_kanban_addcard_container.row {
+    position: relative;
+}
+
+.mod_kanban_render_container > .mod_kanban_addcolumn_container {
+    position: relative;
+}
+
+.mod_kanban_card:not(.dragging):hover *,
+.mod_kanban_card:not(.dragging):focus *,
+.mod_kanban_card:not(.dragging):focus-within *,
+.mod_kanban_column:not(.dragging):hover > *,
+.mod_kanban_column:not(.dragging):focus > *,
+.mod_kanban_column:not(.dragging):focus-within > * {
+    opacity: 1;
+}
+
+.mod_kanban_render_container.container {
+    overflow-x: auto;
+    overflow-y: visible;
+    min-height: 300px;
+    max-width: none;
+}
+
+.mod_kanban_action_menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.mod_kanban_card_completion {
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    cursor: inherit;
+}
+
+.mod_kanban_description {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.mod_kanban_card_title input,
+.mod_kanban_column_title input {
+    max-width: 100%;
+    z-index: 3;
+    height: 1.7rem;
+    padding: 0;
+    border-width: 0;
+    border-style: none;
+}
+
+.mod_kanban_card_title {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+}
+
+.mod_kanban_assignees {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    max-width: 14rem;
+    overflow: hidden;
+    max-height: 2.5rem;
+}
+
+.mod_kanban_assignees .mod_kanban_assigned_user:hover,
+.mod_kanban_assignees .mod_kanban_assigned_user:focus {
+    z-index: 4;
+}
+
+.mod_kanban_assigned_user.btn {
+    cursor: inherit;
+}
+
+.mod_kanban_assigned_user:not(:first-of-type) {
+    position: relative;
+    margin-left: -20px;
+}
+
+.mod_kanban_addcolumn_first {
+    list-style: none;
+    width: 10px;
+}
+
+.mod_kanban_addcard_first {
+    list-style: none;
+    height: 10px;
+    width: 18rem;
+    position: relative;
+}
+
+.mod_kanban_render_container .quickediticon.visibleifjs {
+    display: none;
+}
+
+.mod_kanban_render_container .inplaceeditable .quickeditlink {
+    text-decoration: none;
+    box-shadow: none;
+}
+
+.mod_kanban_column_title {
+    margin-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 90%;
+}
+
+.mod_kanban_action_menu_trigger.dropdown-toggle::after {
+    content: none;
+}
+
+.mod_kanban_duedate {
+    border-radius: 5px;
+    width: fit-content;
+    background-color: yellowgreen;
+    padding-left: 10px;
+    padding-right: 10px;
+    right: 10px;
+    position: relative;
+}
+
+.mod_kanban_duedate.mod_kanban_overdue {
+    background-color: orangered;
+}
+
+.card-footer.mod_kanban_card_footer {
+    background-color: transparent;
+    border-top: 0;
+}
+
+a.mod_kanban_attachment_item {
+    margin: 0;
+}
+
+.mod_kanban_main.row {
+    overflow-y: visible;
+    overflow-x: auto;
+    padding-bottom: 200px;
+}
+
+.mod_kanban_discussion_input {
+    width: 85%;
+    height: 4rem;
+}
+
+.mod_kanban_discussion_messages {
+    font-size: smaller;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.draggable {
+    cursor: move;
+}
+
+.mod_kanban_column.mod_kanban_autohide .mod_kanban_hidden_actions {
+    position: absolute;
+    right: 50px;
+    top: 10px;
+}
+
+.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_delete_card,
+.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_card_edit_details,
+.mod_kanban_card:not(.mod_kanban_hasdescription):not(.mod_kanban_hasattachment) .mod_kanban_description_trigger,
+.mod_kanban_card:not(.mod_kanban_hasdiscussion) .mod_kanban_discussion_trigger,
+.mod_kanban_card.mod_kanban_hasdiscussion .mod_kanban_start_discussion,
+.mod_kanban_card.mod_kanban_selfassigned .mod_kanban_assign_self,
+.mod_kanban_card:not(.mod_kanban_selfassigned) .mod_kanban_unassign_self,
+.mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_complete_card,
+.mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_uncomplete_card,
+.mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_move_card,
+.mod_kanban_board:not(.mod_kanban_history) .mod_kanban_card_view_history,
+.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
+.mod_kanban_complete_card,
+.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
+.mod_kanban_uncomplete_card,
+.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
+.mod_kanban_move_card,
+.mod_kanban_board_locked .mod_kanban_addcolumn_container,
+.mod_kanban_board_locked_columns .mod_kanban_addcolumn_container,
+.mod_kanban_board_locked .mod_kanban_lock_column,
+.mod_kanban_board_locked_column .mod_kanban_lock_column,
+.mod_kanban_board_locked_columns .mod_kanban_lock_column,
+.mod_kanban_board_locked .mod_kanban_delete_column,
+.mod_kanban_board_locked_columns .mod_kanban_delete_column,
+.mod_kanban_board_locked .mod_kanban_unlock_column,
+.mod_kanban_board_locked_columns .mod_kanban_unlock_column,
+.mod_kanban_board_locked_columns .mod_kanban_lock_board_columns,
+.mod_kanban_board:not(.mod_kanban_board_locked_columns) .mod_kanban_unlock_board_columns,
+.mod_kanban_board:not(.mod_kanban_addcards, .mod_kanban_moveassignedcards, .mod_kanban_moveallcards) .mod_kanban_addcard_container,
+.mod_kanban_board:not(.mod_kanban_managecolumns) .mod_kanban_addcolumn_container,
+.mod_kanban_board:not(.mod_kanban_hastemplate) .mod_kanban_show_template,
+.mod_kanban_board.mod_kanban_istemplate .mod_kanban_show_template,
+.mod_kanban_board.mod_kanban_istemplate .mod_kanban_delete_board,
+.mod_kanban_board:not(.mod_kanban_ismyuserboard, .mod_kanban_manageboard) .mod_kanban_delete_board,
+.mod_kanban_board.mod_kanban_iscourseboard:not(.mod_kanban_userboards_only) .mod_kanban_show_board,
+.mod_kanban_board:not(.mod_kanban_istemplate) .mod_kanban_delete_template,
+.mod_kanban_column.mod_kanban_locked_column .mod_kanban_lock_column,
+.mod_kanban_column:not(.mod_kanban_locked_column) .mod_kanban_unlock_column,
+.mod_kanban_column.mod_kanban_autohide:not(.mod_kanban_show_hidden) [data-action="hide_hidden"],
+.mod_kanban_column.mod_kanban_autohide.mod_kanban_show_hidden [data-action="show_hidden"],
+.mod_kanban_column:not(.mod_kanban_autohide) .mod_kanban_hidden_actions,
+.mod_kanban_column.mod_kanban_autohide:not(.mod_kanban_show_hidden) .mod_kanban_card.mod_kanban_closed,
+.mod_kanban_card.mod_kanban_closed .mod_kanban_complete_card,
+.mod_kanban_card.mod_kanban_closed .mod_kanban_duedate,
+.mod_kanban_card:not(.mod_kanban_closed) .mod_kanban_uncomplete_card,
+.mod_kanban_card:not(.mod_kanban_closed) .mod_kanban_card_completion,
+.mod_kanban_card .modal-body:not(.mod_kanban_loading) .mod_kanban_loading_status,
+.mod_kanban_board:not(.mod_kanban_manageboard) .mod_kanban_push_card {
+    display: none;
+}
+
+.mod_kanban_column.mod_kanban_locked_column,
+.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned) {
+    cursor: not-allowed;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 5px -2px #ffc400;
+    }
+    to {
+        box-shadow: 0 0 5px 2px #989600;
+    }
+}
+
+.mod_kanban_updated {
+    animation: glow 3s 1 ease-out;
+}
+
+.col.mod_kanban_heading {
+    max-width: max-content;
+}
+
+.mod_kanban_heading .mod_kanban_action_menu_trigger {
+    position: absolute;
+    top: 0;
+    right: -30px;
+}
+
+.col.mod_kanban_action_menu {
+    top: 0;
+}
+
+.mod_kanban_history_modal,
+.mod_kanban_discussion_modal,
+.mod_kanban_description_modal {
+    cursor: pointer;
+}
+
+.mod_kanban_addcard {
+    background-color: lightgray;
+}
+
+.mod_kanban_board .btn {
+    background-color: white;
+}

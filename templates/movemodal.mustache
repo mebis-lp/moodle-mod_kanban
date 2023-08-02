@@ -1,0 +1,70 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_kanban/movemodal
+}}
+<div class="row">
+    <div class="col-3">
+        <label for="mod_kanban_move_card_column">{{#str}} column, mod_kanban {{/str}}</label>
+    </div>
+    <div class="col-9">
+        <select data-id="{{cardid}}" data-initial-value="{{kanbancolumn}}" class="mod_kanban_move_card_column custom-select" id="mod_kanban_move_card_column">
+            {{#columns}}
+            <option value="{{id}}">{{title}}</option>
+            {{/columns}}
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <label for="mod_kanban_move_card_aftercard">{{#str}} moveaftercard, mod_kanban {{/str}}</label>
+    </div>
+    <div class="col-9">
+        <select data-id="{{cardid}}" data-initial-value="{{cardid}}" class="mod_kanban_move_card_aftercard custom-select" id="mod_kanban_move_card_aftercard">
+            {{#columns}}
+                <option value="0" data-columnid="{{id}}">{{#str}} topofcolumn, mod_kanban {{/str}}</option>
+                {{#cards}}
+                <option value="{{id}}" data-columnid="{{kanbancolumn}}">{{title}}</option>
+                {{/cards}}
+            {{/columns}}
+        </select>
+        <select data-id="{{cardid}}" data-initial-value="{{cardid}}" class="mod_kanban_move_card_options hidden">
+        </select>
+    </div>
+</div>
+{{#js}}
+    function updateCards(el) {
+        let select = document.querySelector('.mod_kanban_move_card_aftercard[data-id="{{cardid}}"]');
+        let select2 = document.querySelector('.mod_kanban_move_card_options');
+        let column = parseInt(el.value);
+        Array.from(select.children).forEach((n) => {
+            if (parseInt(n.dataset.columnid) != column) {
+                select2.appendChild(n);
+            }
+        });
+        Array.from(select2.children).forEach((n) => {
+            if (parseInt(n.dataset.columnid) == column) {
+                select.appendChild(n);
+            }
+        });
+    }
+    document.querySelector('.mod_kanban_move_card_column[data-id="{{cardid}}"]').addEventListener('change', (e) => {
+        let target = e.target.closest('.mod_kanban_move_card_column');
+        updateCards(target);
+    });
+    updateCards(document.querySelector('.mod_kanban_move_card_column[data-id="{{cardid}}"]'));
+{{/js}}

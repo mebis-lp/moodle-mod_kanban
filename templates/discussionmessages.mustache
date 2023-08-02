@@ -1,0 +1,39 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_kanban/discussionmessages
+
+    Example context (json):
+    {
+        "discussions": [
+            {"id": 4, "kanban_card": 1, "content": "Task", "username": "Berti Beispiel", "timecreated": 123456789, "candelete": true}
+        ]
+    }
+}}
+<ul class="list-group mod_kanban_discussion_messages">
+    {{#discussions}}
+        <li class="list-group-item">
+            <div class="font-weight-bold">{{username}}</div>
+            <div>
+                {{content}}
+            </div>
+            <div class="text-right text-muted font-weight-light">{{#userdate}} {{timecreated}}, {{#str}} strftimedatemonthtimeshort, core_langconfig {{/str}} {{/userdate}}
+            {{#candelete}}<button class="btn btn-icon icon-no-margin" data-action="delete_message" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}</button>{{/candelete}}
+            </div>
+        </li>
+    {{/discussions}}
+</ul>
