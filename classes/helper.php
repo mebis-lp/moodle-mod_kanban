@@ -231,7 +231,7 @@ class helper {
             }
 
             // Don't notify current user about own actions.
-            if ($user != $USER->id || $tocurrentuser) {
+            if ($user->id != $USER->id || $tocurrentuser) {
                 $message->userto = $user;
                 message_send($message);
             }
