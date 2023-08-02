@@ -247,7 +247,7 @@ class helper {
     public static function add_or_update_calendar_event(stdClass $kanban, stdClass $card, array $users) {
         global $CFG, $DB;
 
-        if (empty($kanban->due)) {
+        if (empty($card->duedate)) {
             return;
         }
 
@@ -266,7 +266,7 @@ class helper {
         $data->visible = instance_is_visible('kanban', $kanban);
         $data->timeduration = 0;
         $data->uuid = $card->id;
-        $data->name = get_string('message_due_subject', 'mod_kanban', $card);
+        $data->name = get_string('message_due_smallmessage', 'mod_kanban', $card);
         $data->description = $card->description;
         $data->format = $card->descriptionformat;
         foreach ($users as $user) {
