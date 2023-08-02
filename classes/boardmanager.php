@@ -828,7 +828,7 @@ class boardmanager {
             if (!empty($todelete)) {
                 helper::remove_calendar_event($this->kanban, (object) $carddata, $todelete);
                 list($sql, $params) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
-                $sql = 'kanban_card = :cardid AND user ' . $sql;
+                $sql = 'kanban_card = :cardid AND userid ' . $sql;
                 $params['cardid'] = $cardid;
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
                 helper::send_notification($this->cminfo, 'assigned', $todelete, (object) $carddata, 'unassigned');
