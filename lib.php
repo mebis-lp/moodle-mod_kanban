@@ -252,7 +252,7 @@ function kanban_reset_userdata($data) {
     foreach ($kanbans as $kanban) {
         if (!empty($data->reset_kanban_personal)) {
             $personalboards = $DB->get_fieldset_sql(
-                'SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND user > 0',
+                'SELECT id FROM {kanban_board} WHERE kanban_instance = :id AND userid > 0',
                 ['id' => $kanban->id]
             );
             if ($personalboards) {
