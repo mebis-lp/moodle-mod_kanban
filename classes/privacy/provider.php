@@ -29,6 +29,8 @@ use \core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\writer;
 use stdClass;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
 
 /**
  * Privacy provider for mod_kanban.
@@ -39,7 +41,173 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-    \core_privacy\local\request\plugin\provider {
+    \core_privacy\local\request\plugin\provider, \core_privacy\local\request\core_userlist_provider {
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        if (!$cm = get_coursemodule_from_id('kanban', $context->instanceid)) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+
+        foreach ($userids as $userid) {
+            // Delete calendar events.
+            $DB->delete_records('event', ['modulename' => 'kanban', 'instance' => $kanban->id, 'userid' => $userid]);
+
+            $boardids = $DB->get_fieldset_select(
+                'kanban_board',
+                'id',
+                'kanban_instance = :instance',
+                ['instance' => $cm->instance]
+            );
+            list($insql, $params) = $DB->get_in_or_equal($boardids);
+
+            // Delete history.
+            $params['userid'] = $userid;
+            $DB->delete_records_select('kanban_history', 'userid = :userid AND kanban_board ' . $insql, $params);
+            $DB->execute(
+                'UPDATE kanban_history SET affected_userid = 0 WHERE affected_userid = :userid AND kanban_board ' . $insql,
+                $params
+            );
+
+            // Remove card author.
+            $DB->execute(
+                'UPDATE kanban_card SET createdby = 0 WHERE createdby = :userid AND kanban_board ' . $insql,
+                $params
+            );
+
+            $sql = 'SELECT id FROM {kanban_card} WHERE kanban_board ' . $insql;
+            $cardids = $DB->get_fieldset_sql($sql, $params);
+
+            if (!empty($cardids)) {
+                list($insql, $params) = $DB->get_in_or_equal($cardids);
+                $sql = 'userid = :userid AND kanban_card ' . $insql;
+                $params['userid'] = $userid;
+                // Unassign user.
+                $DB->delete_records_select('kanban_assignee', $sql, $params);
+                // Delete discussion.
+                $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
+            }
+
+            // Get all personal boards.
+            $boardid = $DB->get_field_select(
+                'kanban_board',
+                'id',
+                'kanban_instance = :instance AND userid = :user',
+                ['instance' => $cm->instance, 'userid' => $userid]
+            );
+            $cardids = $DB->get_fieldset_select('kanban_card', 'kanban_board = :board', ['board' => $boardid]);
+
+            if (!empty($cardids)) {
+                // Unassign all users from private board.
+                list($insql, $params) = $DB->get_in_or_equal($cardids);
+                $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
+                // Delete all discussions.
+                $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
+            }
+
+            $DB->delete_records('kanban_card', ['kanban_board' => $boardid]);
+            $DB->delete_records('kanban_column', ['kanban_board' => $boardid]);
+            $DB->delete_records('kanban_board', ['id' => $boardid]);
+            $DB->delete_records('kanban_history', ['id' => $boardid]);
+        }
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        $params = [
+            'cmid'      => $context->instanceid,
+            'modname'   => 'kanban',
+        ];
+
+        // Personal boards.
+        $sql = "SELECT DISTINCT b.userid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON k.id = b.kanban_instance
+                 WHERE cm.id = :cmid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // Created cards.
+        $sql = "SELECT DISTINCT c.createdby
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON k.id = b.kanban_instance
+            INNER JOIN {kanban_card} c ON c.kanban_board = b.id
+                 WHERE cm.id = :cmid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // Assigned cards.
+        $sql = "SELECT DISTINCT a.userid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON k.id = b.kanban_instance
+            INNER JOIN {kanban_card} c ON c.kanban_board = b.id
+            INNER JOIN {kanban_assignee} a ON a.kanban_card = c.id
+                 WHERE cm.id = :cmid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // Discussion comments.
+        $sql = "SELECT DISTINCT d.userid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON k.id = b.kanban_instance
+            INNER JOIN {kanban_card} c ON c.kanban_board = b.id
+            INNER JOIN {kanban_discussion_comment} d ON d.kanban_card = c.id
+                 WHERE cm.id = :cmid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // History items.
+        $sql = "SELECT DISTINCT h.userid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON k.id = b.kanban_instance
+            INNER JOIN {kanban_history} h ON h.kanban_board = b.id
+                 WHERE cm.id = :cmid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+
+        // History items - affected user.
+        $sql = "SELECT DISTINCT h.affected_userid
+                  FROM {course_modules} cm
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {kanban} k ON k.id = cm.instance
+            INNER JOIN {kanban_board} b ON k.id = b.kanban_instance
+            INNER JOIN {kanban_history} h ON h.kanban_board = b.id
+                 WHERE cm.id = :cmid";
+
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
 
     /**
      * Get the list of contexts that contain user information for the specified user.
