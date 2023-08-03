@@ -1149,7 +1149,14 @@ class boardmanager {
         $fs = get_file_storage();
         $attachments = $fs->get_area_files($contextid, 'mod_kanban', 'attachments', $cardid, 'filename', false);
         foreach ($attachments as $attachment) {
-            $existingfile = $fs->get_file($contextid, 'mod_kanban', 'attachments', $newcardid, $attachment->get_filepath(), $attachment->get_filename());
+            $existingfile = $fs->get_file(
+                $contextid,
+                'mod_kanban',
+                'attachments',
+                $newcardid,
+                $attachment->get_filepath(),
+                $attachment->get_filename()
+            );
             if ($existingfile) {
                 $existingfile->delete();
             }
