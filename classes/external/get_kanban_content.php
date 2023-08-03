@@ -711,7 +711,7 @@ class get_kanban_content extends external_api {
                         $item->username = fullname($user);
                     }
                 }
-                if (!empty($item->affecteduser)) {
+                if (!empty($item->affected_userid)) {
                     $affecteduser = \core_user::get_user($item->affected_userid);
                     if ($affecteduser) {
                         $item->affectedusername = fullname($affecteduser);
