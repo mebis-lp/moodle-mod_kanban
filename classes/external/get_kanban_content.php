@@ -462,9 +462,9 @@ class get_kanban_content extends external_api {
                 'SELECT id
                  FROM {kanban_board}
                  WHERE template = 1 AND kanban_instance = :instance
-                 ORDER BY timemodified DESC
-                 LIMIT 0,1',
-                ['instance' => $kanbanboard->kanban_instance]
+                 ORDER BY timemodified DESC',
+                ['instance' => $kanbanboard->kanban_instance],
+                IGNORE_MULTIPLE
             );
             if (empty($common->template)) {
                 $common->template = 0;
@@ -711,7 +711,7 @@ class get_kanban_content extends external_api {
                         $item->username = fullname($user);
                     }
                 }
-                if (!empty($item->affecteduser)) {
+                if (!empty($item->affected_userid)) {
                     $affecteduser = \core_user::get_user($item->affected_userid);
                     if ($affecteduser) {
                         $item->affectedusername = fullname($affecteduser);

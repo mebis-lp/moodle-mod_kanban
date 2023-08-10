@@ -981,8 +981,10 @@ class boardmanager {
                     $newcard['kanban_column'] = $columnids[0];
                     $newcard['kanban_board'] = $boardid;
                     $newcard['timecreated'] = time();
+                    $newcard['timemodified'] = time();
+                    unset($newcard['id']);
                     $newcard['id'] = $DB->insert_record('kanban_card', $newcard);
-                    $this->copy_attachment_files($context->id, $card->id, $newcard['id']);
+                    $this->copy_attachment_files($context->id, $cardid, $newcard['id']);
                     $column = $DB->get_record('kanban_column', ['id' => $columnids[0]]);
                     $DB->update_record(
                         'kanban_column',
@@ -998,9 +1000,9 @@ class boardmanager {
                     helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_COLUMN, $newcard['timemodified']);
                 }
             } else {
-                $newcard = array_merge((array) $existingcard, (array) $card);
+                $newcard = array_merge((array) $existingcard, (array) $card, ['timemodified' => time()]);
                 $DB->update_record('kanban_card', $newcard);
-                $this->copy_attachment_files($context->id, $card->id, $newcard['id']);
+                $this->copy_attachment_files($context->id, $cardid, $newcard['id']);
                 $this->write_history('updated', constants::MOD_KANBAN_CARD, $newcard, $newcard['kanban_column']);
                 helper::update_cached_timestamp($boardid, constants::MOD_KANBAN_CARD, $newcard['timemodified']);
             }
@@ -1135,7 +1137,8 @@ class boardmanager {
     }
 
     /**
-     * Copy attachment files from one card to another (works only inside the same kanban instance).
+     * Copy attachment files from one card to another (works only inside the same kanban instance). Overwrites files that have
+     * the same filename.
      *
      * @param int $contextid Context id of the instance
      * @param int $cardid Card id (original)
@@ -1146,9 +1149,18 @@ class boardmanager {
         $fs = get_file_storage();
         $attachments = $fs->get_area_files($contextid, 'mod_kanban', 'attachments', $cardid, 'filename', false);
         foreach ($attachments as $attachment) {
-            $newfile = (array) $attachment;
-            $newfile['itemid'] = $newcardid;
-            $fs->create_file_from_storedfile($newfile, $attachment);
+            $existingfile = $fs->get_file(
+                $contextid,
+                'mod_kanban',
+                'attachments',
+                $newcardid,
+                $attachment->get_filepath(),
+                $attachment->get_filename()
+            );
+            if ($existingfile) {
+                $existingfile->delete();
+            }
+            $fs->create_file_from_storedfile(['itemid' => $newcardid], $attachment);
         }
     }
 }
