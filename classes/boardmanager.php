@@ -785,7 +785,7 @@ class boardmanager {
      * @return void
      */
     public function update_card(int $cardid, array $data): void {
-        global $DB, $OUTPUT;
+        global $DB, $OUTPUT, $USER;
         $context = context_module::instance($this->cmid);
         $cardkeys = [
             'id',
@@ -818,6 +818,8 @@ class boardmanager {
             $DB->update_record('kanban_card', $cardupdate);
         }
         $carddata = array_merge($card, $cardupdate);
+        $carddata['username'] = fullname($USER);
+        $carddata['boardname'] = $this->kanban->name;
         if (isset($data['assignees'])) {
             $assignees = $data['assignees'];
             $currentassignees = $this->get_card_assignees($cardid);
