@@ -8,6 +8,7 @@ import {get_string as getString} from 'core/str';
 import Templates from 'core/templates';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 import Log from 'core/log';
+import capabilities from 'mod_kanban/capabilities';
 
 
 /**
@@ -503,8 +504,8 @@ export default class extends KanbanComponent {
         }
         // User may move the card if he/she has moveallcards capability or has moveassignedcards
         // capability and is currently assigned to the card.
-        if (state.capabilities.get('moveallcards').value ||
-            (state.capabilities.get('moveassignedcards').value &&
+        if (state.capabilities.get(capabilities.MOVEALLCARDS).value ||
+            (state.capabilities.get(capabilities.MOVEASSIGNEDCARDS).value &&
                 state.cards.get(this.id).selfassigned)) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);

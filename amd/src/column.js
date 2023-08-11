@@ -1,5 +1,6 @@
 import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
+import capabilities from 'mod_kanban/capabilities';
 import exporter from 'mod_kanban/exporter';
 import {saveCancel} from 'core/notification';
 import * as Str from 'core/str';
@@ -143,7 +144,7 @@ export default class extends KanbanComponent {
             state = this.reactive.stateManager.state;
         }
 
-        if (state.capabilities.get('managecolumns').value && state.columns.get(this.id).locked == 0) {
+        if (state.capabilities.get(capabilities.MANAGECOLUMNS).value && state.columns.get(this.id).locked == 0) {
             this.dragdrop.setDraggable(true);
         } else {
             this.dragdrop.setDraggable(false);

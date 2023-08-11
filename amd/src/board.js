@@ -1,5 +1,6 @@
 import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
+import capabilities from 'mod_kanban/capabilities';
 import exporter from 'mod_kanban/exporter';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 import Log from 'core/log';
@@ -57,7 +58,7 @@ export default class extends KanbanComponent {
             'click',
             this._addColumn
         );
-        if (state.capabilities.get('manageboard').value == true) {
+        if (state.capabilities.get(capabilities.MANAGEBOARD).value == true) {
             this.addEventListener(
                 this.getElement(selectors.LOCKBOARDCOLUMNS),
                 'click',
