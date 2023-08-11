@@ -1,3 +1,5 @@
+import capabilities from 'mod_kanban/capabilities';
+
 /**
  * Exporter for use in mustache template.
  */
@@ -18,8 +20,8 @@ export default class {
         }
 
         let showactionmenu = state.common.userboards == 1 || state.common.groupselector != '' ||
-            state.capabilities.get('manageboards').value ||
-            (state.common.userboards == 2 && state.capabilities.get('viewallboards').value);
+            state.capabilities.get(capabilities.MANAGEBOARD).value ||
+            (state.common.userboards == 2 && state.capabilities.get(capabilities.VIEWALLBOARDS).value);
 
         return Object.assign({
             cmid: state.common.id,
@@ -33,7 +35,7 @@ export default class {
             heading: state.board.heading,
             groupselector: state.common.groupselector,
             userboards: state.common.userboards,
-            history: state.common.history && state.capabilities.get('viewhistory').value,
+            history: state.common.history && state.capabilities.get(capabilities.VIEWHISTORY).value,
             groupmode: state.common.groupmode,
             ismyuserboard: state.common.userid == state.board.userid,
             myuserid: state.common.userid,
