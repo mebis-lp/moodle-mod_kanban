@@ -14,7 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_kanban;
+namespace mod_kanban\task;
+
+use mod_kanban\boardmanager;
 
 /**
  * Unit test for mod_kanban
@@ -62,7 +64,7 @@ class reminder_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_reminder_duedate() {
+    public function test_reminder_duedate(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -127,11 +129,11 @@ class reminder_test extends \advanced_testcase {
 
         $reminder->execute();
 
-        // User 0 and 2 should have one additional notification.
+        // Everybody except user 1 should have one additional notification.
 
         for ($i = 0; $i < 3; $i++) {
             $this->assertEquals(
-                $notificationcount[$i] + (int)($i % 2 == 0),
+                $notificationcount[$i] + (int)($i != 1),
                 $DB->count_records('notifications', ['useridfrom' => $noreply->id, 'useridto' => $this->users[$i]->id])
             );
         }
