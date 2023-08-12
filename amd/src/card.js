@@ -74,7 +74,12 @@ export default class extends KanbanComponent {
         if (state.common.lang !== undefined) {
             lang = state.common.lang;
         }
-        this.rtf = new Intl.RelativeTimeFormat(lang, {numeric: 'auto'});
+        try {
+            this.rtf = new Intl.RelativeTimeFormat(lang, {numeric: 'auto'});
+        } catch (e) {
+            // Fallback if there is no valid lang found.
+            this.rtf = new Intl.RelativeTimeFormat('en', {numeric: 'auto'});
+        }
 
         this.addEventListener(
             this.getElement(selectors.DELETECARD, this.id),
