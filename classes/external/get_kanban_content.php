@@ -450,7 +450,9 @@ class get_kanban_content extends external_api {
         $common->timestamp = time();
         $common->id = $cmid;
         $common->userid = $USER->id;
-        $common->lang = current_language();
+        // Additional information in the locale (e.g. ".UTF-8") cannot be parsed by the browser.
+        $common->lang = explode('.', get_string('locale', 'langconfig'))[0];
+        $common->lang = str_replace('_', '-', $common->lang);
         $common->liveupdate = get_config('mod_kanban', 'liveupdatetime');
         $common->userboards = $kanban->userboards;
         $common->groupmode = $cminfo->groupmode;
