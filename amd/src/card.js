@@ -74,10 +74,9 @@ export default class extends KanbanComponent {
         if (state.common.lang !== undefined) {
             lang = state.common.lang;
         }
-        // The property state.common.lang contains the "moodle locale"/lang pack name, for example "en_AU", "de_DU".
-        // This however is not always a real locale and thus suitable for RelativeTimeFormat.
-        // RelativeTimeFormat will try to find the best fitting locale. But we will have to work with a fallback in
-        // case it fails to find one.
+        // The property state.common.lang contains the locale extracted from the currently used moodle language pack.
+        // This should be a real locale and thus suitable for RelativeTimeFormat, for edge cases however we are
+        // using a fallback locale here.
         try {
             this.rtf = new Intl.RelativeTimeFormat(lang, {numeric: 'auto'});
         } catch (e) {
