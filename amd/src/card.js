@@ -281,7 +281,9 @@ export default class extends KanbanComponent {
             // Scroll down to latest message.
             el.scrollTop = el.scrollHeight;
             data.discussions.forEach((d) => {
-                this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
+                if (d.candelete) {
+                    this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
+                }
             });
             return true;
         }).catch((error) => displayException(error));
