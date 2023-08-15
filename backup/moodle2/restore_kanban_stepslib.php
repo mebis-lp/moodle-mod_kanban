@@ -45,7 +45,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
                 '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/assignees/assignee'
             );
             $paths[] = new restore_path_element(
-                'assignee',
+                'discussion',
                 '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/discussions/discussion'
             );
             $paths[] = new restore_path_element('historyitem', '/activity/kanban/boards/kanban_board/historyitems/historyitem');
