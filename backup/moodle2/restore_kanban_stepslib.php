@@ -137,6 +137,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data->kanban_column = $this->get_mappingid('kanban_column_id', $data->kanban_column);
         $data->kanban_board = $this->get_mappingid('kanban_board_id', $data->kanban_board);
+        $data->originalid = $this->get_mappingid('kanban_card_id', $data->originalid);
         $data->createdby = $this->get_mappingid('user', $data->createdby);
 
         $newid = $DB->insert_record('kanban_card', $data);
