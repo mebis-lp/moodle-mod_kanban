@@ -742,10 +742,10 @@ class boardmanager {
         $this->formatter->put('discussions', $update);
 
         if (empty($card->discussion)) {
-            $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
-            $DB->update_record('kanban_card', $update);
-            $this->formatter->put('cards', $update);
-            helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
+            $updatecard = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
+            $DB->update_record('kanban_card', $updatecard);
+            $this->formatter->put('cards', $updatecard);
+            helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $updatecard['timemodified']);
         }
 
         $update['boardname'] = $this->kanban->name;
