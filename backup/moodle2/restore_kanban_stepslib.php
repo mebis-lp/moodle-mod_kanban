@@ -42,13 +42,13 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         if ($userinfo) {
             $paths[] = new restore_path_element(
                 'assignee',
-                '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/assignees/assignee'
+                '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/assignees/kanban_assignee'
             );
             $paths[] = new restore_path_element(
-                'assignee',
-                '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/discussions/discussion'
+                'discussion_comment',
+                '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card/discussions/kanban_discussion_comment'
             );
-            $paths[] = new restore_path_element('historyitem', '/activity/kanban/boards/kanban_board/historyitems/historyitem');
+            $paths[] = new restore_path_element('historyitem', '/activity/kanban/boards/kanban_board/historyitems/kanban_history');
         }
 
         return $this->prepare_activity_structure($paths);
@@ -88,7 +88,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         $data = (object) $data;
         $oldid = $data->id;
 
-        $data->userid = $this->get_mappingid('userid', $data->userid);
+        $data->userid = $this->get_mappingid('user', $data->userid);
         $data->groupid = $this->get_mappingid('group', $data->groupid);
         $data->kanban_instance = $this->get_mappingid('kanban_id', $data->kanban_instance);
 
@@ -137,10 +137,12 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data->kanban_column = $this->get_mappingid('kanban_column_id', $data->kanban_column);
         $data->kanban_board = $this->get_mappingid('kanban_board_id', $data->kanban_board);
-        $data->createdby = $this->get_mappingid('userid', $data->createdby);
+        $data->originalid = $this->get_mappingid('kanban_card_id', $data->originalid);
+        $data->createdby = $this->get_mappingid('user', $data->createdby);
 
         $newid = $DB->insert_record('kanban_card', $data);
-        $this->set_mapping('kanban_card_id', $oldid, $newid);
+        $this->set_mapping('kanban_card_id', $oldid, $newid, true);
+        $this->add_related_files('mod_kanban', 'attachments', 'kanban_card_id', null, $oldid);
     }
 
     /**
@@ -156,7 +158,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data = (object) $data;
 
-        $data->userid = $this->get_mappingid('userid', $data->userid);
+        $data->userid = $this->get_mappingid('user', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
 
         $DB->insert_record('kanban_assignee', $data);
@@ -175,29 +177,29 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
 
         $data = (object) $data;
 
-        $data->userid = $this->get_mappingid('userid', $data->userid);
+        $data->userid = $this->get_mappingid('user', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
         $data->kanban_column = $this->get_mappingid('kanban_column_id', $data->kanban_column);
         $data->kanban_board = $this->get_mappingid('kanban_board_id', $data->kanban_board);
-        $data->affected_userid = $this->get_mappingid('userid', $data->affected_userid);
+        $data->affected_userid = $this->get_mappingid('user', $data->affected_userid);
 
         $DB->insert_record('kanban_history', $data);
     }
 
     /**
-     * Restore an discussion record.
+     * Restore an discussion_comment record.
      *
      * @param array|object $data
      * @throws base_step_exception
      * @throws dml_exception
      * @throws restore_step_exception
      */
-    protected function process_discussion($data): void {
+    protected function process_discussion_comment($data): void {
         global $DB;
 
         $data = (object) $data;
 
-        $data->userid = $this->get_mappingid('userid', $data->userid);
+        $data->userid = $this->get_mappingid('user', $data->userid);
         $data->kanban_card = $this->get_mappingid('kanban_card_id', $data->kanban_card);
 
         $DB->insert_record('kanban_discussion_comment', $data);
@@ -209,7 +211,6 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
     protected function after_execute(): void {
         global $DB;
         $this->add_related_files('mod_kanban', 'intro', null);
-        $this->add_related_files('mod_kanban', 'attachments', 'kanban_card_id');
 
         $kanbanboards = $DB->get_records('kanban_board', ['kanban_instance' => $this->task->get_activityid()]);
 

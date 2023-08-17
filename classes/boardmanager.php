@@ -742,16 +742,18 @@ class boardmanager {
         $this->formatter->put('discussions', $update);
 
         if (empty($card->discussion)) {
-            $update = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
-            $DB->update_record('kanban_card', $update);
-            $this->formatter->put('cards', $update);
-            helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
+            $updatecard = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
+            $DB->update_record('kanban_card', $updatecard);
+            $this->formatter->put('cards', $updatecard);
+            helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $updatecard['timemodified']);
         }
 
         $update['boardname'] = $this->kanban->name;
         $update['title'] = $card->title;
         $assignees = $this->get_card_assignees($cardid);
         helper::send_notification($this->cminfo, 'discussion', $assignees, (object) $update);
+        // Do not write username to history.
+        unset($update['username']);
         $this->write_history('added', constants::MOD_KANBAN_DISCUSSION, $update, $card->kanban_column, $cardid);
     }
 
@@ -1084,8 +1086,10 @@ class boardmanager {
         // Affected user must be written to a separate column (for privacy provider).
         if (!empty($data['userid'])) {
             $affecteduser = $data['userid'];
-            unset($data['userid']);
         }
+        // Prevent data to be accidentially saved to parameters json.
+        unset($data['userid']);
+        unset($data['username']);
         // Unset unused data.
         unset($data['timemodified']);
         unset($data['timecreated']);

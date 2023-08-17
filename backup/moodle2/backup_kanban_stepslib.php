@@ -37,7 +37,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             ['course', 'name', 'intro', 'introformat', 'userboards', 'history', 'completioncreate', 'completioncomplete']
         );
         $kanban->set_source_table('kanban', ['id' => backup::VAR_ACTIVITYID]);
-        $kanban->annotate_files('kanban', 'intro', null);
+        $kanban->annotate_files('mod_kanban', 'intro', null);
 
         $boards = new backup_nested_element('boards');
         $board = new backup_nested_element(
@@ -70,12 +70,14 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
                 'description',
                 'descriptionformat',
                 'linkedactivity',
+                'originalid',
                 'discussion',
                 'reminder_sent',
                 'createdby'
             ]
         );
-        $card->annotate_files('kanban', 'attachments', null);
+        $card->annotate_files('mod_kanban', 'attachments', 'id');
+        $card->annotate_ids('kanban_card_id', 'originalid');
 
         $assignees = new backup_nested_element('assignees');
         $assignee = new backup_nested_element(
