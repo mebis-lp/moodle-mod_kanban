@@ -7,10 +7,9 @@ export default {
     ASSIGNSELF: 'assignself',
     EDITALLBOARDS: 'editallboards',
     MANAGEBOARD: 'manageboard',
-    MANAGECARDS: 'managecards',
+    MANAGEALLCARDS: 'manageallcards',
+    MANAGEASSIGNEDCARDS: 'manageassignedcards',
     MANAGECOLUMNS: 'managecolumns',
-    MOVEALLCARDS: 'moveallcards',
-    MOVEASSIGNEDCARDS: 'moveassignedcards',
     VIEWALLBOARDS: 'viewallboards',
     VIEWHISTORY: 'viewhistory',
 };
