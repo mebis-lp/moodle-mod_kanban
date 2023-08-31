@@ -109,8 +109,16 @@ class edit_card_form extends dynamic_form {
         $id = $this->optional_param('id', null, PARAM_INT);
         $boardmanager = new boardmanager($cmid, $boardid);
         $card = $boardmanager->get_card($id);
-        if (!(has_capability('mod/kanban:addcard', $context) && $card->createdby == $USER->id)) {
-            require_capability('mod/kanban:managecards', $context);
+        if (
+            !(
+                has_capability('mod/kanban:addcard', $context) &&
+                $card->createdby == $USER->id
+            ) && !(
+                has_capability('mod/kanban:manageassignedcards', $context) &&
+                in_array($USER->id, $boardmanager->get_card_assignees($card->id))
+            )
+        ) {
+            require_capability('mod/kanban:manageallcards', $context);
         }
         $modinfo = get_fast_modinfo($COURSE);
         $cm = $modinfo->get_cm($cmid);

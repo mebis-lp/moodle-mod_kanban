@@ -148,8 +148,16 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
     external_api::validate_context($context);
 
     if ($itemtype == 'card') {
-        if (!(has_capability('mod/kanban:addcard', $context) && $card->createdby == $USER->id)) {
-            require_capability('mod/kanban:managecards', $context);
+        if (
+            !(
+                has_capability('mod/kanban:addcard', $context) &&
+                $card->createdby == $USER->id
+            ) && !(
+                has_capability('mod/kanban:manageassignedcards', $context) &&
+                in_array($USER->id, $boardmanager->get_card_assignees($card->id))
+            )
+        ) {
+            require_capability('mod/kanban:manageallcards', $context);
         }
     }
 
