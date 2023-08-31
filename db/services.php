@@ -64,7 +64,7 @@ $functions = [
         'description' => 'Adds a column to the kanban board',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:addcolumn',
+        'capabilities' => 'mod/kanban:managecolumns',
     ],
     'mod_kanban_add_card' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
@@ -88,7 +88,7 @@ $functions = [
         'description' => 'Moves a card within the kanban board',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:managecards',
+        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards',
     ],
     'mod_kanban_delete_column' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
@@ -104,7 +104,7 @@ $functions = [
         'description' => 'Deletes a card from the kanban board',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:managecards',
+        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards',
     ],
     'mod_kanban_assign_user' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
@@ -136,7 +136,7 @@ $functions = [
         'description' => 'Changes the completion state of a card',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:managecards',
+        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards',
     ],
     'mod_kanban_set_board_columns_locked' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
@@ -152,7 +152,7 @@ $functions = [
         'description' => 'Adds a message to card discussion',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:managecards',
+        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards',
     ],
     'mod_kanban_delete_discussion_message' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
@@ -160,7 +160,7 @@ $functions = [
         'description' => 'Deletes a message from card discussion',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:managecards',
+        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards',
     ],
     'mod_kanban_save_as_template' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',

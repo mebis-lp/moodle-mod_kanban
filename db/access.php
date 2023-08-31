@@ -92,7 +92,7 @@ $capabilities = [
         ],
     ],
 
-    'mod/kanban:moveassignedcards' => [
+    'mod/kanban:manageassignedcards' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
@@ -103,7 +103,7 @@ $capabilities = [
         ],
     ],
 
-    'mod/kanban:moveallcards' => [
+    'mod/kanban:manageallcards' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
@@ -167,5 +167,17 @@ $capabilities = [
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
         ],
+    ],
+];
+
+$deprecatedcapabilities = [
+    'mod/kanban:managecards' => [
+        'replacement' => 'mod/kanban:manageallcards',
+    ],
+    'mod/kanban:moveallcards' => [
+        'replacement' => 'mod/kanban:manageallcards',
+    ],
+    'mod/kanban:moveassignedcards' => [
+        'replacement' => 'mod/kanban:manageassignedcards',
     ],
 ];

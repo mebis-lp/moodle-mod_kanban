@@ -349,11 +349,10 @@ class get_kanban_content extends external_api {
         // Get the values of some capabilities for output.
         $capabilities = [
             'addcard' => has_capability('mod/kanban:addcard', $context),
-            'managecards' => has_capability('mod/kanban:managecards', $context),
+            'manageallcards' => has_capability('mod/kanban:manageallcards', $context),
+            'manageassignedcards' => has_capability('mod/kanban:manageallcards', $context),
             'assignself' => has_capability('mod/kanban:assignself', $context),
             'assignothers' => has_capability('mod/kanban:assignothers', $context),
-            'moveassignedcards' => has_capability('mod/kanban:moveassignedcards', $context),
-            'moveallcards' => has_capability('mod/kanban:moveallcards', $context),
             'managecolumns' => has_capability('mod/kanban:managecolumns', $context),
             'editallboards' => has_capability('mod/kanban:editallboards', $context),
             'manageboard' => has_capability('mod/kanban:manageboard', $context),
@@ -521,9 +520,12 @@ class get_kanban_content extends external_api {
                 if (empty($kanbanassignees[$card->id])) {
                     $kanbanassignees[$card->id] = [];
                 }
-                $card->canedit = $capabilities['managecards'] || $card->createdby == $USER->id;
                 $card->assignees = $kanbanassignees[$card->id];
                 $card->selfassigned = in_array($USER->id, $card->assignees);
+                $card->canedit =
+                    $capabilities['manageallcards'] ||
+                    ($capabilities['manageassignedcards'] && $card->selfassigned) ||
+                    $card->createdby == $USER->id;
                 $card->hasdescription = !empty($card->description);
                 $card->discussions = [];
                 $card->description = file_rewrite_pluginfile_urls(

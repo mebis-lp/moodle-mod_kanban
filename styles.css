@@ -301,15 +301,15 @@ a.mod_kanban_attachment_item {
 .mod_kanban_card.mod_kanban_hasdiscussion .mod_kanban_start_discussion,
 .mod_kanban_card.mod_kanban_selfassigned .mod_kanban_assign_self,
 .mod_kanban_card:not(.mod_kanban_selfassigned) .mod_kanban_unassign_self,
-.mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_complete_card,
-.mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_uncomplete_card,
-.mod_kanban_board:not(.mod_kanban_moveallcards):not(.mod_kanban_moveassignedcards) .mod_kanban_move_card,
+.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_complete_card,
+.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_uncomplete_card,
+.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_move_card,
 .mod_kanban_board:not(.mod_kanban_history) .mod_kanban_card_view_history,
-.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
+.mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
 .mod_kanban_complete_card,
-.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
+.mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
 .mod_kanban_uncomplete_card,
-.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
+.mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
 .mod_kanban_move_card,
 .mod_kanban_board_locked .mod_kanban_addcolumn_container,
 .mod_kanban_board_locked_columns .mod_kanban_addcolumn_container,
@@ -322,7 +322,8 @@ a.mod_kanban_attachment_item {
 .mod_kanban_board_locked_columns .mod_kanban_unlock_column,
 .mod_kanban_board_locked_columns .mod_kanban_lock_board_columns,
 .mod_kanban_board:not(.mod_kanban_board_locked_columns) .mod_kanban_unlock_board_columns,
-.mod_kanban_board:not(.mod_kanban_addcards, .mod_kanban_moveassignedcards, .mod_kanban_moveallcards) .mod_kanban_addcard_container,
+.mod_kanban_board:not(.mod_kanban_addcards, .mod_kanban_manageassignedcards, .mod_kanban_manageallcards)
+.mod_kanban_addcard_container,
 .mod_kanban_board:not(.mod_kanban_managecolumns) .mod_kanban_addcolumn_container,
 .mod_kanban_board:not(.mod_kanban_hastemplate) .mod_kanban_show_template,
 .mod_kanban_board.mod_kanban_istemplate .mod_kanban_show_template,
@@ -346,7 +347,7 @@ a.mod_kanban_attachment_item {
 }
 
 .mod_kanban_column.mod_kanban_locked_column,
-.mod_kanban_board.mod_kanban_moveassignedcards:not(.mod_kanban_moveallcards) .mod_kanban_card:not(.mod_kanban_selfassigned) {
+.mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned) {
     cursor: not-allowed;
 }
 
