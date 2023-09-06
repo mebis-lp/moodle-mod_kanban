@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use context_module;
+
 /**
  * Restore steps for mod_kanban
  *
@@ -38,6 +40,7 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
         $paths[] = new restore_path_element('board', '/activity/kanban/boards/kanban_board');
         $paths[] = new restore_path_element('column', '/activity/kanban/boards/kanban_board/columns/kanban_column');
         $paths[] = new restore_path_element('card', '/activity/kanban/boards/kanban_board/columns/kanban_column/cards/kanban_card');
+        $paths[] = new restore_path_element('cardtag', '/activity/kanban/cardtags/tag');
 
         if ($userinfo) {
             $paths[] = new restore_path_element(
@@ -238,5 +241,21 @@ class restore_kanban_activity_structure_step extends restore_activity_structure_
                 $DB->update_record('kanban_column', ['id' => $column->id, 'sequence' => join(',', $seqcard)]);
             }
         }
+    }
+
+    protected function process_cardtag($data) {
+        $data = (object)$data;
+    
+        if (!core_tag_tag::is_enabled('mod_kanban', 'kanban_card')) {
+            return;
+        }
+    
+        $tag = $data->rawname;
+        if (!$itemid = $this->get_mappingid('kanban_card', $data->itemid)) {
+            return;
+        }
+    
+        $context = context_module::instance($this->task->get_moduleid());
+        core_tag_tag::add_item_tag('mod_kanban', 'kanban_card', $itemid, $context, $tag);
     }
 }

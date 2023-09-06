@@ -151,6 +151,7 @@ $string['showdiscussion'] = 'Diskussion anzeigen';
 $string['showhidden'] = 'Verborgene Karten anzeigen';
 $string['showtemplate'] = 'Vorlage anzeigen';
 $string['startdiscussion'] = 'Diskussion beginnen';
+$string['tagarea_kanban_card'] = 'Kanban-Karten';
 $string['template'] = 'Vorlage';
 $string['toboard'] = 'Board "{$a->boardname}"';
 $string['todo'] = 'Zu erledigen';

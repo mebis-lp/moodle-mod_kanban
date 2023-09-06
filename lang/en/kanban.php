@@ -151,6 +151,7 @@ $string['showdiscussion'] = 'Show discussion';
 $string['showhidden'] = 'Show hidden cards';
 $string['showtemplate'] = 'Show template';
 $string['startdiscussion'] = 'Start discussion';
+$string['tagarea_kanban_card'] = 'Kanban cards';
 $string['template'] = 'Template';
 $string['toboard'] = 'Board "{$a->boardname}"';
 $string['todo'] = 'Todo';

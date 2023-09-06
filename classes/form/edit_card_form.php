@@ -22,6 +22,7 @@ use core_form\dynamic_form;
 use mod_kanban\boardmanager;
 use mod_kanban\helper;
 use moodle_url;
+use core_tag_tag;
 
 /**
  * From for editing a card.
@@ -85,6 +86,16 @@ class edit_card_form extends dynamic_form {
         $mform->addElement('color', 'color', get_string('color', 'mod_kanban'), ['size' => 5]);
         $mform->setType('color', PARAM_TEXT);
         $mform->setDefault('color', '#ffffff');
+
+        $mform->addElement(
+            'tags',
+            'tags',
+            get_string('tags'),
+            [
+                'itemtype' => 'kanban_card',
+                'component' => 'mod_kanban',
+            ]
+        );
     }
 
     /**
@@ -191,6 +202,7 @@ class edit_card_form extends dynamic_form {
         $card->description_editor['format'] = $card->descriptionformat;
         $card->description_editor['itemid'] = $draftitemid;
         $card->attachments = $draftitemid;
+        $card->tags = core_tag_tag::get_item_tags_array('mod_kanban', 'kanban_card', $id);
         $this->set_data($card);
     }
 

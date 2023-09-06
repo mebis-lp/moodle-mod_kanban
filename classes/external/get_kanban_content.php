@@ -46,6 +46,7 @@ use moodle_exception;
 use required_capability_exception;
 use restricted_context_exception;
 use stdClass;
+use core_tag_tag;
 
 /**
  * Class for delivering kanban content
@@ -207,6 +208,12 @@ class get_kanban_content extends external_api {
                                     'current user can edit this card?',
                                     VALUE_OPTIONAL,
                                     false
+                                ),
+                                'tags' => new external_value(
+                                    PARAM_RAW,
+                                    'tags',
+                                    VALUE_OPTIONAL,
+                                    ''
                                 ),
                             ],
                             '',
@@ -504,6 +511,7 @@ class get_kanban_content extends external_api {
             }
         }
         if (!empty($kanbancardids)) {
+            $tags = core_tag_tag::get_items_tags('mod_kanban', 'kanban_card', $kanbancardids);
             [$sql, $params] = $DB->get_in_or_equal($kanbancardids);
             $sql = 'kanban_card ' . $sql;
             $kanbanassigneesraw = $DB->get_records_select('kanban_assignee', $sql, $params);
@@ -537,6 +545,9 @@ class get_kanban_content extends external_api {
                 );
                 $card->attachments = helper::get_attachments($context->id, $card->id);
                 $card->hasattachment = count($card->attachments) > 0;
+                if (!empty($tags[$card->id])) {
+                    $card->tags = $OUTPUT->tag_list($tags[$card->id], '', 'mod_kanban_tags');
+                }
             }
         }
 

@@ -39,6 +39,9 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         $kanban->set_source_table('kanban', ['id' => backup::VAR_ACTIVITYID]);
         $kanban->annotate_files('mod_kanban', 'intro', null);
 
+        $tags = new backup_nested_element('cardtags');
+        $tag = new backup_nested_element('tag', ['id'], ['itemid', 'rawname']);
+
         $boards = new backup_nested_element('boards');
         $board = new backup_nested_element(
             'kanban_board',
@@ -111,6 +114,8 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
         );
 
         $kanban->add_child($boards);
+        $kanban->add_child($tags);
+        $tags->add_child($tag);
         $boards->add_child($board);
         $board->add_child($columns);
         $columns->add_child($column);
@@ -140,13 +145,40 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             $historyitem->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->annotate_ids('kanban_column_id', 'kanban_column');
             $historyitem->annotate_ids('kanban_board_id', 'kanban_board');
-
+            if (core_tag_tag::is_enabled('mod_kanban', 'kanban_card')) {
+                $tag->set_source_sql('SELECT t.id, ti.itemid, t.rawname
+                                        FROM {tag} t
+                                        JOIN {tag_instance} ti ON ti.tagid = t.id
+                                       WHERE ti.itemtype = ?
+                                         AND ti.component = ?
+                                         AND ti.contextid = ?', [
+                    backup_helper::is_sqlparam('kanban_card'),
+                    backup_helper::is_sqlparam('mod_kanban'),
+                    backup::VAR_CONTEXTID]);
+            }
         } else {
             $board->set_source_sql('
             SELECT *
               FROM {kanban_board}
              WHERE kanban_instance = ? AND userid = 0 AND groupid = 0 AND template = 1',
                 [backup::VAR_PARENTID]);
+            if (core_tag_tag::is_enabled('mod_kanban', 'kanban_card')) {
+                $tag->set_source_sql('SELECT t.id, ti.itemid, t.rawname
+                                        FROM {tag} t
+                                        JOIN {tag_instance} ti ON ti.tagid = t.id
+                                        JOIN {kanban_card} c ON ti.itemid = c.id
+                                        JOIN {kanban_board} b ON c.kanban_board = b.id
+                                            AND kanban_instance = ?
+                                            AND userid = 0
+                                            AND groupid = 0
+                                            AND template = 1
+                                        WHERE ti.itemtype = ?
+                                            AND ti.component = ?
+                                            AND ti.contextid = ?', [
+                    backup_helper::is_sqlparam('kanban_card'),
+                    backup_helper::is_sqlparam('mod_kanban'),
+                    backup::VAR_CONTEXTID]);
+            }
         }
         $column->set_source_table('kanban_column', ['kanban_board' => backup::VAR_PARENTID]);
         $card->set_source_table('kanban_card', ['kanban_column' => backup::VAR_PARENTID]);

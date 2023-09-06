@@ -29,6 +29,7 @@ use cm_info;
 use context_module;
 use context_system;
 use stdClass;
+use core_tag_tag;
 
 /**
  * Class to handle updating the board. It also sends notifications, but does not check permissions.
@@ -364,6 +365,7 @@ class boardmanager {
             helper::update_cached_timestamp($card->kanban_board, constants::MOD_KANBAN_COLUMN);
         }
         $DB->delete_records('kanban_card', ['id' => $cardid]);
+        core_tag_tag::remove_all_item_tags('mod_kanban', 'kanban_card', $cardid);
         helper::remove_calendar_event($this->kanban, (object) ['id' => $cardid]);
         $this->formatter->delete('cards', ['id' => $cardid]);
         // As long as history is only attached to cards, it will be deleted here.
@@ -789,6 +791,15 @@ class boardmanager {
     public function update_card(int $cardid, array $data): void {
         global $DB, $OUTPUT, $USER;
         $context = context_module::instance($this->cmid);
+        if (isset($data['tags'])) {
+            core_tag_tag::set_item_tags(
+                'mod_kanban',
+                'kanban_card',
+                $cardid,
+                $context,
+                $data['tags']
+            );
+        }
         $cardkeys = [
             'id',
             'title',
