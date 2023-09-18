@@ -749,7 +749,7 @@ class get_kanban_content extends external_api {
     }
 
     /**
-     * Get the timestamp of the latest entry in a db table from cache.
+     * Set the timestamp of the latest entry in a db table from cache.
      *
      * @param int $type one of constants::MOD_KANBAN_BOARD, constants::MOD_KANBAN_COLUMN or constants::MOD_KANBAN_CARD
      * @param int $timestamp value
