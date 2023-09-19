@@ -104,7 +104,7 @@ $functions = [
         'description' => 'Deletes a card from the kanban board',
         'type'        => 'write',
         'ajax'        => true,
-        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards',
+        'capabilities' => 'mod/kanban:manageassignedcards, mod/kanban:manageallcards, mod/kanban:addcard',
     ],
     'mod_kanban_assign_user' => [
         'classname'   => 'mod_kanban\external\change_kanban_content',
