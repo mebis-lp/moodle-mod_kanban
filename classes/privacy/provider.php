@@ -153,7 +153,7 @@ class provider implements
         $userlist->add_from_sql('userid', $sql, $params);
 
         // Created cards.
-        $sql = "SELECT DISTINCT c.createdby
+        $sql = "SELECT DISTINCT c.createdby as userid
                   FROM {course_modules} cm
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {kanban} k ON k.id = cm.instance
@@ -199,7 +199,7 @@ class provider implements
         $userlist->add_from_sql('userid', $sql, $params);
 
         // History items - affected user.
-        $sql = "SELECT DISTINCT h.affected_userid
+        $sql = "SELECT DISTINCT h.affected_userid as userid
                   FROM {course_modules} cm
             INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
             INNER JOIN {kanban} k ON k.id = cm.instance
