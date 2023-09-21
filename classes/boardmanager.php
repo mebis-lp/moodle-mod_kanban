@@ -536,6 +536,21 @@ class boardmanager {
         } else {
             $targetcolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
 
+            // Card needs to be processed first, because column sorting in frontend will only
+            // work if card is already moved in the right position.
+            $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
+            // If target column has autoclose option set, update card to be completed.
+            $options = json_decode($targetcolumn->options);
+            if (!empty($options->autoclose)) {
+                $updatecard['completed'] = 1;
+            }
+            $DB->update_record('kanban_card', $updatecard);
+            // When inplace editing the title and moving the card happens quite fast in a row,
+            // it might happen that the "old" title is shown in the ui since inplace editing does
+            // change the DOM directly and does not trigger the update function.
+            // So we add the current title here to avoid this.
+            $this->formatter->put('cards', array_merge($updatecard, ['title' => $card->title]));
+
             // Remove from current column.
             $update = [
                 'id' => $sourcecolumn->id,
@@ -553,19 +568,6 @@ class boardmanager {
             ];
             $DB->update_record('kanban_column', $update);
             $this->formatter->put('columns', $update);
-
-            $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
-            // If target column has autoclose option set, update card to be completed.
-            $options = json_decode($targetcolumn->options);
-            if (!empty($options->autoclose)) {
-                $updatecard['completed'] = 1;
-            }
-            $DB->update_record('kanban_card', $updatecard);
-            // When inplace editing the title and moving the card happens quite fast in a row,
-            // it might happen that the "old" title is shown in the ui since inplace editing does
-            // change the DOM directly and does not trigger the update function.
-            // So we add the current title here to avoid this.
-            $this->formatter->put('cards', array_merge($updatecard, ['title' => $card->title]));
 
             $data = array_merge((array) $card, $updatecard);
             $data['username'] = fullname($USER);
