@@ -32,9 +32,9 @@ $capabilities = [
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager' => CAP_ALLOW,
         ],
-        'clonepermissionsfrom' => 'moodle/course:manageactivities'
+        'clonepermissionsfrom' => 'moodle/course:manageactivities',
     ],
 
     'mod/kanban:view' => [
@@ -44,8 +44,8 @@ $capabilities = [
             'student' => CAP_ALLOW,
             'guest' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:addcard' => [
@@ -55,8 +55,8 @@ $capabilities = [
             'student' => CAP_ALLOW,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:managecards' => [
@@ -66,8 +66,8 @@ $capabilities = [
             'student' => CAP_ALLOW,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:assignself' => [
@@ -77,8 +77,8 @@ $capabilities = [
             'student' => CAP_ALLOW,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:assignothers' => [
@@ -88,8 +88,8 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:moveassignedcards' => [
@@ -99,8 +99,8 @@ $capabilities = [
             'student' => CAP_ALLOW,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:moveallcards' => [
@@ -110,8 +110,8 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:managecolumns' => [
@@ -121,8 +121,8 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:viewhistory' => [
@@ -132,8 +132,8 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:viewallboards' => [
@@ -143,8 +143,8 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:editallboards' => [
@@ -154,8 +154,8 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 
     'mod/kanban:manageboard' => [
@@ -165,7 +165,7 @@ $capabilities = [
             'student' => CAP_PREVENT,
             'guest' => CAP_PREVENT,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ]
+            'manager' => CAP_ALLOW,
+        ],
     ],
 ];

@@ -184,7 +184,7 @@ class get_kanban_content extends external_api {
                                 'attachments' => new external_multiple_structure(
                                     new external_single_structure([
                                         'url' => new external_value(PARAM_URL, 'attachment url', VALUE_REQUIRED),
-                                        'name' => new external_value(PARAM_TEXT, 'filename', VALUE_REQUIRED)
+                                        'name' => new external_value(PARAM_TEXT, 'filename', VALUE_REQUIRED),
                                     ]),
                                     'attachments',
                                     VALUE_OPTIONAL,
@@ -245,7 +245,7 @@ class get_kanban_content extends external_api {
                                 'kanban_card' => new external_value(PARAM_INT, 'card id'),
                                 'content' => new external_value(PARAM_TEXT, 'discussion message'),
                                 'username' => new external_value(PARAM_TEXT, 'user name'),
-                                'candelete' => new external_value(PARAM_BOOL, 'whether the current user can delete this message')
+                                'candelete' => new external_value(PARAM_BOOL, 'whether the current user can delete this message'),
                             ],
                             '',
                             VALUE_OPTIONAL
@@ -336,7 +336,7 @@ class get_kanban_content extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
-            'timestamp' => $timestamp
+            'timestamp' => $timestamp,
         ]);
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
@@ -561,7 +561,7 @@ class get_kanban_content extends external_api {
                 $formatter->put('users', (array) $kanbanusers[$userid]);
             }
             return [
-                'update' => $formatter->get_formatted_updates()
+                'update' => $formatter->get_formatted_updates(),
             ];
         }
 
@@ -642,7 +642,7 @@ class get_kanban_content extends external_api {
             $formatter->put('discussions', (array) $discussion);
         }
         return [
-            'update' => $formatter->get_formatted_updates()
+            'update' => $formatter->get_formatted_updates(),
         ];
     }
 
@@ -732,7 +732,7 @@ class get_kanban_content extends external_api {
             }
         }
         return [
-            'update' => $formatter->get_formatted_updates()
+            'update' => $formatter->get_formatted_updates(),
         ];
     }
 

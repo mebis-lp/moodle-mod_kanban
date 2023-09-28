@@ -67,7 +67,7 @@ class change_kanban_content extends external_api {
                     VALUE_OPTIONAL,
                     get_string('newcolumn', 'mod_kanban')
                 ),
-                'aftercol' => new external_value(PARAM_INT, 'insert column after this id', VALUE_OPTIONAL, 0)
+                'aftercol' => new external_value(PARAM_INT, 'insert column after this id', VALUE_OPTIONAL, 0),
             ]),
         ]);
     }
@@ -117,7 +117,7 @@ class change_kanban_content extends external_api {
         $boardmanager->add_column($aftercol, $data);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -189,7 +189,7 @@ class change_kanban_content extends external_api {
         $boardmanager->add_card($columnid, $aftercard, $data);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -204,7 +204,7 @@ class change_kanban_content extends external_api {
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'data' => new external_single_structure([
                 'columnid' => new external_value(PARAM_INT, 'id of the moved column', VALUE_REQUIRED),
-                'aftercol' => new external_value(PARAM_INT, 'move column after this id', VALUE_REQUIRED)
+                'aftercol' => new external_value(PARAM_INT, 'move column after this id', VALUE_REQUIRED),
             ]),
         ]);
     }
@@ -254,7 +254,7 @@ class change_kanban_content extends external_api {
         $boardmanager->move_column($columnid, $aftercol);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -270,7 +270,7 @@ class change_kanban_content extends external_api {
             'data' => new external_single_structure([
                 'cardid' => new external_value(PARAM_INT, 'id of the moved card', VALUE_REQUIRED),
                 'columnid' => new external_value(PARAM_INT, 'id of the target column', VALUE_REQUIRED),
-                'aftercard' => new external_value(PARAM_INT, 'move card after this card', VALUE_REQUIRED)
+                'aftercard' => new external_value(PARAM_INT, 'move card after this card', VALUE_REQUIRED),
             ]),
         ]);
     }
@@ -326,7 +326,7 @@ class change_kanban_content extends external_api {
         $boardmanager->move_card($cardid, $aftercard, $columnid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -340,7 +340,7 @@ class change_kanban_content extends external_api {
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'data' => new external_single_structure([
-                'cardid' => new external_value(PARAM_INT, 'id of the moved card', VALUE_REQUIRED)
+                'cardid' => new external_value(PARAM_INT, 'id of the moved card', VALUE_REQUIRED),
             ]),
         ]);
     }
@@ -392,7 +392,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_card($cardid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -406,7 +406,7 @@ class change_kanban_content extends external_api {
             'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'data' => new external_single_structure([
-                'columnid' => new external_value(PARAM_INT, 'id of the column', VALUE_REQUIRED)
+                'columnid' => new external_value(PARAM_INT, 'id of the column', VALUE_REQUIRED),
             ]),
         ]);
     }
@@ -452,7 +452,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_column($columnid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -467,7 +467,7 @@ class change_kanban_content extends external_api {
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'data' => new external_single_structure([
                 'cardid' => new external_value(PARAM_INT, 'id of the column', VALUE_REQUIRED),
-                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL)
+                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL),
             ]),
         ]);
     }
@@ -520,7 +520,7 @@ class change_kanban_content extends external_api {
         $boardmanager->assign_user($cardid, $userid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -535,7 +535,7 @@ class change_kanban_content extends external_api {
             'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
             'data' => new external_single_structure([
                 'cardid' => new external_value(PARAM_INT, 'id of the column', VALUE_REQUIRED),
-                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL, 0)
+                'userid' => new external_value(PARAM_INT, 'user id', VALUE_OPTIONAL, 0),
             ]),
         ]);
     }
@@ -590,7 +590,7 @@ class change_kanban_content extends external_api {
         $boardmanager->unassign_user($cardid, $userid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -660,7 +660,7 @@ class change_kanban_content extends external_api {
         $boardmanager->set_card_complete($cardid, $state);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -725,7 +725,7 @@ class change_kanban_content extends external_api {
         $boardmanager->set_column_locked($columnid, $state);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -787,7 +787,7 @@ class change_kanban_content extends external_api {
         $boardmanager->set_board_columns_locked($state);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -851,7 +851,7 @@ class change_kanban_content extends external_api {
         $boardmanager->add_discussion_message($cardid, $message);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
 
     }
@@ -921,7 +921,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_discussion_message($messageid, $message->kanban_card);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -976,7 +976,7 @@ class change_kanban_content extends external_api {
         $boardmanager->create_template();
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -1036,7 +1036,7 @@ class change_kanban_content extends external_api {
         $boardmanager->delete_board($boardid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -1099,7 +1099,7 @@ class change_kanban_content extends external_api {
         $boardmanager->push_card_copy($cardid);
 
         return [
-            'update' => $boardmanager->get_formatted_updates()
+            'update' => $boardmanager->get_formatted_updates(),
         ];
     }
 
@@ -1113,7 +1113,7 @@ class change_kanban_content extends external_api {
             new external_single_structure(
                 [
                     'success' => new external_value(PARAM_BOOL, 'success', VALUE_OPTIONAL, true),
-                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON')
+                    'update' => new external_value(PARAM_RAW, 'Encoded course update JSON'),
                 ]
             );
     }

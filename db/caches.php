@@ -31,5 +31,5 @@ $definitions = [
     ],
     'board' => [
         'mode' => cache_store::MODE_APPLICATION,
-    ]
+    ],
 ];
