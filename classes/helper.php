@@ -184,7 +184,7 @@ class helper {
                     $attachment->get_filepath(),
                     $attachment->get_filename()
                 )->out(),
-                'name' => $attachment->get_filename()
+                'name' => $attachment->get_filename(),
             ];
         }
 

@@ -37,7 +37,7 @@ class generation_test extends \advanced_testcase {
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
-        $this->assertFalse($DB->record_exists('kanban', array('course' => $course->id)));
+        $this->assertFalse($DB->record_exists('kanban', ['course' => $course->id]));
         $kanban = $this->getDataGenerator()->create_module('kanban', ['course' => $course]);
 
         $records = $DB->get_records('kanban', ['course' => $course->id], 'id');

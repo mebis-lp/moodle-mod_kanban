@@ -216,7 +216,7 @@ class boardmanager {
                 'template' => 0,
                 'timecreated' => time(),
                 'timemodified' => time(),
-                'kanban_instance' => $this->kanban->id
+                'kanban_instance' => $this->kanban->id,
             ];
             // Replace / append data.
             $boarddata = array_merge($boarddata, $data);
@@ -421,7 +421,7 @@ class boardmanager {
             $update = [
                 'id' => $this->board->id,
                 'sequence' => helper::sequence_add_after($this->board->sequence, $aftercol, $data['id']),
-                'timemodified' => time()
+                'timemodified' => time(),
             ];
             $DB->update_record('kanban_board', $update);
             helper::update_cached_board($update['id']);
@@ -448,7 +448,7 @@ class boardmanager {
             'title' => get_string('newcard', 'mod_kanban'),
             'options' => '{}',
             'description' => '',
-            'createdby' => $USER->id
+            'createdby' => $USER->id,
         ];
         $defaultsfixed = [
             'kanban_board' => $this->board->id,
@@ -467,7 +467,7 @@ class boardmanager {
         $update = [
             'id' => $columnid,
             'sequence' => helper::sequence_add_after($column->sequence, $aftercard, $data['id']),
-            'timemodified' => time()
+            'timemodified' => time(),
         ];
         $DB->update_record('kanban_column', $update);
 
@@ -529,31 +529,15 @@ class boardmanager {
             $update = [
                 'id' => $columnid,
                 'sequence' => helper::sequence_move_after($sourcecolumn->sequence, $aftercard, $cardid),
-                'timemodified' => time()
+                'timemodified' => time(),
             ];
             $DB->update_record('kanban_column', $update);
             $this->formatter->put('columns', $update);
         } else {
             $targetcolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
 
-            // Remove from current column.
-            $update = [
-                'id' => $sourcecolumn->id,
-                'sequence' => helper::sequence_remove($sourcecolumn->sequence, $cardid),
-                'timemodified' => time()
-            ];
-            $DB->update_record('kanban_column', $update);
-            $this->formatter->put('columns', $update);
-
-            // Add to target column.
-            $update = [
-                'id' => $columnid,
-                'sequence' => helper::sequence_add_after($targetcolumn->sequence, $aftercard, $cardid),
-                'timemodified' => time()
-            ];
-            $DB->update_record('kanban_column', $update);
-            $this->formatter->put('columns', $update);
-
+            // Card needs to be processed first, because column sorting in frontend will only
+            // work if card is already moved in the right position.
             $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
             // If target column has autoclose option set, update card to be completed.
             $options = json_decode($targetcolumn->options);
@@ -566,6 +550,24 @@ class boardmanager {
             // change the DOM directly and does not trigger the update function.
             // So we add the current title here to avoid this.
             $this->formatter->put('cards', array_merge($updatecard, ['title' => $card->title]));
+
+            // Remove from current column.
+            $update = [
+                'id' => $sourcecolumn->id,
+                'sequence' => helper::sequence_remove($sourcecolumn->sequence, $cardid),
+                'timemodified' => time(),
+            ];
+            $DB->update_record('kanban_column', $update);
+            $this->formatter->put('columns', $update);
+
+            // Add to target column.
+            $update = [
+                'id' => $columnid,
+                'sequence' => helper::sequence_add_after($targetcolumn->sequence, $aftercard, $cardid),
+                'timemodified' => time(),
+            ];
+            $DB->update_record('kanban_column', $update);
+            $this->formatter->put('columns', $update);
 
             $data = array_merge((array) $card, $updatecard);
             $data['username'] = fullname($USER);
@@ -803,7 +805,7 @@ class boardmanager {
             'options',
             'kanban_column',
             'kanban_board',
-            'completed'
+            'completed',
         ];
         if (!empty($data['color'])) {
             $data['options'] = json_encode(['background' => $data['color']]);
@@ -863,7 +865,8 @@ class boardmanager {
                 $this->formatter->put('users', [
                         'id' => $user->id,
                         'fullname' => fullname($user),
-                        'userpicture' => $OUTPUT->user_picture($user, ['link' => false])]
+                        'userpicture' => $OUTPUT->user_picture($user, ['link' => false]),
+                    ]
                 );
             }
             $DB->insert_records('kanban_assignee', $assignees);
@@ -999,7 +1002,7 @@ class boardmanager {
                         [
                             'id' => $columnids[0],
                             'sequence' => helper::sequence_add_after($column->sequence, 0, $newcard['id']),
-                            'timemodified' => time()
+                            'timemodified' => time(),
                         ]
                     );
                     $newcard['columnname'] = $column->title;

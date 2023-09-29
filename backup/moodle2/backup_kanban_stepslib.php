@@ -73,7 +73,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
                 'originalid',
                 'discussion',
                 'reminder_sent',
-                'createdby'
+                'createdby',
             ]
         );
         $card->annotate_files('mod_kanban', 'attachments', 'id');
@@ -106,7 +106,7 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
                 'parameters',
                 'timestamp',
                 'affected_userid',
-                'type'
+                'type',
             ]
         );
 
