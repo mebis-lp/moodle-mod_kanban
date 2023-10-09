@@ -59,17 +59,6 @@ $capabilities = [
         ],
     ],
 
-    'mod/kanban:managecards' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'student' => CAP_ALLOW,
-            'guest' => CAP_PREVENT,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
     'mod/kanban:assignself' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
