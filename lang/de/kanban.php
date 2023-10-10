@@ -64,6 +64,7 @@ $string['editboard'] = 'Board bearbeiten';
 $string['editcard'] = 'Karte bearbeiten';
 $string['editcolumn'] = 'Spalte bearbeiten';
 $string['editdetails'] = 'Details bearbeiten';
+$string['editing_this_card_is_not_allowed'] = 'Sie haben nicht das Recht, diese Karte zu bearbeiten';
 $string['enablehistory'] = 'Verlauf aktivieren';
 $string['enablehistory_help'] = 'Aktiviert die Speicherung des Bearbeitungsverlaufs der Karten im Board (z.B. wann eine Karte verschoben / umbenannt oder abgeschlossen wurde).';
 $string['enablehistorydescription'] = 'Wenn diese Option aktiv ist, ist der Änderungsverlauf in den Boards verfügbar.';
