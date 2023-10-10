@@ -39,6 +39,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_kanban\boardmanager;
 use mod_kanban\constants;
 use mod_kanban\helper;
 use mod_kanban\updateformatter;
@@ -363,6 +364,8 @@ class get_kanban_content extends external_api {
         $params['board'] = $boardid;
         $params['timestamp'] = $timestamp;
 
+        $boardmanager = new boardmanager($cmid, $boardid);
+
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
 
         $kanbanboard = helper::get_cached_board($boardid);
@@ -522,10 +525,7 @@ class get_kanban_content extends external_api {
                 }
                 $card->assignees = $kanbanassignees[$card->id];
                 $card->selfassigned = in_array($USER->id, $card->assignees);
-                $card->canedit =
-                    $capabilities['manageallcards'] ||
-                    ($capabilities['manageassignedcards'] && $card->selfassigned) ||
-                    $card->createdby == $USER->id;
+                $card->canedit = $boardmanager->can_user_manage_specific_card($card->id);
                 $card->hasdescription = !empty($card->description);
                 $card->discussions = [];
                 $card->description = file_rewrite_pluginfile_urls(

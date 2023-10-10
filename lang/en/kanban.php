@@ -66,6 +66,7 @@ $string['editboard'] = 'Edit board';
 $string['editcard'] = 'Edit card';
 $string['editcolumn'] = 'Edit column';
 $string['editdetails'] = 'Edit details';
+$string['editing_this_card_is_not_allowed'] = 'Editing this card is not allowed';
 $string['enablehistory'] = 'Enable history';
 $string['enablehistory_help'] = 'Enable recording history of cards in this board (e.g. when card was moved / renamed / completed)';
 $string['enablehistorydescription'] = 'Enabling this option will make history of changes available to the boards.';

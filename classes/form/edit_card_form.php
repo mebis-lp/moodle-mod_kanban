@@ -101,25 +101,18 @@ class edit_card_form extends dynamic_form {
      * Checks if current user has access to this card, otherwise throws exception
      */
     protected function check_access_for_dynamic_submission(): void {
-        global $COURSE, $DB, $USER;
+        global $COURSE;
         $context = $this->get_context_for_dynamic_submission();
         $cmid = $this->optional_param('cmid', null, PARAM_INT);
         $boardid = $this->optional_param('boardid', null, PARAM_INT);
         $kanbanboard = helper::get_cached_board($boardid);
         $id = $this->optional_param('id', null, PARAM_INT);
         $boardmanager = new boardmanager($cmid, $boardid);
-        $card = $boardmanager->get_card($id);
-        if (
-            !(
-                has_capability('mod/kanban:addcard', $context) &&
-                $card->createdby == $USER->id
-            ) && !(
-                has_capability('mod/kanban:manageassignedcards', $context) &&
-                in_array($USER->id, $boardmanager->get_card_assignees($card->id))
-            )
-        ) {
-            require_capability('mod/kanban:manageallcards', $context);
+        
+        if (!$boardmanager->can_user_manage_specific_card($id)) {
+            throw new moodle_exception('editing_this_card_is_not_allowed', 'mod_kanban');
         }
+
         $modinfo = get_fast_modinfo($COURSE);
         $cm = $modinfo->get_cm($cmid);
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cm);

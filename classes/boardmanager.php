@@ -1176,4 +1176,36 @@ class boardmanager {
             $fs->create_file_from_storedfile(['itemid' => $newcardid], $attachment);
         }
     }
+
+    /**
+     * Checks whether a user can manage a specific card.
+     * @param int $cardid Id of the card
+     * @param int $userid Id of the user (defaults to 0, then current user is used)
+     * @return bool
+     */
+    public function can_user_manage_specific_card(int $cardid, int $userid = 0): bool {
+        global $USER;
+
+        $context = context_module::instance($this->cmid);
+        if (has_capability('mod/kanban:manageallcards', $context)) {
+            return true;
+        }
+        
+        if (empty($userid)) {
+            $userid = $USER->id;
+        }
+
+        $card = $this->get_card($cardid);
+
+        if ($card->createdby == $userid) {
+            return true;
+        }
+
+        if (has_capability('mod/kanban:manageassignedcards', $context) &&
+                in_array($userid, $this->get_card_assignees($card->id))) {
+            return true;
+        }
+
+        return false;
+    }
 }

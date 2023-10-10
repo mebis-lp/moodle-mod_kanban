@@ -314,12 +314,8 @@ class change_kanban_content extends external_api {
         self::validate_context($context);
         $boardmanager = new boardmanager($cmid, $boardid);
 
-        $assignees = $boardmanager->get_card_assignees($cardid);
-
-        if (in_array($USER->id, $assignees)) {
-            require_capability('mod/kanban:manageassignedcards', $context);
-        } else {
-            require_capability('mod/kanban:manageallcards', $context);
+        if (!$boardmanager->can_user_manage_specific_card($cardid)) {
+            throw new moodle_exception('editing_this_card_is_not_allowed', 'mod_kanban');
         }
 
         helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
@@ -382,18 +378,9 @@ class change_kanban_content extends external_api {
         self::validate_context($context);
 
         $boardmanager = new boardmanager($cmid, $boardid);
-        $card = $boardmanager->get_card($cardid);
 
-        if (
-            !(
-                has_capability('mod/kanban:addcard', $context) &&
-                $card->createdby == $USER->id
-            ) && !(
-                has_capability('mod/kanban:manageassignedcards', $context) &&
-                in_array($USER->id, $boardmanager->get_card_assignees($card->id))
-            )
-        ) {
-            require_capability('mod/kanban:manageallcards', $context);
+        if (!$boardmanager->can_user_manage_specific_card($cardid)) {
+            throw new moodle_exception('editing_this_card_is_not_allowed', 'mod_kanban');
         }
 
         helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
@@ -655,12 +642,9 @@ class change_kanban_content extends external_api {
         $context = context_module::instance($cmid);
         self::validate_context($context);
         $boardmanager = new boardmanager($cmid, $boardid);
-        $assignees = $boardmanager->get_card_assignees($cardid);
 
-        if (in_array($USER->id, $assignees)) {
-            require_capability('mod/kanban:manageassignedcards', $context);
-        } else {
-            require_capability('mod/kanban:manageallcards', $context);
+        if (!$boardmanager->can_user_manage_specific_card($cardid)) {
+            throw new moodle_exception('editing_this_card_is_not_allowed', 'mod_kanban');
         }
 
         helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);

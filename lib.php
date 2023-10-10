@@ -148,16 +148,8 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
     external_api::validate_context($context);
 
     if ($itemtype == 'card') {
-        if (
-            !(
-                has_capability('mod/kanban:addcard', $context) &&
-                $card->createdby == $USER->id
-            ) && !(
-                has_capability('mod/kanban:manageassignedcards', $context) &&
-                in_array($USER->id, $boardmanager->get_card_assignees($card->id))
-            )
-        ) {
-            require_capability('mod/kanban:manageallcards', $context);
+        if (!$boardmanager->can_user_manage_specific_card($card->id)) {
+            throw new moodle_exception('editing_this_card_is_not_allowed', 'mod_kanban');
         }
     }
 
