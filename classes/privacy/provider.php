@@ -31,6 +31,7 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use core_privacy\local\metadata\collection;
 use stdClass;
 
 /**
@@ -42,7 +43,9 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-    \core_privacy\local\request\plugin\provider, \core_privacy\local\request\core_userlist_provider {
+    \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider {
     /**
      * Delete multiple users within a single context.
      *
@@ -531,5 +534,56 @@ class provider implements
             $DB->delete_records('kanban_board', ['id' => $boardid]);
             $DB->delete_records('kanban_history', ['id' => $boardid]);
         }
+    }
+
+    /**
+     * Returns meta data about this system.
+     *
+     * @param   collection     $collection The initialised collection to add items to.
+     * @return  collection     A listing of user data stored through this system.
+     */
+    public static function get_metadata(collection $collection) : collection {
+        $collection->add_database_table('kanban_board', [
+            'userid' => 'privacy:metadata:userid',
+            'groupid' => 'privacy:metadata:groupid',
+            'timecreated' => 'privacy:metadata:timecreated',
+            'timemodified' => 'privacy:metadata:timemodified',
+        ], 'privacy:metadata:kanban_board');
+
+        $collection->add_database_table('kanban_column', [
+            'timecreated' => 'privacy:metadata:timecreated',
+            'timemodified' => 'privacy:metadata:timemodified',
+        ], 'privacy:metadata:kanban_column');
+
+        $collection->add_database_table('kanban_card', [
+            'timecreated' => 'privacy:metadata:timecreated',
+            'timemodified' => 'privacy:metadata:timemodified',
+            'createdby' => 'privacy:metadata:createdby',
+        ], 'privacy:metadata:kanban_card');
+
+        $collection->add_database_table('kanban_assignee', [
+            'userid' => 'privacy:metadata:userid',
+            'kanban_card' => 'privacy:metadata:kanban_card',
+        ], 'privacy:metadata:kanban_assignee');
+
+        $collection->add_database_table('kanban_discussion_comment', [
+            'userid' => 'privacy:metadata:userid',
+            'kanban_card' => 'privacy:metadata:kanban_card',
+            'content' => 'privacy:metadata:content',
+            'timecreated' => 'privacy:metadata:timecreated',
+        ], 'privacy:metadata:kanban_discussion_comment');
+
+        $collection->add_database_table('kanban_history', [
+            'userid' => 'privacy:metadata:userid',
+            'kanban_board' => 'privacy:metadata:kanban_board',
+            'kanban_column' => 'privacy:metadata:kanban_column',
+            'kanban_card' => 'privacy:metadata:kanban_card',
+            'parameters' => 'privacy:metadata:parameters',
+            'action' => 'privacy:metadata:action',
+            'affected_userid' => 'privacy:metadata:affected_userid',
+            'timestamp' => 'privacy:metadata:timestamp',
+        ], 'privacy:metadata:kanban_history');
+
+        return $collection;
     }
 }
