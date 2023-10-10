@@ -517,6 +517,7 @@ export default class extends KanbanComponent {
             this.draggable = false;
             this.dragdrop.setDraggable(false);
         }
+        this.toggleClass(state.cards.get(this.id).canedit, 'mod_kanban_canedit');
     }
 
     /**
