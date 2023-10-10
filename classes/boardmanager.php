@@ -443,7 +443,6 @@ class boardmanager {
      */
     public function add_card(int $columnid, int $aftercard = 0, array $data = []): int {
         global $DB, $USER;
-        $aftercard = intval($aftercard);
         $defaults = [
             'title' => get_string('newcard', 'mod_kanban'),
             'options' => '{}',
@@ -472,7 +471,7 @@ class boardmanager {
         $DB->update_record('kanban_column', $update);
 
         // Users can always edit cards they created.
-        $data['canedit'] = true;
+        $data['canedit'] = $this->can_user_manage_specific_card($data['id']);;
         $data['columnname'] = $column->title;
 
         $this->formatter->put('cards', $data);
