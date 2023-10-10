@@ -1183,7 +1183,7 @@ class boardmanager {
      * Checks whether a user can manage a specific card.
      * @param int $cardid Id of the card
      * @param int $userid Id of the user (defaults to 0, then current user is used)
-     * @return bool
+     * @return bool true if the user can manage a specific card, false otherwise
      */
     public function can_user_manage_specific_card(int $cardid, int $userid = 0): bool {
         global $USER;
