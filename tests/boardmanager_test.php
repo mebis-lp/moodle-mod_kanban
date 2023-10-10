@@ -270,4 +270,35 @@ class boardmanager_test extends \advanced_testcase {
         array_shift($columnids);
         $this->assertEquals(join(',', $columnids), $boardmanager->get_board()->sequence);
     }
+
+    /**
+     * Test for permission checking.
+     *
+     * @return void
+     */
+    public function test_can_user_manage_specific_card() {
+        global $DB;
+
+        $this->resetAfterTest();
+        
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+
+        // Teacher user.
+        $this->setUser($this->users[2]);
+        $teachercard = $boardmanager->add_card($columnids[0]);
+        $teachercardstudentassigned = $boardmanager->add_card($columnids[0]);
+        $boardmanager->assign_user($teachercardstudentassigned, $this->users[0]->id);
+
+        // Student user.
+        $this->setUser($this->users[0]);
+        $studentcard = $boardmanager->add_card($columnids[1]);
+
+        $this->assertEquals(false, $boardmanager->can_user_manage_specific_card($teachercard));
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($teachercardstudentassigned));
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard));
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard, $this->users[2]->id));
+    }
 }
