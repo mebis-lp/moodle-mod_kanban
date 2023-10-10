@@ -296,9 +296,13 @@ class boardmanager_test extends \advanced_testcase {
         $this->setUser($this->users[0]);
         $studentcard = $boardmanager->add_card($columnids[1]);
 
+        // Student user should not be able to edit a card created by the teacher.
         $this->assertEquals(false, $boardmanager->can_user_manage_specific_card($teachercard));
+        // Student user should be able to edit a card he is assigned to.
         $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($teachercardstudentassigned));
+        // Student user should be able to edit a card created by himself.
         $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard));
+        // Teacher user should be able to edit every card.
         $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard, $this->users[2]->id));
     }
 }
