@@ -16,6 +16,8 @@
 
 namespace mod_kanban;
 
+use context_course;
+
 /**
  * Unit test for mod_kanban
  *
@@ -269,5 +271,49 @@ class boardmanager_test extends \advanced_testcase {
         $this->assertEquals($columncount - 1, $DB->count_records('kanban_column', ['kanban_board' => $boardid]));
         array_shift($columnids);
         $this->assertEquals(join(',', $columnids), $boardmanager->get_board()->sequence);
+    }
+
+    /**
+     * Test for permission checking.
+     *
+     * @return void
+     */
+    public function test_can_user_manage_specific_card() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $boardmanager = new boardmanager($this->kanban->cmid);
+        $boardid = $boardmanager->create_board();
+        $boardmanager->load_board($boardid);
+        $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $boardid]);
+
+        // Teacher user.
+        $this->setUser($this->users[2]);
+        $teachercard = $boardmanager->add_card($columnids[0]);
+        $teachercardstudentassigned = $boardmanager->add_card($columnids[0]);
+        $boardmanager->assign_user($teachercardstudentassigned, $this->users[0]->id);
+
+        // Student user.
+        $this->setUser($this->users[0]);
+        $studentcard = $boardmanager->add_card($columnids[1]);
+
+        // Student user should not be able to edit a card created by the teacher.
+        $this->assertEquals(false, $boardmanager->can_user_manage_specific_card($teachercard));
+        // Student user should be able to edit a card he is assigned to.
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($teachercardstudentassigned));
+        // Student user should be able to edit a card created by himself.
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard));
+        // Teacher user should be able to edit every card.
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard, $this->users[2]->id));
+
+        // Test explicitly the mod_kanban/manageallcards capability.
+        $context = context_course::instance($boardmanager->get_cminfo()->course);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        // Current student user should not be able to edit teacher card.
+        $this->assertEquals(false, $boardmanager->can_user_manage_specific_card($teachercard));
+        assign_capability('mod/kanban:manageallcards', CAP_ALLOW, $studentrole->id, $context);
+        // Current student user now should be able to also edit teacher card.
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($teachercard));
     }
 }

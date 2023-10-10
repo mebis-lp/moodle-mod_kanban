@@ -8,8 +8,6 @@ import {get_string as getString} from 'core/str';
 import Templates from 'core/templates';
 import KanbanComponent from 'mod_kanban/kanbancomponent';
 import Log from 'core/log';
-import capabilities from 'mod_kanban/capabilities';
-
 
 /**
  * Component representing a card in a kanban board.
@@ -512,17 +510,14 @@ export default class extends KanbanComponent {
         if (state === undefined) {
             state = this.reactive.stateManager.state;
         }
-        // User may move the card if he/she has moveallcards capability or has moveassignedcards
-        // capability and is currently assigned to the card.
-        if (state.capabilities.get(capabilities.MOVEALLCARDS).value ||
-            (state.capabilities.get(capabilities.MOVEASSIGNEDCARDS).value &&
-                state.cards.get(this.id).selfassigned)) {
+        if (state.cards.get(this.id).canedit) {
             this.draggable = true;
             this.dragdrop.setDraggable(true);
         } else {
             this.draggable = false;
             this.dragdrop.setDraggable(false);
         }
+        this.toggleClass(state.cards.get(this.id).canedit, 'mod_kanban_canedit');
     }
 
     /**

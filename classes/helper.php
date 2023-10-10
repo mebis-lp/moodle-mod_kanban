@@ -229,7 +229,7 @@ class helper {
 
         foreach ($users as $user) {
             $user = \core_user::get_user($user);
-            fix_current_language($user->lang);
+            self::fix_current_language($user->lang);
             $message->subject = get_string('message_' . $messagename . '_smallmessage', 'mod_kanban', $data);
             $message->fullmessage = get_string('message_' . $messagename . '_fullmessage', 'mod_kanban', $data);
             $message->smallmessage = $message->subject;
@@ -419,5 +419,17 @@ class helper {
      */
     public static function get_timestamp_cache(): \cache_application {
         return \cache::make('mod_kanban', 'timestamp');
+    }
+
+    /**
+     * Set the current language to the given one. If this fails, English will be used.
+     * @param string $lang Language
+     */
+    public static function fix_current_language(string $lang) {
+        try {
+            fix_current_language($lang);
+        } catch (\moodle_exception $exception) {
+            fix_current_language('en');
+        }
     }
 }

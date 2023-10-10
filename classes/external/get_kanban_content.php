@@ -39,6 +39,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use mod_kanban\boardmanager;
 use mod_kanban\constants;
 use mod_kanban\helper;
 use mod_kanban\updateformatter;
@@ -349,11 +350,10 @@ class get_kanban_content extends external_api {
         // Get the values of some capabilities for output.
         $capabilities = [
             'addcard' => has_capability('mod/kanban:addcard', $context),
-            'managecards' => has_capability('mod/kanban:managecards', $context),
+            'manageallcards' => has_capability('mod/kanban:manageallcards', $context),
+            'manageassignedcards' => has_capability('mod/kanban:manageallcards', $context),
             'assignself' => has_capability('mod/kanban:assignself', $context),
             'assignothers' => has_capability('mod/kanban:assignothers', $context),
-            'moveassignedcards' => has_capability('mod/kanban:moveassignedcards', $context),
-            'moveallcards' => has_capability('mod/kanban:moveallcards', $context),
             'managecolumns' => has_capability('mod/kanban:managecolumns', $context),
             'editallboards' => has_capability('mod/kanban:editallboards', $context),
             'manageboard' => has_capability('mod/kanban:manageboard', $context),
@@ -363,6 +363,8 @@ class get_kanban_content extends external_api {
 
         $params['board'] = $boardid;
         $params['timestamp'] = $timestamp;
+
+        $boardmanager = new boardmanager($cmid, $boardid);
 
         $kanban = $DB->get_record('kanban', ['id' => $cminfo->instance]);
 
@@ -521,9 +523,9 @@ class get_kanban_content extends external_api {
                 if (empty($kanbanassignees[$card->id])) {
                     $kanbanassignees[$card->id] = [];
                 }
-                $card->canedit = $capabilities['managecards'] || $card->createdby == $USER->id;
                 $card->assignees = $kanbanassignees[$card->id];
                 $card->selfassigned = in_array($USER->id, $card->assignees);
+                $card->canedit = $boardmanager->can_user_manage_specific_card($card->id);
                 $card->hasdescription = !empty($card->description);
                 $card->discussions = [];
                 $card->description = file_rewrite_pluginfile_urls(

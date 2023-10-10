@@ -443,7 +443,6 @@ class boardmanager {
      */
     public function add_card(int $columnid, int $aftercard = 0, array $data = []): int {
         global $DB, $USER;
-        $aftercard = intval($aftercard);
         $defaults = [
             'title' => get_string('newcard', 'mod_kanban'),
             'options' => '{}',
@@ -472,7 +471,7 @@ class boardmanager {
         $DB->update_record('kanban_column', $update);
 
         // Users can always edit cards they created.
-        $data['canedit'] = true;
+        $data['canedit'] = $this->can_user_manage_specific_card($data['id']);;
         $data['columnname'] = $column->title;
 
         $this->formatter->put('cards', $data);
@@ -617,6 +616,7 @@ class boardmanager {
 
         $update['assignees'] = $userids;
         $update['selfassigned'] = in_array($USER->id, $userids);
+        $update['canedit'] = $this->can_user_manage_specific_card($card->id);
         $this->formatter->put('cards', $update);
 
         $user = \core_user::get_user($userid);
@@ -657,6 +657,7 @@ class boardmanager {
 
         $update['assignees'] = $userids;
         $update['selfassigned'] = in_array($USER->id, $userids);
+        $update['canedit'] = $this->can_user_manage_specific_card($card->id);
         $this->formatter->put('cards', $update);
         $this->write_history('unassigned', constants::MOD_KANBAN_CARD, ['userid' => $userid], $card->kanban_column, $cardid);
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
@@ -902,6 +903,7 @@ class boardmanager {
                 $cardupdate['id']
             );
         }
+        $cardupdate['canedit'] = $this->can_user_manage_specific_card($cardupdate['id']);
         $this->formatter->put('cards', $cardupdate);
 
         $this->write_history(
@@ -1175,5 +1177,37 @@ class boardmanager {
             }
             $fs->create_file_from_storedfile(['itemid' => $newcardid], $attachment);
         }
+    }
+
+    /**
+     * Checks whether a user can manage a specific card.
+     * @param int $cardid Id of the card
+     * @param int $userid Id of the user (defaults to 0, then current user is used)
+     * @return bool true if the user can manage a specific card, false otherwise
+     */
+    public function can_user_manage_specific_card(int $cardid, int $userid = 0): bool {
+        global $USER;
+
+        if (empty($userid)) {
+            $userid = $USER->id;
+        }
+
+        $context = context_module::instance($this->cmid);
+        if (has_capability('mod/kanban:manageallcards', $context, $userid)) {
+            return true;
+        }
+
+        $card = $this->get_card($cardid);
+
+        if ($card->createdby == $userid) {
+            return true;
+        }
+
+        if (has_capability('mod/kanban:manageassignedcards', $context, $userid) &&
+                in_array($userid, $this->get_card_assignees($card->id))) {
+            return true;
+        }
+
+        return false;
     }
 }
