@@ -16,6 +16,8 @@
 
 namespace mod_kanban;
 
+use context_course;
+
 /**
  * Unit test for mod_kanban
  *
@@ -304,5 +306,14 @@ class boardmanager_test extends \advanced_testcase {
         $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard));
         // Teacher user should be able to edit every card.
         $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($studentcard, $this->users[2]->id));
+
+        // Test explicitly the mod_kanban/manageallcards capability.
+        $context = context_course::instance($boardmanager->get_cminfo()->course);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        // Current student user should not be able to edit teacher card.
+        $this->assertEquals(false, $boardmanager->can_user_manage_specific_card($teachercard));
+        assign_capability('mod/kanban:manageallcards', CAP_ALLOW, $studentrole->id, $context);
+        // Current student user now should be able to also edit teacher card.
+        $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($teachercard));
     }
 }
