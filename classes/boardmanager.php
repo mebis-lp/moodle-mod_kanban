@@ -1186,13 +1186,13 @@ class boardmanager {
     public function can_user_manage_specific_card(int $cardid, int $userid = 0): bool {
         global $USER;
 
-        $context = context_module::instance($this->cmid);
-        if (has_capability('mod/kanban:manageallcards', $context)) {
-            return true;
-        }
-        
         if (empty($userid)) {
             $userid = $USER->id;
+        }
+
+        $context = context_module::instance($this->cmid);
+        if (has_capability('mod/kanban:manageallcards', $context, $userid)) {
+            return true;
         }
 
         $card = $this->get_card($cardid);
@@ -1201,7 +1201,7 @@ class boardmanager {
             return true;
         }
 
-        if (has_capability('mod/kanban:manageassignedcards', $context) &&
+        if (has_capability('mod/kanban:manageassignedcards', $context, $userid) &&
                 in_array($userid, $this->get_card_assignees($card->id))) {
             return true;
         }

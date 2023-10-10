@@ -280,7 +280,7 @@ class boardmanager_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
-        
+
         $boardmanager = new boardmanager($this->kanban->cmid);
         $boardid = $boardmanager->create_board();
         $boardmanager->load_board($boardid);

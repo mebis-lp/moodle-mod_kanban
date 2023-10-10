@@ -108,7 +108,7 @@ class edit_card_form extends dynamic_form {
         $kanbanboard = helper::get_cached_board($boardid);
         $id = $this->optional_param('id', null, PARAM_INT);
         $boardmanager = new boardmanager($cmid, $boardid);
-        
+
         if (!$boardmanager->can_user_manage_specific_card($id)) {
             throw new moodle_exception('editing_this_card_is_not_allowed', 'mod_kanban');
         }
