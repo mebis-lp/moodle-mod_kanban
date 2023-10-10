@@ -48,7 +48,7 @@ class edit_card_form extends dynamic_form {
         $mform->setType('cmid', PARAM_INT);
 
         $mform->addElement('text', 'title', get_string('cardtitle', 'kanban'), ['size' => '50']);
-        $mform->setType('text', PARAM_TEXT);
+        $mform->setType('title', PARAM_TEXT);
 
         $userid = $this->optional_param('userid', 0, PARAM_INT);
         $groupid = $this->optional_param('groupid', 0, PARAM_INT);
