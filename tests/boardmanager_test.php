@@ -39,6 +39,7 @@ class boardmanager_test extends \advanced_testcase {
      * Prepare testing environment
      */
     public function setUp(): void {
+        $this->resetAfterTest();
         global $DB;
         $this->course = $this->getDataGenerator()->create_course();
         $this->kanban = $this->getDataGenerator()->create_module('kanban', ['course' => $this->course]);
@@ -315,5 +316,44 @@ class boardmanager_test extends \advanced_testcase {
         assign_capability('mod/kanban:manageallcards', CAP_ALLOW, $studentrole->id, $context);
         // Current student user now should be able to also edit teacher card.
         $this->assertEquals(true, $boardmanager->can_user_manage_specific_card($teachercard));
+    }
+
+    /**
+     * Tests the json sanitization function.
+     *
+     * @dataProvider test_sanitize_json_string_provider
+     * @param $jsonstring string the json string to sanitize
+     * @param $sanitized string the expected sanitized json string
+     * @return void
+     */
+    public function test_sanitize_json_string(string $jsonstring, string $sanitized): void {
+        $output = helper::sanitize_json_string($jsonstring);
+        $this->assertEquals($sanitized, $output);
+    }
+
+    /**
+     * Data Provider for self::test_sanitize_json_string.
+     *
+     * @return array[] containing the keys 'json' and 'expected'
+     */
+    public function test_sanitize_json_string_provider(): array {
+        return [
+            [
+                'json' => '{"test": "<b>bad html</b><script>console.log(\"bla\")</script>"}',
+                'expected' => '{"test":"<b>bad html<\/b>"}'
+            ],
+            [
+                'json' => '{"test": "<b>good html</b>"}',
+                'expected' => '{"test":"<b>good html<\/b>"}'
+            ],
+            [
+                'json' => '{"test": "<b>good html</b>","anotherkey": [{"nestedkey":"<script>console.log(\"bla\");</script>"}]}',
+                'expected' => '{"test":"<b>good html<\/b>","anotherkey":[{"nestedkey":""}]}'
+            ],
+            [
+                'json' => '{"te<script>console.log(\"bla\");</script>st": "<b>good html</b>"}',
+                'expected' => '{"test":"<b>good html<\/b>"}'
+            ]
+        ];
     }
 }

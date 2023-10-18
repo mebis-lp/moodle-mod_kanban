@@ -51,6 +51,8 @@ class updateformatter {
      * @param array $data Fields to update, must contain 'id' field
      */
     public function put(string $name, array $data) {
+        // Sanitize the output.
+        $data = json_decode(helper::sanitize_json_string(json_encode($data)), true);
         // Find int values covered as string.
         foreach ($data as $key => $value) {
             if ($key == 'sequence') {

@@ -229,7 +229,7 @@ class boardmanager {
             $columnids = [];
             foreach ($columns as $columnname => $options) {
                 $columnids[] = $DB->insert_record('kanban_column', [
-                    'title' => $columnname,
+                    'title' => clean_param($columnname, PARAM_TEXT),
                     'sequence' => '',
                     'kanban_board' => $boardid,
                     'options' => $options,
@@ -267,6 +267,7 @@ class boardmanager {
             $newcolumn = [];
             $newcard = [];
             foreach ($columns as $column) {
+                $column->title = clean_param($column->title, PARAM_TEXT);
                 $newcolumn[$column->id] = clone $column;
                 $newcolumn[$column->id]->kanban_board = $newboard['id'];
                 $newcolumn[$column->id]->timecreated = time();
@@ -416,6 +417,8 @@ class boardmanager {
             ];
             $data = array_merge($defaults, $data, $defaultsfixed);
 
+            // Sanitize title to be extra safe.
+            $data['title'] = clean_param($data['title'], PARAM_TEXT);
             $data['id'] = $DB->insert_record('kanban_column', $data);
 
             $update = [
@@ -460,6 +463,8 @@ class boardmanager {
 
         $data['id'] = $DB->insert_record('kanban_card', $data);
         $data['assignees'] = [];
+        // Sanitize title to be extra safe.
+        $data['title'] = clean_param($data['title'], PARAM_TEXT);
 
         $column = $DB->get_record('kanban_column', ['id' => $columnid]);
 
@@ -472,7 +477,7 @@ class boardmanager {
 
         // Users can always edit cards they created.
         $data['canedit'] = $this->can_user_manage_specific_card($data['id']);;
-        $data['columnname'] = $column->title;
+        $data['columnname'] = clean_param($column->title, PARAM_TEXT);
 
         $this->formatter->put('cards', $data);
         $this->formatter->put('columns', $update);
@@ -548,7 +553,7 @@ class boardmanager {
             // it might happen that the "old" title is shown in the ui since inplace editing does
             // change the DOM directly and does not trigger the update function.
             // So we add the current title here to avoid this.
-            $this->formatter->put('cards', array_merge($updatecard, ['title' => $card->title]));
+            $this->formatter->put('cards', array_merge($updatecard, ['title' => clean_param($card->title, PARAM_TEXT)]));
 
             // Remove from current column.
             $update = [
@@ -571,11 +576,11 @@ class boardmanager {
             $data = array_merge((array) $card, $updatecard);
             $data['username'] = fullname($USER);
             $data['boardname'] = $this->kanban->name;
-            $data['columnname'] = $targetcolumn->title;
+            $data['columnname'] = clean_param($targetcolumn->title, PARAM_TEXT);
             $assignees = $this->get_card_assignees($cardid);
             helper::send_notification($this->cminfo, 'moved', $assignees, (object) $data);
             if (!empty($options->autoclose) && $card->completed == 0) {
-                $data['title'] = $card->title;
+                $data['title'] = clean_param($card->title, PARAM_TEXT);
                 helper::send_notification($this->cminfo, 'closed', $assignees, (object) $data);
                 helper::remove_calendar_event($this->kanban, $card);
                 $this->write_history('completed', constants::MOD_KANBAN_CARD, [], $columnid, $cardid);
@@ -584,7 +589,7 @@ class boardmanager {
             $this->write_history(
                 'moved',
                 constants::MOD_KANBAN_CARD,
-                ['columnname' => $targetcolumn->title],
+                ['columnname' => clean_param($targetcolumn->title, PARAM_TEXT)],
                 $card->kanban_column,
                 $cardid
             );
@@ -756,7 +761,7 @@ class boardmanager {
         }
 
         $update['boardname'] = $this->kanban->name;
-        $update['title'] = $card->title;
+        $update['title'] = clean_param($card->title, PARAM_TEXT);
         $assignees = $this->get_card_assignees($cardid);
         helper::send_notification($this->cminfo, 'discussion', $assignees, (object) $update);
         // Do not write username to history.
@@ -808,6 +813,16 @@ class boardmanager {
             'kanban_board',
             'completed',
         ];
+        // Do some extra sanitizing.
+        if (isset($data['title'])) {
+            $data['title'] = clean_param($data['title'], PARAM_TEXT);
+        }
+        if (isset($data['description'])) {
+            $data['description'] = clean_param($data['description'], PARAM_CLEANHTML);
+        }
+        if (isset($data['options'])) {
+            $data['options'] = helper::sanitize_json_string($data['options']);
+        }
         if (!empty($data['color'])) {
             $data['options'] = json_encode(['background' => $data['color']]);
         }
@@ -909,7 +924,7 @@ class boardmanager {
         $this->write_history(
             'updated',
             constants::MOD_KANBAN_CARD,
-            array_merge(['title' => $card['title']], $cardupdate),
+            array_merge(['title' => clean_param($card['title'], PARAM_TEXT)], $cardupdate),
             $card['kanban_column'],
             $card['id']
         );
@@ -930,10 +945,13 @@ class boardmanager {
             'autoclose' => $data['autoclose'],
             'autohide' => $data['autohide'],
         ];
+        if (isset($data['title'])) {
+            $data['title'] = clean_param($data['title'], PARAM_TEXT);
+        }
         $columndata = [
             'id' => $columnid,
             'title' => $data['title'],
-            'options' => json_encode($options),
+            'options' => helper::sanitize_json_string(json_encode($options)),
             'timemodified' => time(),
         ];
 
@@ -1111,7 +1129,7 @@ class boardmanager {
             'userid' => $USER->id,
             'kanban_column' => $columnid,
             'kanban_card' => $cardid,
-            'parameters' => json_encode($data),
+            'parameters' => helper::sanitize_json_string(json_encode($data)),
             'affected_userid' => $affecteduser,
             'timestamp' => time(),
             'type' => $type,
