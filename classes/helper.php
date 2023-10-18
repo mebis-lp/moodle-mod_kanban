@@ -420,4 +420,20 @@ class helper {
     public static function get_timestamp_cache(): \cache_application {
         return \cache::make('mod_kanban', 'timestamp');
     }
+
+    /**
+     * Sanitizes a json string by stripping off all html tags.
+     *
+     * @param string $jsonstring the json encoded string
+     * @return string the same string, but HTML code will have been sanitized
+     */
+    public static function sanitize_json_string(string $jsonstring): string {
+        $json = json_decode($jsonstring, true);
+        foreach ($json as $key => $value) {
+            unset($json[$key]);
+            $key = clean_param(clean_param($key, PARAM_CLEANHTML), PARAM_NOTAGS);
+            $json[$key] = is_array($value) ? clean_param_array($value, PARAM_CLEANHTML, true) : clean_param($value, PARAM_CLEANHTML);
+        }
+        return json_encode($json);
+    }
 }

@@ -487,6 +487,9 @@ class get_kanban_content extends external_api {
         } else {
             $kanbancolumns = [];
         }
+        foreach ($kanbancolumns as $kanbancolumn) {
+            $kanbancolumn->title = clean_param($kanbancolumn->title, PARAM_TEXT);
+        }
 
         if (!$timestampcards || $timestamp <= $timestampcards) {
             $kanbancards = $DB->get_records_select('kanban_card', $sql, $params);
@@ -521,13 +524,14 @@ class get_kanban_content extends external_api {
                 if (empty($kanbanassignees[$card->id])) {
                     $kanbanassignees[$card->id] = [];
                 }
+                $card->title = clean_param($card->title, PARAM_TEXT);
                 $card->canedit = $capabilities['managecards'] || $card->createdby == $USER->id;
                 $card->assignees = $kanbanassignees[$card->id];
                 $card->selfassigned = in_array($USER->id, $card->assignees);
                 $card->hasdescription = !empty($card->description);
                 $card->discussions = [];
                 $card->description = file_rewrite_pluginfile_urls(
-                    $card->description,
+                    format_text($card->description),
                     'pluginfile.php',
                     $context->id,
                     'mod_kanban',
@@ -637,6 +641,7 @@ class get_kanban_content extends external_api {
 
         $formatter = new updateformatter();
         foreach ($discussions as $discussion) {
+            $discussion->content = format_text($discussion->content);
             $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->userid));
             $formatter->put('discussions', (array) $discussion);
@@ -722,6 +727,8 @@ class get_kanban_content extends external_api {
                 }
 
                 $type = constants::MOD_KANBAN_TYPES[$item->type];
+                // One has to be careful, because $item->parameters theoretically could contain user input.
+                $item->parameters = helper::sanitize_json_string($item->parameters);
                 $item = (object) array_merge((array) $item, json_decode($item->parameters, true));
                 $historyitem = [];
                 $historyitem['id'] = $item->id;

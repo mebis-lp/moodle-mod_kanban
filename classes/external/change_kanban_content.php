@@ -104,7 +104,8 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $data = [];
         if (!empty($params['data']['title'])) {
-            $data['title'] = $params['data']['title'];
+            // Additional cleaning most likely not needed, because title is PARAM_TEXT, but let's be extra sure.
+            $data['title'] = clean_param($params['data']['title'], PARAM_TEXT);
         }
         $aftercol = $params['data']['aftercol'];
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
@@ -176,7 +177,8 @@ class change_kanban_content extends external_api {
         $columnid = $params['data']['columnid'];
         $data = [];
         if (!empty($params['data']['title'])) {
-            $data['title'] = $params['data']['title'];
+            // Additional cleaning most likely not needed, because title is PARAM_TEXT, but let's be extra sure.
+            $data['title'] = clean_param($params['data']['title'], PARAM_TEXT);
         }
         $aftercard = $params['data']['aftercard'];
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
@@ -838,7 +840,8 @@ class change_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $cardid = $params['data']['cardid'];
-        $message = $params['data']['message'];
+        // Additional cleaning most likely not needed, because message is PARAM_TEXT, but let's be extra sure.
+        $message = clean_param($params['data']['message'], PARAM_TEXT);
 
         list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
