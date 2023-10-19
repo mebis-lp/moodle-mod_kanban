@@ -444,7 +444,9 @@ class helper {
         foreach ($json as $key => $value) {
             unset($json[$key]);
             $key = clean_param(clean_param($key, PARAM_CLEANHTML), PARAM_NOTAGS);
-            $json[$key] = is_array($value) ? clean_param_array($value, PARAM_CLEANHTML, true) : clean_param($value, PARAM_CLEANHTML);
+            $json[$key] = is_array($value)
+                ? clean_param_array($value, PARAM_CLEANHTML, true)
+                : clean_param($value, PARAM_CLEANHTML);
         }
         return json_encode($json);
     }
