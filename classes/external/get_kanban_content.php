@@ -643,7 +643,7 @@ class get_kanban_content extends external_api {
 
         $formatter = new updateformatter();
         foreach ($discussions as $discussion) {
-            $discussion->content = format_text($discussion->content);
+            $discussion->content = format_text($discussion->content, FORMAT_HTML);
             $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->userid));
             $formatter->put('discussions', (array) $discussion);
