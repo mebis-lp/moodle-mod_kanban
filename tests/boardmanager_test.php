@@ -321,9 +321,9 @@ class boardmanager_test extends \advanced_testcase {
     /**
      * Tests the json sanitization function.
      *
-     * @dataProvider test_sanitize_json_string_provider
-     * @param $jsonstring string the json string to sanitize
-     * @param $sanitized string the expected sanitized json string
+     * @dataProvider sanitize_json_string_provider
+     * @param string $jsonstring the json string to sanitize
+     * @param string $sanitized the expected sanitized json string
      * @return void
      */
     public function test_sanitize_json_string(string $jsonstring, string $sanitized): void {
@@ -336,24 +336,24 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return array[] containing the keys 'json' and 'expected'
      */
-    public function test_sanitize_json_string_provider(): array {
+    public static function sanitize_json_string_provider(): array {
         return [
             [
                 'json' => '{"test": "<b>bad html</b><script>console.log(\"bla\")</script>"}',
-                'expected' => '{"test":"<b>bad html<\/b>"}'
+                'expected' => '{"test":"<b>bad html<\/b>"}',
             ],
             [
                 'json' => '{"test": "<b>good html</b>"}',
-                'expected' => '{"test":"<b>good html<\/b>"}'
+                'expected' => '{"test":"<b>good html<\/b>"}',
             ],
             [
                 'json' => '{"test": "<b>good html</b>","anotherkey": [{"nestedkey":"<script>console.log(\"bla\");</script>"}]}',
-                'expected' => '{"test":"<b>good html<\/b>","anotherkey":[{"nestedkey":""}]}'
+                'expected' => '{"test":"<b>good html<\/b>","anotherkey":[{"nestedkey":""}]}',
             ],
             [
                 'json' => '{"te<script>console.log(\"bla\");</script>st": "<b>good html</b>"}',
-                'expected' => '{"test":"<b>good html<\/b>"}'
-            ]
+                'expected' => '{"test":"<b>good html<\/b>"}',
+            ],
         ];
     }
 }
