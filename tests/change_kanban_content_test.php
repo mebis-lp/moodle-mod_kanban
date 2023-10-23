@@ -63,7 +63,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_add_column() {
+    public function test_add_column(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -122,7 +122,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_add_card() {
+    public function test_add_card(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -179,7 +179,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_move_column() {
+    public function test_move_column(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -230,7 +230,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_move_card() {
+    public function test_move_card(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -311,7 +311,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_delete_card() {
+    public function test_delete_card(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -354,7 +354,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_delete_column() {
+    public function test_delete_column(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -397,7 +397,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_assign_unassign_user() {
+    public function test_assign_unassign_user(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 
@@ -485,7 +485,7 @@ class change_kanban_content_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_set_card_complete() {
+    public function test_set_card_complete(): void {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/lib/externallib.php');
 

@@ -65,7 +65,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_create_board() {
+    public function test_create_board(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -89,7 +89,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_delete_board() {
+    public function test_delete_board(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -110,7 +110,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_add_card() {
+    public function test_add_card(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -135,7 +135,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_move_card() {
+    public function test_move_card(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -180,7 +180,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_delete_card() {
+    public function test_delete_card(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -205,7 +205,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_add_column() {
+    public function test_add_column(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -234,7 +234,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_move_column() {
+    public function test_move_column(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -257,7 +257,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_delete_column() {
+    public function test_delete_column(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -279,7 +279,7 @@ class boardmanager_test extends \advanced_testcase {
      *
      * @return void
      */
-    public function test_can_user_manage_specific_card() {
+    public function test_can_user_manage_specific_card(): void {
         global $DB;
 
         $this->resetAfterTest();
