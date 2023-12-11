@@ -28,5 +28,5 @@ $plugin->component = 'mod_kanban';
 $plugin->release = '0.2.2';
 $plugin->version = 2023102001;
 $plugin->requires = 2022112800;
-$plugin->supported = [401, 403];
+$plugin->supported = [401, 404];
 $plugin->maturity = MATURITY_BETA;
