@@ -38,7 +38,7 @@ class change_kanban_content_test extends \advanced_testcase {
      * Prepare testing environment
      */
     public function setUp(): void {
-        global $DB;
+        global $DB, $SCRIPT;
         $this->course = $this->getDataGenerator()->create_course();
         $this->kanban = $this->getDataGenerator()->create_module('kanban', ['course' => $this->course]);
 
@@ -56,6 +56,8 @@ class change_kanban_content_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($this->users[0]->id, $this->course->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($this->users[1]->id, $this->course->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($this->users[2]->id, $this->course->id, $teacherrole->id);
+        // This is just for the tests of auth_saml2 not to fail.
+        $SCRIPT = '/mod/kanban/view.php';
     }
 
     /**
