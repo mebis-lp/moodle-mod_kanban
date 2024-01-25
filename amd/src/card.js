@@ -150,7 +150,7 @@ export default class extends KanbanComponent {
 
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
-        this.checkDragging(state);
+        this.checkEditing(state);
         this.boardid = state.board.id;
         this.cmid = state.common.id;
         this.userid = state.board.userid;
@@ -378,14 +378,7 @@ export default class extends KanbanComponent {
         }
         this.toggleClass(element.selfassigned, 'mod_kanban_selfassigned');
         // Set card completion state.
-        if (element.completed !== undefined) {
-            this.toggleClass(element.completed == 1, 'mod_kanban_closed');
-            if (element.completed == 1) {
-                this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
-            } else {
-                this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
-            }
-        }
+        this.toggleClass(element.completed == 1, 'mod_kanban_closed');
         // Update title (also in modals).
         if (element.title !== undefined) {
             // For Moodle inplace editing title is once needed plain and once with html entities encoded.
@@ -425,8 +418,8 @@ export default class extends KanbanComponent {
                 this.getElement().setAttribute('style', 'background-color: ' + options.background);
             }
         }
-        // Enable/disable dragging (e.g. if user is not assigned to the card anymore).
-        this.checkDragging();
+        // Enable/disable dragging and inplace editing (e.g. if user is not assigned to the card anymore).
+        this.checkEditing();
     }
 
     /**
@@ -507,10 +500,10 @@ export default class extends KanbanComponent {
     }
 
     /**
-     * Conditionally enable / disable dragging.
+     * Conditionally enable / disable dragging and inplace editing.
      * @param {*} state
      */
-    checkDragging(state) {
+    checkEditing(state) {
         if (state === undefined) {
             state = this.reactive.stateManager.state;
         }
@@ -521,6 +514,12 @@ export default class extends KanbanComponent {
             this.draggable = false;
             this.dragdrop.setDraggable(false);
         }
+        if (state.cards.get(this.id).completed != 1 && state.cards.get(this.id).canedit) {
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-inplaceeditable', '1');
+        } else {
+            this.getElement(selectors.INPLACEEDITABLE).removeAttribute('data-inplaceeditable');
+        }
+
         this.toggleClass(state.cards.get(this.id).canedit, 'mod_kanban_canedit');
     }
 
