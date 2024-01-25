@@ -36,7 +36,6 @@ use mod_kanban\helper;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class reminder extends \core\task\scheduled_task {
-
     /**
      * Return the task's name as shown in admin screens.
      *
@@ -66,12 +65,12 @@ class reminder extends \core\task\scheduled_task {
             ['time' => $time, 'time2' => $time]
         );
         foreach ($kanbancards as $kanbancard) {
-            list($course, $cminfo) = get_course_and_cm_from_instance($kanbancard->instance, 'kanban');
+            [$course, $cminfo] = get_course_and_cm_from_instance($kanbancard->instance, 'kanban');
             $user = \core_user::get_user($kanbancard->userid);
             helper::fix_current_language($user->lang);
             $kanbancard->duedate = userdate($kanbancard->duedate, get_string('strftimedate', 'langconfig'));
             helper::send_notification($cminfo, 'due', [$kanbancard->userid], $kanbancard, null, true);
-            $data = new \stdClass;
+            $data = new \stdClass();
             $data->id = $kanbancard->id;
             $data->reminder_sent = 1;
             $DB->update_record('kanban_card', $data);

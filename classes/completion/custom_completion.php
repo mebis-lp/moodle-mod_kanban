@@ -40,7 +40,8 @@ class custom_completion extends \core_completion\activity_custom_completion {
 
         if ($rule == 'completioncreate') {
             if ($kanban->completioncreate > 0) {
-                $count = $DB->get_field_sql('
+                $count = $DB->get_field_sql(
+                    '
                     SELECT COUNT(DISTINCT c.id)
                     FROM {kanban_board} b
                     INNER JOIN {kanban_card} c ON b.kanban_instance = :kanbanid AND c.kanban_board = b.id
@@ -52,7 +53,8 @@ class custom_completion extends \core_completion\activity_custom_completion {
         }
         if ($rule == 'completioncomplete') {
             if ($kanban->completioncomplete > 0) {
-                $count = $DB->get_field_sql('
+                $count = $DB->get_field_sql(
+                    '
                     SELECT COUNT(DISTINCT c.id)
                     FROM {kanban_board} b
                     INNER JOIN {kanban_card} c ON b.kanban_instance = :kanbanid AND c.kanban_board = b.id AND c.completed != 0

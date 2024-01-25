@@ -43,8 +43,8 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-    \core_privacy\local\request\plugin\provider,
     \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\request\plugin\provider,
     \core_privacy\local\metadata\provider {
     /**
      * Delete multiple users within a single context.
@@ -75,7 +75,7 @@ class provider implements
                 'kanban_instance = :instance',
                 ['instance' => $cm->instance]
             );
-            list($insql, $params) = $DB->get_in_or_equal($boardids);
+            [$insql, $params] = $DB->get_in_or_equal($boardids);
 
             // Delete history.
             $params['userid'] = $userid;
@@ -95,7 +95,7 @@ class provider implements
             $cardids = $DB->get_fieldset_sql($sql, $params);
 
             if (!empty($cardids)) {
-                list($insql, $params) = $DB->get_in_or_equal($cardids);
+                [$insql, $params] = $DB->get_in_or_equal($cardids);
                 $sql = 'userid = :userid AND kanban_card ' . $insql;
                 $params['userid'] = $userid;
                 // Unassign user.
@@ -115,7 +115,7 @@ class provider implements
 
             if (!empty($cardids)) {
                 // Unassign all users from private board.
-                list($insql, $params) = $DB->get_in_or_equal($cardids);
+                [$insql, $params] = $DB->get_in_or_equal($cardids);
                 $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
                 // Delete all discussions.
                 $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
@@ -268,7 +268,7 @@ class provider implements
         $user = $contextlist->get_user();
         $userid = $user->id;
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         // Get all cards the user is assigned to without private board of the user.
         $sql = "SELECT cm.id AS cmid,
@@ -429,12 +429,12 @@ class provider implements
 
         $boardids = $DB->get_fieldset_select('kanban_board', 'id', 'kanban_instance = :instance', ['instance' => $cm->instance]);
         if (!empty($boardids)) {
-            list($insql, $params) = $DB->get_in_or_equal($boardids);
+            [$insql, $params] = $DB->get_in_or_equal($boardids);
             $sql = 'SELECT id FROM {kanban_card} WHERE kanban_board ' . $insql;
             $cardids = $DB->get_fieldset_sql($sql, $params);
 
             // Delete all assignees (this needs to be done also for template boards).
-            list($insql, $params) = $DB->get_in_or_equal($cardids);
+            [$insql, $params] = $DB->get_in_or_equal($cardids);
             $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
 
             // Delete discussion.
@@ -447,7 +447,7 @@ class provider implements
                 'kanban_instance = :instance AND template = 0',
                 ['instance' => $cm->instance]
             );
-            list($insql, $params) = $DB->get_in_or_equal($boardids);
+            [$insql, $params] = $DB->get_in_or_equal($boardids);
             $DB->delete_records_select('kanban_column', 'kanban_board ' . $insql, $params);
 
             // Delete history.
@@ -483,7 +483,7 @@ class provider implements
                 'kanban_instance = :instance',
                 ['instance' => $cm->instance]
             );
-            list($insql, $params) = $DB->get_in_or_equal($boardids);
+            [$insql, $params] = $DB->get_in_or_equal($boardids);
 
             // Delete history.
             $params['userid'] = $userid;
@@ -503,7 +503,7 @@ class provider implements
             $cardids = $DB->get_fieldset_sql($sql, $params);
 
             if (!empty($cardids)) {
-                list($insql, $params) = $DB->get_in_or_equal($cardids);
+                [$insql, $params] = $DB->get_in_or_equal($cardids);
                 $sql = 'userid = :userid AND kanban_card ' . $insql;
                 $params['userid'] = $userid;
                 // Unassign user.
@@ -523,7 +523,7 @@ class provider implements
 
             if (!empty($cardids)) {
                 // Unassign all users from private board.
-                list($insql, $params) = $DB->get_in_or_equal($cardids);
+                [$insql, $params] = $DB->get_in_or_equal($cardids);
                 $DB->delete_records_select('kanban_assignee', 'kanban_card ' . $insql, $params);
                 // Delete all discussions.
                 $DB->delete_records_select('kanban_discussion_comment', 'kanban_card ' . $insql, $params);
@@ -542,7 +542,7 @@ class provider implements
      * @param   collection     $collection The initialised collection to add items to.
      * @return  collection     A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table('kanban_board', [
             'userid' => 'privacy:metadata:userid',
             'groupid' => 'privacy:metadata:groupid',

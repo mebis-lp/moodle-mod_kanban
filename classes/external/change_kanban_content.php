@@ -50,7 +50,6 @@ use restricted_context_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class change_kanban_content extends external_api {
-
     /**
      * Returns description of method parameters for the add_column function.
      *
@@ -108,7 +107,7 @@ class change_kanban_content extends external_api {
             $data['title'] = clean_param($params['data']['title'], PARAM_TEXT);
         }
         $aftercol = $params['data']['aftercol'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecolumns', $context);
@@ -181,7 +180,7 @@ class change_kanban_content extends external_api {
             $data['title'] = clean_param($params['data']['title'], PARAM_TEXT);
         }
         $aftercard = $params['data']['aftercard'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:addcard', $context);
@@ -244,7 +243,7 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $aftercol = $params['data']['aftercol'];
         $columnid = $params['data']['columnid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecolumns', $context);
@@ -311,7 +310,7 @@ class change_kanban_content extends external_api {
         $aftercard = $params['data']['aftercard'];
         $columnid = $params['data']['columnid'];
         $cardid = $params['data']['cardid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         $boardmanager = new boardmanager($cmid, $boardid);
@@ -375,7 +374,7 @@ class change_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $cardid = $params['data']['cardid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
@@ -439,7 +438,7 @@ class change_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $columnid = $params['data']['columnid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:managecolumns', $context);
@@ -502,7 +501,7 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $cardid = $params['data']['cardid'];
         $userid = $params['data']['userid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         if (empty($userid)) {
@@ -573,7 +572,7 @@ class change_kanban_content extends external_api {
         if (empty($userid)) {
             $userid = $USER->id;
         }
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         if ($userid == $USER->id) {
@@ -640,7 +639,7 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $state = $params['data']['state'];
         $cardid = $params['data']['cardid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         $boardmanager = new boardmanager($cmid, $boardid);
@@ -706,7 +705,7 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $state = $params['data']['state'];
         $columnid = $params['data']['columnid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
@@ -770,7 +769,7 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $state = $params['data']['state'];
 
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
@@ -835,7 +834,7 @@ class change_kanban_content extends external_api {
         // Additional cleaning most likely not needed, because message is PARAM_TEXT, but let's be extra sure.
         $message = clean_param($params['data']['message'], PARAM_TEXT);
 
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
@@ -848,7 +847,6 @@ class change_kanban_content extends external_api {
         return [
             'update' => $boardmanager->get_formatted_updates(),
         ];
-
     }
 
     /**
@@ -899,7 +897,7 @@ class change_kanban_content extends external_api {
         $boardid = $params['boardid'];
         $messageid = $params['data']['messageid'];
 
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
@@ -961,7 +959,7 @@ class change_kanban_content extends external_api {
         ]);
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:manageboard', $context);
@@ -1016,7 +1014,7 @@ class change_kanban_content extends external_api {
         ]);
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 
@@ -1081,7 +1079,7 @@ class change_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $cardid = $params['data']['cardid'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
 

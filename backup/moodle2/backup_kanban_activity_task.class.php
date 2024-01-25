@@ -27,7 +27,6 @@ require_once($CFG->dirroot . '/mod/kanban/backup/moodle2/backup_kanban_stepslib.
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_kanban_activity_task extends backup_activity_task {
-
     /**
      * No specific settings for this activity
      */

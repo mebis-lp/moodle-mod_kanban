@@ -23,7 +23,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_kanban_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * List of elements that can be restored
      *

@@ -148,7 +148,7 @@ class helper {
             }
             if (!empty($board->groupid)) {
                 $members = groups_get_members($board->groupid, 'u.id');
-                $members = array_map(function($v) {
+                $members = array_map(function ($v) {
                     return intval($v->id);
                 }, $members);
                 $ismember = in_array($USER->id, $members);
@@ -302,7 +302,7 @@ class helper {
     public static function remove_calendar_event(stdClass $kanban, stdClass $card, array $users = []) {
         global $DB;
         if (!empty($users)) {
-            list($sql, $params) = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
+            [$sql, $params] = $DB->get_in_or_equal($users, SQL_PARAMS_NAMED);
             $sql = 'instance = :id AND uuid = :cardid AND userid ' . $sql;
             $params['cardid'] = $card->id;
             $params['id'] = $kanban->id;

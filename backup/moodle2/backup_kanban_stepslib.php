@@ -140,13 +140,14 @@ class backup_kanban_activity_structure_step extends backup_activity_structure_st
             $historyitem->annotate_ids('kanban_card_id', 'kanban_card');
             $historyitem->annotate_ids('kanban_column_id', 'kanban_column');
             $historyitem->annotate_ids('kanban_board_id', 'kanban_board');
-
         } else {
-            $board->set_source_sql('
+            $board->set_source_sql(
+                '
             SELECT *
               FROM {kanban_board}
              WHERE kanban_instance = ? AND userid = 0 AND groupid = 0 AND template = 1',
-                [backup::VAR_PARENTID]);
+                [backup::VAR_PARENTID]
+            );
         }
         $column->set_source_table('kanban_column', ['kanban_board' => backup::VAR_PARENTID]);
         $card->set_source_table('kanban_card', ['kanban_column' => backup::VAR_PARENTID]);

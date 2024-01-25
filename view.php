@@ -35,7 +35,7 @@ $boardid = optional_param('boardid', 0, PARAM_INT);
 $userid = optional_param('user', 0, PARAM_INT);
 $group = optional_param('group', -1, PARAM_INT);
 
-list ($course, $cm) = get_course_and_cm_from_cmid($id, 'kanban');
+ [$course, $cm] = get_course_and_cm_from_cmid($id, 'kanban');
 
 require_course_login($course, true, $cm);
 $context = context_module::instance($cm->id);

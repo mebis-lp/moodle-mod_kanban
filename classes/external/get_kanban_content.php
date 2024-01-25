@@ -56,7 +56,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_kanban_content extends external_api {
-
     /**
      * Returns description of method parameters for the execute webservice function.
      *
@@ -342,7 +341,7 @@ class get_kanban_content extends external_api {
         $cmid = $params['cmid'];
         $boardid = $params['boardid'];
         $timestamp = $params['timestamp'];
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:view', $context);
@@ -429,7 +428,7 @@ class get_kanban_content extends external_api {
             }
             if (!empty($kanbanboard->groupid)) {
                 $members = groups_get_members($kanbanboard->groupid, 'u.id');
-                $members = array_map(function($v) {
+                $members = array_map(function ($v) {
                     return intval($v->id);
                 }, $members);
                 $ismember = in_array($USER->id, $members);
@@ -449,7 +448,7 @@ class get_kanban_content extends external_api {
             }
         }
 
-        $common = new stdClass;
+        $common = new stdClass();
         $common->timestamp = time();
         $common->id = $cmid;
         $common->userid = $USER->id;
@@ -626,7 +625,7 @@ class get_kanban_content extends external_api {
      */
     public static function get_discussion_update(int $cmid, int $boardid, int $cardid, int $timestamp = 0): array {
         global $DB, $USER;
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:view', $context);
@@ -696,7 +695,7 @@ class get_kanban_content extends external_api {
      */
     public static function get_history_update(int $cmid, int $boardid, int $cardid, int $timestamp = 0): array {
         global $DB;
-        list($course, $cminfo) = get_course_and_cm_from_cmid($cmid);
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
         $context = context_module::instance($cmid);
         self::validate_context($context);
         require_capability('mod/kanban:viewhistory', $context);

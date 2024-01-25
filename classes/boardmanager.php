@@ -66,7 +66,7 @@ class boardmanager {
     public function __construct(int $cmid = 0, int $boardid = 0) {
         $this->cmid = $cmid;
         if ($cmid) {
-            list($this->course, $this->cminfo) = get_course_and_cm_from_cmid($cmid);
+            [$this->course, $this->cminfo] = get_course_and_cm_from_cmid($cmid);
             $this->load_instance($this->cminfo->instance);
         }
         $this->formatter = new updateformatter();
@@ -86,7 +86,7 @@ class boardmanager {
         global $DB;
         $this->kanban = $DB->get_record('kanban', ['id' => $instance], '*', MUST_EXIST);
         if (!$dontloadcm) {
-            list ($this->course, $this->cminfo) = get_course_and_cm_from_instance($this->kanban->id, 'kanban');
+             [$this->course, $this->cminfo] = get_course_and_cm_from_instance($this->kanban->id, 'kanban');
             $this->cmid = $this->cminfo->id;
         }
     }
@@ -476,7 +476,8 @@ class boardmanager {
         $DB->update_record('kanban_column', $update);
 
         // Users can always edit cards they created.
-        $data['canedit'] = $this->can_user_manage_specific_card($data['id']);;
+        $data['canedit'] = $this->can_user_manage_specific_card($data['id']);
+        ;
         $data['columnname'] = clean_param($column->title, PARAM_TEXT);
 
         $this->formatter->put('cards', $data);
@@ -853,7 +854,7 @@ class boardmanager {
             helper::add_or_update_calendar_event($this->kanban, (object) $carddata, $assignees);
             if (!empty($todelete)) {
                 helper::remove_calendar_event($this->kanban, (object) $carddata, $todelete);
-                list($sql, $params) = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
+                [$sql, $params] = $DB->get_in_or_equal($todelete, SQL_PARAMS_NAMED);
                 $sql = 'kanban_card = :cardid AND userid ' . $sql;
                 $params['cardid'] = $cardid;
                 $DB->delete_records_select('kanban_assignee', $sql, $params);
@@ -882,8 +883,7 @@ class boardmanager {
                         'id' => $user->id,
                         'fullname' => fullname($user),
                         'userpicture' => $OUTPUT->user_picture($user, ['link' => false]),
-                    ]
-                );
+                    ]);
             }
             $DB->insert_records('kanban_assignee', $assignees);
             helper::send_notification(
@@ -1221,8 +1221,10 @@ class boardmanager {
             return true;
         }
 
-        if (has_capability('mod/kanban:manageassignedcards', $context, $userid) &&
-                in_array($userid, $this->get_card_assignees($card->id))) {
+        if (
+            has_capability('mod/kanban:manageassignedcards', $context, $userid) &&
+                in_array($userid, $this->get_card_assignees($card->id))
+        ) {
             return true;
         }
 
