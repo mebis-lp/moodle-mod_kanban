@@ -18,15 +18,15 @@
  * Version information for mod_kanban
  *
  * @package     mod_kanban
- * @copyright   2023, ISB Bayern
+ * @copyright   2023-2024 ISB Bayern
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_kanban';
-$plugin->release = '0.2.2';
-$plugin->version = 2023102001;
+$plugin->release = '0.2.3';
+$plugin->version = 2024020201;
 $plugin->requires = 2022112800;
 $plugin->supported = [401, 404];
 $plugin->maturity = MATURITY_BETA;
