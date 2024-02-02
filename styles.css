@@ -284,7 +284,7 @@ a.mod_kanban_attachment_item {
     overflow-y: auto;
 }
 
-.draggable {
+.mod_kanban_board .draggable {
     cursor: move;
 }
 
