@@ -816,7 +816,7 @@ class boardmanager {
         ];
         // Do some extra sanitizing.
         if (isset($data['title'])) {
-            $data['title'] = clean_param($data['title'], PARAM_TEXT);
+            $data['title'] = s($data['title']);
         }
         if (isset($data['description'])) {
             $data['description'] = clean_param($data['description'], PARAM_CLEANHTML);
@@ -946,7 +946,7 @@ class boardmanager {
             'autohide' => $data['autohide'],
         ];
         if (isset($data['title'])) {
-            $data['title'] = clean_param($data['title'], PARAM_TEXT);
+            $data['title'] = s($data['title']);
         }
         $columndata = [
             'id' => $columnid,
