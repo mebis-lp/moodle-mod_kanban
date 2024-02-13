@@ -90,11 +90,27 @@ export default class extends KanbanComponent {
             'click',
             this._deleteConfirm
         );
+        this.addEventListener(
+            this.getElement(selectors.SCROLLLEFT),
+            'click',
+            this._scrollLeft
+        );
+        this.addEventListener(
+            this.getElement(selectors.SCROLLRIGHT),
+            'click',
+            this._scrollRight
+        );
+        this.addEventListener(
+            this.getElement(selectors.MAIN),
+            'scroll',
+            this._updateScrollButtons
+        );
         this.dragdrop = new DragDrop(this);
         if (state.common.liveupdate > 0) {
             this._continuousUpdate(state.common.liveupdate);
         }
         this.toggleClass('ontouchstart' in document.documentElement, 'mod_kanban_touch');
+        this._updateScrollButtons();
     }
 
     /**
@@ -243,6 +259,7 @@ export default class extends KanbanComponent {
         // Set CSS classes to show/hide action menu items.
         this.toggleClass(element.locked, 'mod_kanban_board_locked_columns');
         this.toggleClass(element.hastemplate, 'mod_kanban_hastemplate');
+        this._updateScrollButtons();
     }
 
     /**
@@ -262,6 +279,8 @@ export default class extends KanbanComponent {
         const newcomponent = await this.renderComponent(placeholder, 'mod_kanban/column', data);
         const newelement = newcomponent.getElement();
         this.getElement(selectors.COLUMNCONTAINER).replaceChild(newelement, placeholder);
+        // Make sure that the new column is recognized for the scroll buttons.
+        this._updateScrollButtons();
     }
 
     /**
@@ -318,5 +337,36 @@ export default class extends KanbanComponent {
      */
     hideDropZone() {
         this.getElement(selectors.ADDCOLUMNCONTAINER).classList.remove('mod_kanban_insert');
+    }
+
+    /**
+     * Scroll to the left.
+     */
+    _scrollLeft() {
+        this.getElement(selectors.MAIN).scrollLeft -= document.querySelector('.mod_kanban_column').clientWidth * 0.75;
+    }
+
+    /**
+     * Scroll to the right.
+     */
+    _scrollRight() {
+        this.getElement(selectors.MAIN).scrollLeft += document.querySelector('.mod_kanban_column').clientWidth * 0.75;
+    }
+
+    /**
+     * Only show scroll buttons if it's possible to scroll in this direction.
+     */
+    _updateScrollButtons() {
+        let main = this.getElement(selectors.MAIN);
+        if (main.scrollLeft <= 1) {
+            this.getElement(selectors.SCROLLLEFT).style.setProperty('visibility', 'hidden');
+        } else {
+            this.getElement(selectors.SCROLLLEFT).style.setProperty('visibility', 'visible');
+        }
+        if (main.clientWidth + main.scrollLeft < main.scrollWidth) {
+            this.getElement(selectors.SCROLLRIGHT).style.setProperty('visibility', 'visible');
+        } else {
+            this.getElement(selectors.SCROLLRIGHT).style.setProperty('visibility', 'hidden');
+        }
     }
 }
