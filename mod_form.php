@@ -71,7 +71,10 @@ class mod_kanban_mod_form extends moodleform_mod {
      * @return bool
      */
     public function completion_rule_enabled($data): bool {
-        return (!empty($data['completioncreate']) || !empty($data['completioncomplete']));
+        return (
+            !empty($data['completioncreate' . $this->get_suffix()]) ||
+            !empty($data['completioncomplete' . $this->get_suffix()])
+        );
     }
 
     /**
@@ -82,22 +85,38 @@ class mod_kanban_mod_form extends moodleform_mod {
     public function add_completion_rules(): array {
         $mform = $this->_form;
 
+        $completioncreate = 'completioncreate' . $this->get_suffix();
+        $completioncomplete = 'completioncomplete' . $this->get_suffix();
+
         $mform->addElement(
             'text',
-            'completioncreate',
+            $completioncreate,
             get_string('completioncreate', 'kanban'),
             ['size' => 3]
         );
-        $mform->setType('completioncreate', PARAM_INT);
+        $mform->setType($completioncreate, PARAM_INT);
 
         $mform->addElement(
             'text',
-            'completioncomplete',
+            $completioncomplete,
             get_string('completioncomplete', 'kanban'),
             ['size' => 3]
         );
-        $mform->setType('completioncomplete', PARAM_INT);
+        $mform->setType($completioncomplete, PARAM_INT);
 
-        return (['completioncreate', 'completioncomplete']);
+        return ([$completioncreate, $completioncomplete]);
+    }
+
+    /**
+     * Get the suffix to be added to the completion elements when creating them.
+     * This acts as a spare for compatibility with Moodle 4.1 and 4.2.
+     *
+     * @return string The suffix
+     */
+    public function get_suffix(): string {
+        if (method_exists(get_parent_class($this), 'get_suffix')) {
+            return parent::get_suffix();
+        }
+        return '';
     }
 }
