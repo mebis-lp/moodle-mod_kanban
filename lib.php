@@ -167,7 +167,7 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
         $boardmanager->update_column($itemid, ['title' => $newvalue]);
     }
 
-    return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, $newvalue, $newvalue, null, '');
+    return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, s($newvalue), s($newvalue), null, '');
 }
 
 /**
