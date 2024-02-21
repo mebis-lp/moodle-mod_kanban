@@ -290,6 +290,9 @@ export default class extends KanbanComponent {
         }
         // Update data for inplace editing if title was updated (this is important if title was modified by another user).
         if (element.title !== undefined) {
+            // For Moodle inplace editing title is once needed plain and once with html entities encoded.
+            // This avoids double encoding of html entities as the value of "data-value" is exactly what is shown
+            // in the input field when clicking on the inplace editable.
             let titlehelper = document.createElement('textarea');
             titlehelper.innerHTML = element.title;
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', titlehelper.value);
