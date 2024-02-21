@@ -290,7 +290,9 @@ export default class extends KanbanComponent {
         }
         // Update data for inplace editing if title was updated (this is important if title was modified by another user).
         if (element.title !== undefined) {
-            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
+            let titlehelper = document.createElement('textarea');
+            titlehelper.innerHTML = element.title;
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', titlehelper.value);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
         }
         // Only autohide option is relevant for the frontend for now. autoclose option is handled by the backend.
