@@ -26,11 +26,6 @@
         "userpicture": ""
     }
 }}
-<div id="mod_kanban_assignee-{{cardid}}-{{id}}" class="mod_kanban_assigned_user btn btn-icon icon-no-margin p-0" data-id="{{cardid}}" data-userid="{{id}}" title="{{fullname}}" data-toggle="tooltip" data-placement="top">
+<div id="mod_kanban_assignee-{{cardid}}-{{id}}" class="mod_kanban_assigned_user btn btn-icon icon-no-margin p-0" data-id="{{cardid}}" data-userid="{{id}}" title="{{fullname}}" data-toggle="tooltip" data-placement="top" data-trigger="click hover focus">
     {{{userpicture}}}
 </div>
-{{#js}}
-    require(['mod_kanban/tooltip'], function(tooltip) {
-        tooltip.addTooltipClickListener('mod_kanban_assignee-{{cardid}}-{{id}}');
-    });
-{{/js}}
