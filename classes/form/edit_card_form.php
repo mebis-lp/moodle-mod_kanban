@@ -165,6 +165,7 @@ class edit_card_form extends dynamic_form {
         $id = $this->optional_param('id', null, PARAM_INT);
         $card = $DB->get_record('kanban_card', ['id' => $id]);
         $options = json_decode($card->options);
+        $card->title = html_entity_decode($card->title, ENT_COMPAT, 'UTF-8');
         $card->cmid = $this->optional_param('cmid', null, PARAM_INT);
         $card->boardid = $card->kanban_board;
         $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'userid', 'kanban_card = :cardid', ['cardid' => $id]);
