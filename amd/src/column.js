@@ -273,7 +273,8 @@ export default class extends KanbanComponent {
                     if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
                         el.removeChild(node);
                     }
-                });
+                });let doc = new DOMParser().parseFromString(element.title, 'text/html');
+                this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', doc.documentElement.textContent);
             // Reorder cards according to sequence from the database.
             [...el.children]
                 .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
@@ -293,9 +294,8 @@ export default class extends KanbanComponent {
             // For Moodle inplace editing title is once needed plain and once with html entities encoded.
             // This avoids double encoding of html entities as the value of "data-value" is exactly what is shown
             // in the input field when clicking on the inplace editable.
-            let titlehelper = document.createElement('textarea');
-            titlehelper.innerHTML = element.title;
-            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', titlehelper.value);
+            let doc = new DOMParser().parseFromString(element.title, 'text/html');
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', doc.documentElement.textContent);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
         }
         // Only autohide option is relevant for the frontend for now. autoclose option is handled by the backend.
