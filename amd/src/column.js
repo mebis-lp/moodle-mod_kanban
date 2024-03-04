@@ -290,7 +290,11 @@ export default class extends KanbanComponent {
         }
         // Update data for inplace editing if title was updated (this is important if title was modified by another user).
         if (element.title !== undefined) {
-            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', element.title);
+            // For Moodle inplace editing title is once needed plain and once with html entities encoded.
+            // This avoids double encoding of html entities as the value of "data-value" is exactly what is shown
+            // in the input field when clicking on the inplace editable.
+            let doc = new DOMParser().parseFromString(element.title, 'text/html');
+            this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', doc.documentElement.textContent);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
         }
         // Only autohide option is relevant for the frontend for now. autoclose option is handled by the backend.

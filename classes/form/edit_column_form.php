@@ -119,6 +119,7 @@ class edit_column_form extends dynamic_form {
         $id = $this->optional_param('id', null, PARAM_INT);
         $column = $DB->get_record('kanban_column', ['id' => $id]);
         $column->cmid = $this->optional_param('cmid', null, PARAM_INT);
+        $column->title = html_entity_decode($column->title, ENT_COMPAT, 'UTF-8');
         $column->boardid = $column->kanban_board;
         $options = json_decode($column->options);
         $column->autoclose = $options->autoclose;

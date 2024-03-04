@@ -159,17 +159,15 @@ function kanban_inplace_editable($itemtype, $itemid, $newvalue) {
 
     \mod_kanban\helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $boardmanager->get_cminfo());
 
-    $newtitle = clean_param($newvalue, PARAM_TEXT);
-
     if ($itemtype == 'card') {
-        $boardmanager->update_card($itemid, ['title' => $newtitle]);
+        $boardmanager->update_card($itemid, ['title' => $newvalue]);
     }
 
     if ($itemtype == 'column') {
-        $boardmanager->update_column($itemid, ['title' => $newtitle]);
+        $boardmanager->update_column($itemid, ['title' => $newvalue]);
     }
 
-    return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, $newtitle, $newtitle, null, '');
+    return new \core\output\inplace_editable('mod_kanban', $itemtype, $itemid, true, s($newvalue), $newvalue, null, '');
 }
 
 /**
