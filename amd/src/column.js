@@ -273,8 +273,7 @@ export default class extends KanbanComponent {
                     if (node.classList.contains('mod_kanban_card') && !sequence.includes(node.dataset.id)) {
                         el.removeChild(node);
                     }
-                });let doc = new DOMParser().parseFromString(element.title, 'text/html');
-                this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', doc.documentElement.textContent);
+                });
             // Reorder cards according to sequence from the database.
             [...el.children]
                 .sort((a, b) => sequence.indexOf(a.dataset.id) > sequence.indexOf(b.dataset.id) ? 1 : -1)
