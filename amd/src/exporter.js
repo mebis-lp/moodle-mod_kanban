@@ -58,6 +58,9 @@ export default class {
         col.hascards = col.sequence != '';
         col.autoclose = options.autoclose;
         col.autohide = options.autohide;
+        if (options.wiplimit > 0) {
+            col.wiplimit = options.wiplimit;
+        }
         if (col.hascards) {
             let cardOrder = col.sequence.split(',');
             col.cards = cardOrder.map((value) => {

@@ -26,10 +26,11 @@
         "managecolumns": true,
         "hascards": false,
         "autohide": true,
-        "locked": false
+        "locked": false,
+        "wiplimit": 5
     }
 }}
-<li class="mod_kanban_column col card{{#autohide}} mod_kanban_autohide{{/autohide}} {{#locked}}mod_kanban_locked_column{{/locked}}" id="mod_kanban_column-{{id}}" data-id="{{id}}">
+<li class="mod_kanban_column col card{{#autohide}} mod_kanban_autohide{{/autohide}} {{#locked}}mod_kanban_locked_column{{/locked}} {{#wiplimit}}mod_kanban_column_wiplimit{{/wiplimit}}" id="mod_kanban_column-{{id}}" data-id="{{id}}">
     <h5 class="mod_kanban_column_title card-title">
     <span class="inplaceeditable inplaceeditable-text"{{#managecolumns}} {{^locked}}data-inplaceeditable="1" {{/locked}}data-component="mod_kanban" data-itemtype="column" data-itemid="{{id}}"
     data-value="{{{title}}}" data-type="text"{{/managecolumns}}>
@@ -38,6 +39,7 @@
         </a>
     </span>
     </h5>
+    <span class="badge rounded-pill text-bg-info mod_kanban_wiplimit">{{wiplimit}} / {{#pix}} t/user, core, {{#str}} wiplimit, mod_kanban{{/str}} {{/pix}}</span>
     <div class="mod_kanban_hidden_actions">
         <button data-action="show_hidden" class="btn btn-icon icon-no-margin p-0">{{#pix}} i/show, core, {{#str}} showhidden, mod_kanban {{/str}} {{/pix}}</button>
         <button data-action="hide_hidden" class="btn btn-icon icon-no-margin p-0">{{#pix}} i/hide, core, {{#str}} hidehidden, mod_kanban {{/str}} {{/pix}}</button>

@@ -184,3 +184,6 @@ $string['userboards'] = 'Personal boards';
 $string['userboards_help'] = 'Enables personal boards for the participants (only visible to them and to the trainers)';
 $string['userboardsenabled'] = 'Personal boards enabled';
 $string['userboardsonly'] = 'Personal boards only';
+$string['wiplimit'] = 'WIP limit per person';
+$string['wiplimitenable'] = 'Enable WIP limit';
+$string['wiplimitreached'] = 'WIP limit is reached for {$a->users}.';

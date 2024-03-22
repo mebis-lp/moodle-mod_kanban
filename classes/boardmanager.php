@@ -28,6 +28,9 @@ namespace mod_kanban;
 use cm_info;
 use context_module;
 use context_system;
+use core_h5p\core;
+use core_user;
+use moodle_exception;
 use stdClass;
 
 /**
@@ -541,6 +544,13 @@ class boardmanager {
         } else {
             $targetcolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
 
+            $options = json_decode($targetcolumn->options);
+            $wiplimit = $options->wiplimit ?? 0;
+
+            if ($wiplimit > 0) {
+                self::check_wiplimit($columnid, $cardid, $wiplimit);
+            }
+
             // Card needs to be processed first, because column sorting in frontend will only
             // work if card is already moved in the right position.
             $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
@@ -600,6 +610,51 @@ class boardmanager {
     }
 
     /**
+     * Checks whether the WIP limit is reached for a certain column and card. Raises an exception if limit is reached.
+     * @param int $columnid Id of the column
+     * @param int $cardid Id of the current card
+     * @param int $wiplimit WIP limit
+     * @param array $assignees Array of user ids that should be checked for WIP limit. If empty, checking will be done 
+     *                         for the current assignees.
+     * @throws moodle_exception
+     */
+    public function check_wiplimit(int $columnid, int $cardid, int $wiplimit, array $assignees = []): void {
+        if (empty($assignees)) {
+            $assignees = $this->get_card_assignees($cardid);
+        }
+        $overlimit = [];
+        foreach ($assignees as $assignee) {
+            $wip = $this->get_wip($columnid, $assignee, $cardid);
+            if ($wip >= $wiplimit) {
+                $user = core_user::get_user($assignee);
+                $overlimit[] = fullname($user);
+            }
+        }
+        if (count($overlimit) > 0) {
+            throw new moodle_exception('wiplimitreached', 'mod_kanban', '', ['users' => implode(', ', $overlimit)]);
+        }
+    }
+
+    /**
+     * Returns the number of cards in a column a certain user is currently assigned to.
+     * @param int $columnid Id of the column
+     * @param int $userid Id of the user
+     * @param int $cardtoexclude Id of a card to exclude from the count
+     */
+    public function get_wip(int $columnid, int $userid, int $cardtoexclude = 0): int {
+        global $DB;
+        $count = $DB->get_field_sql(
+            'SELECT COUNT(*)
+            FROM {kanban_card} c 
+            INNER JOIN {kanban_assignee} a 
+            ON a.kanban_card = c.id 
+            WHERE a.userid = :userid AND c.kanban_column = :columnid AND c.id != :cardid',
+            ['columnid' => $columnid, 'userid' => $userid, 'cardid' => $cardtoexclude]
+        );
+        return $count;
+    }
+
+    /**
      * Assigns a user to a card.
      *
      * @param int $cardid Id of the card
@@ -608,8 +663,17 @@ class boardmanager {
      */
     public function assign_user(int $cardid, int $userid): void {
         global $DB, $OUTPUT, $USER;
-        $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'userid' => $userid]);
         $card = $this->get_card($cardid);
+        $column = $this->get_column($card->kanban_column);
+        $options = json_decode($column->options);
+        $wiplimit = $options->wiplimit ?? 0;
+
+        if ($wiplimit > 0) {
+            self::check_wiplimit($card->kanban_column, $cardid, $wiplimit, [$userid]);
+        }
+
+        $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'userid' => $userid]);
+        
         $update = [
             'id' => $cardid,
             'timemodified' => time(),
@@ -876,6 +940,15 @@ class boardmanager {
                 $cardupdate['assignees'] = $assignees;
             }
             $assignees = [];
+
+            $column = $this->get_column($cardupdate['kanban_column']);
+            $options = json_decode($column->options);
+            $wiplimit = $options->wiplimit ?? 0;
+    
+            if ($wiplimit > 0) {
+                self::check_wiplimit($cardupdate['kanban_column'], $cardid, $wiplimit, $toinsert);
+            }
+    
             foreach ($toinsert as $assignee) {
                 $assignees[] = ['kanban_card' => $cardid, 'userid' => $assignee];
                 $user = \core_user::get_user($assignee);
@@ -944,6 +1017,7 @@ class boardmanager {
         $options = [
             'autoclose' => $data['autoclose'],
             'autohide' => $data['autohide'],
+            'wiplimit' => empty($data['wiplimitenable']) ? 0 : $data['wiplimit'],
         ];
         if (isset($data['title'])) {
             $data['title'] = s($data['title']);
