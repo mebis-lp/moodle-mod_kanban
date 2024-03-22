@@ -18,7 +18,7 @@
  * Class for modifying kanban content
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -299,7 +299,6 @@ class change_kanban_content extends external_api {
      * @throws moodle_exception
      */
     public static function move_card(int $cmid, int $boardid, array $data): array {
-        global $USER;
         $params = self::validate_parameters(self::move_card_parameters(), [
             'cmid' => $cmid,
             'boardid' => $boardid,
