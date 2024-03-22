@@ -1,4 +1,6 @@
 import Ajax from 'core/ajax';
+import Notification from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 /**
  * Mutations library for mod_kanban.
@@ -190,9 +192,18 @@ export default class {
                 boardid: state.board.id,
                 data: data
             },
+            fail: this.processFail,
         }])[0];
 
         this.processUpdates(stateManager, result);
+    }
+
+    /**
+     * Notify user about an error.
+     * @param {*} ex
+     */
+    processFail(ex) {
+        Notification.alert(getString('error'), ex.message, getString('cancel'));
     }
 
     /**
