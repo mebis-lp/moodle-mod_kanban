@@ -26,7 +26,7 @@ namespace mod_kanban;
  * @covers      \mod_kanban\external\change_kanban_content
  * @runTestsInSeparateProcesses
  */
-class change_kanban_content_test extends \advanced_testcase {
+final class change_kanban_content_test extends \advanced_testcase {
     /** @var \stdClass The course used for testing */
     private $course;
     /** @var \stdClass The kanban used for testing */
