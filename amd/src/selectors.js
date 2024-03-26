@@ -33,6 +33,7 @@ export default {
     ASSIGNEDUSER: `.mod_kanban_assigned_user`,
     BOARD: `.mod_kanban_board`,
     CARD: `.mod_kanban_card`,
+    CARDCOUNT: `.mod_kanban_cardcount`,
     CARDNUMBER: `.mod_kanban_card_number`,
     COLUMN: `.mod_kanban_column`,
     COLUMNCONTAINER: `.mod_kanban_column_container`,
