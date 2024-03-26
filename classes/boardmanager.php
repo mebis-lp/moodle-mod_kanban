@@ -613,7 +613,7 @@ class boardmanager {
      * @param int $columnid Id of the column
      * @param int $cardid Id of the current card
      * @param int $wiplimit WIP limit
-     * @param array $assignees Array of user ids that should be checked for WIP limit. If empty, checking will be done 
+     * @param array $assignees Array of user ids that should be checked for WIP limit. If empty, checking will be done
      *                         for the current assignees.
      * @throws moodle_exception
      */
@@ -644,9 +644,9 @@ class boardmanager {
         global $DB;
         $count = $DB->get_field_sql(
             'SELECT COUNT(*)
-            FROM {kanban_card} c 
-            INNER JOIN {kanban_assignee} a 
-            ON a.kanban_card = c.id 
+            FROM {kanban_card} c
+            INNER JOIN {kanban_assignee} a
+            ON a.kanban_card = c.id
             WHERE a.userid = :userid AND c.kanban_column = :columnid AND c.id != :cardid',
             ['columnid' => $columnid, 'userid' => $userid, 'cardid' => $cardtoexclude]
         );
@@ -672,7 +672,7 @@ class boardmanager {
         }
 
         $DB->insert_record('kanban_assignee', ['kanban_card' => $cardid, 'userid' => $userid]);
-        
+
         $update = [
             'id' => $cardid,
             'timemodified' => time(),
@@ -974,11 +974,11 @@ class boardmanager {
             $column = $this->get_column($cardupdate['kanban_column']);
             $options = json_decode($column->options);
             $wiplimit = $options->wiplimit ?? 0;
-    
+
             if ($wiplimit > 0) {
                 self::check_wiplimit($cardupdate['kanban_column'], $cardid, $wiplimit, $toinsert);
             }
-    
+
             foreach ($toinsert as $assignee) {
                 $assignees[] = ['kanban_card' => $cardid, 'userid' => $assignee];
                 $user = \core_user::get_user($assignee);
