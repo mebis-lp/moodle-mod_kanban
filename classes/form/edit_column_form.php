@@ -58,6 +58,16 @@ class edit_column_form extends dynamic_form {
 
         $mform->addElement('advcheckbox', 'autohide', get_string('autohide', 'kanban'));
         $mform->setType('autohide', PARAM_BOOL);
+
+        $wiparray = [];
+        $wiparray[] = $mform->createElement('advcheckbox', 'wiplimitenable', get_string('wiplimitenable', 'kanban'));
+        $wiparray[] = $mform->createElement('text', 'wiplimit', get_string('wiplimit', 'kanban'), ['size' => '5']);
+        $mform->addGroup($wiparray, 'wipgroup', '', '', false);
+        
+        $mform->setType('wiplimit', PARAM_INT);
+        $mform->setType('wiplimitenable', PARAM_BOOL);
+        
+        $mform->disabledIf('wiplimit', 'wiplimitenable', 'notchecked');
     }
 
     /**
@@ -124,6 +134,8 @@ class edit_column_form extends dynamic_form {
         $options = json_decode($column->options);
         $column->autoclose = $options->autoclose;
         $column->autohide = $options->autohide;
+        $column->wiplimitenable = !empty($options->wiplimit);
+        $column->wiplimit = (empty($options->wiplimit) ? 0 : $options->wiplimit);
         $this->set_data($column);
     }
 
