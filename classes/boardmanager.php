@@ -683,7 +683,7 @@ class boardmanager {
         $assignees = $this->get_card_assignees($cardid);
         if ($state) {
             helper::remove_calendar_event($this->kanban, $card, $assignees);
-            if ($card->repeat_enable) {
+            if (!empty($card->repeat_enable)) {
                 $newcard = clone $card;
                 if ($card->repeat_newduedate == constants::MOD_KANBAN_REPEAT_NONEWDUEDATE) {
                     $newcard->duedate = 0;

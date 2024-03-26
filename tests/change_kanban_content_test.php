@@ -260,10 +260,12 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $update = json_decode($returnvalue['update'], true);
 
-        $this->assertCount(3, $update);
+        // As the target column has autoclose enabled by default, we get two updates for cards.
+        $this->assertCount(4, $update);
         $this->assertEquals('cards', $update[0]['name']);
         $this->assertEquals('columns', $update[1]['name']);
         $this->assertEquals('columns', $update[2]['name']);
+        $this->assertEquals('cards', $update[3]['name']);
 
         $this->assertEquals(join(',', [$cards[0]->id, $cards[2]->id]), $update[2]['fields']['sequence']);
         $this->assertEquals('', $update[1]['fields']['sequence']);
@@ -298,10 +300,12 @@ class change_kanban_content_test extends \advanced_testcase {
 
         $update = json_decode($returnvalue['update'], true);
 
-        $this->assertCount(3, $update);
+        // As the target column has autoclose enabled by default, we get two updates for cards.
+        $this->assertCount(4, $update);
         $this->assertEquals('cards', $update[0]['name']);
         $this->assertEquals('columns', $update[1]['name']);
         $this->assertEquals('columns', $update[2]['name']);
+        $this->assertEquals('cards', $update[3]['name']);
 
         $this->assertEquals(join(',', [$cards[2]->id, $cards[1]->id, $cards[0]->id]), $update[2]['fields']['sequence']);
         $this->assertEquals('', $update[1]['fields']['sequence']);
