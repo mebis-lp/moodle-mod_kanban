@@ -63,10 +63,10 @@ class edit_column_form extends dynamic_form {
         $wiparray[] = $mform->createElement('advcheckbox', 'wiplimitenable', get_string('wiplimitenable', 'kanban'));
         $wiparray[] = $mform->createElement('text', 'wiplimit', get_string('wiplimit', 'kanban'), ['size' => '5']);
         $mform->addGroup($wiparray, 'wipgroup', '', '', false);
-        
+
         $mform->setType('wiplimit', PARAM_INT);
         $mform->setType('wiplimitenable', PARAM_BOOL);
-        
+
         $mform->disabledIf('wiplimit', 'wiplimitenable', 'notchecked');
     }
 
