@@ -18,7 +18,7 @@
  * Class for delivering kanban content
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,6 +42,7 @@ use invalid_parameter_exception;
 use mod_kanban\boardmanager;
 use mod_kanban\constants;
 use mod_kanban\helper;
+use mod_kanban\numberfilter;
 use mod_kanban\updateformatter;
 use moodle_exception;
 use required_capability_exception;
@@ -51,7 +52,7 @@ use stdClass;
 /**
  * Class for delivering kanban content
  *
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -115,6 +116,7 @@ class get_kanban_content extends external_api {
                         'groupselector' => new external_value(PARAM_RAW, 'group selector'),
                         'userboards' => new external_value(PARAM_INT, 'userboards'),
                         'history' => new external_value(PARAM_INT, 'history'),
+                        'usenumbers' => new external_value(PARAM_INT, 'use numbers for the cards'),
                     ]),
                     'board' => new external_single_structure([
                         'id' => new external_value(PARAM_INT, 'board id'),
@@ -207,6 +209,10 @@ class get_kanban_content extends external_api {
                                     'current user can edit this card?',
                                     VALUE_OPTIONAL,
                                     false
+                                ),
+                                'number' => new external_value(
+                                    PARAM_INT,
+                                    'number of the card',
                                 ),
                             ],
                             '',
@@ -460,6 +466,7 @@ class get_kanban_content extends external_api {
         $common->groupmode = $cminfo->groupmode;
         $common->groupselector = $groupselector;
         $common->history = $kanban->history;
+        $common->usenumbers = $kanban->usenumbers;
 
         if (!$asupdate) {
             $common->template = $DB->get_field_sql(
@@ -539,6 +546,9 @@ class get_kanban_content extends external_api {
                     'attachments',
                     $card->id
                 );
+                if ($common->usenumbers) {
+                    $card->description = numberfilter::filter($card->description);
+                }
                 $card->attachments = helper::get_attachments($context->id, $card->id);
                 $card->hasattachment = count($card->attachments) > 0;
             }
