@@ -59,6 +59,9 @@ class mod_kanban_mod_form extends moodleform_mod {
             $mform->addHelpButton('history', 'enablehistory', 'mod_kanban');
         }
 
+        $mform->addElement('advcheckbox', 'usenumbers', get_string('usenumbers', 'kanban'));
+        $mform->addHelpButton('usenumbers', 'usenumbers', 'kanban');
+
         $this->standard_coursemodule_elements();
 
         $this->add_action_buttons(true, null, null);

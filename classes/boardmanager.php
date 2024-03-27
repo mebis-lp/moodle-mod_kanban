@@ -461,6 +461,8 @@ class boardmanager {
         ];
         $data = array_merge($defaults, $data, $defaultsfixed);
 
+        $data['number'] = self::get_next_card_number();
+
         $data['id'] = $DB->insert_record('kanban_card', $data);
         $data['assignees'] = [];
         // Sanitize title to be extra safe.
@@ -1229,5 +1231,20 @@ class boardmanager {
         }
 
         return false;
+    }
+
+    /**
+     * Returns the next card number for a board.
+     *
+     * @param int $boardid Id of the board
+     * @return int Next card number
+     */
+    public function get_next_card_number(int $boardid = 0): int {
+        global $DB;
+        if (empty($boardid)) {
+            $boardid = $this->board->id;
+        }
+        $nextnumber = $DB->get_field('kanban_card', 'MAX(number)+1', ['kanban_board' => $boardid]);
+        return empty($nextnumber) ? 1 : $nextnumber;
     }
 }
