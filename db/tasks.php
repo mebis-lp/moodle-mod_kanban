@@ -18,7 +18,7 @@
  * mod_kanban task definition.
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ $tasks = [
     [
         'classname' => 'mod_kanban\task\reminder',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '*/5',
         'hour' => '*',
         'day' => '*',
         'month' => '*',
