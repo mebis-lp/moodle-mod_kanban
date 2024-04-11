@@ -27,7 +27,7 @@ use context_course;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers      \mod_kanban\boardmanager
  */
-class boardmanager_test extends \advanced_testcase {
+final class boardmanager_test extends \advanced_testcase {
     /** @var \stdClass The course used for testing */
     private $course;
     /** @var \stdClass The kanban used for testing */
