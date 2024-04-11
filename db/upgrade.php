@@ -38,10 +38,6 @@ function xmldb_kanban_upgrade($oldversion) {
         $field = new xmldb_field('repeat_enable', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'timemodified');
 
         // Conditionally launch add field repeat_enable.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
         $field = new xmldb_field('repeat_interval', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'repeat_enable');
 
         // Conditionally launch add field repeat_interval.
@@ -83,6 +79,43 @@ function xmldb_kanban_upgrade($oldversion) {
 
         // Kanban savepoint reached.
         upgrade_mod_savepoint(true, 2024032601, 'kanban');
+    }
+
+    if ($oldversion < 2024032701) {
+        // Define field usenumbers to be added to kanban.
+        $table = new xmldb_table('kanban');
+        $field = new xmldb_field('usenumbers', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'history');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field number to be added to kanban_card.
+        $table = new xmldb_table('kanban_card');
+        $field = new xmldb_field('number', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'timemodified');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Set numbers for all cards.
+        $board = 0;
+        $nextnumber = 0;
+        $cards = $DB->get_recordset('kanban_card', ['number' => 0], 'kanban_board ASC, timecreated ASC');
+        foreach ($cards as $card) {
+            if ($card->kanban_board != $board) {
+                $board = $card->kanban_board;
+                $nextnumber = $DB->get_field('kanban_card', 'MAX(number)', ['kanban_board' => $board]) + 1;
+            } else {
+                $nextnumber++;
+            }
+            $DB->set_field('kanban_card', 'number', $nextnumber, ['id' => $card->id]);
+        }
+
+        // Kanban savepoint reached.
+        upgrade_mod_savepoint(true, 2024032701, 'kanban');
     }
     return true;
 }
