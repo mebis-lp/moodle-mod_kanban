@@ -38,6 +38,11 @@ function xmldb_kanban_upgrade($oldversion) {
         $field = new xmldb_field('repeat_enable', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'timemodified');
 
         // Conditionally launch add field repeat_enable.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally launch add field repeat_enable.
         $field = new xmldb_field('repeat_interval', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'repeat_enable');
 
         // Conditionally launch add field repeat_interval.

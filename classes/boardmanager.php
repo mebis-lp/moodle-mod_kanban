@@ -966,12 +966,12 @@ class boardmanager {
             }
             $assignees = [];
 
-            $column = $this->get_column($cardupdate['kanban_column']);
+            $column = $this->get_column($card['kanban_column']);
             $options = json_decode($column->options);
             $wiplimit = $options->wiplimit ?? 0;
     
             if ($wiplimit > 0) {
-                self::check_wiplimit($cardupdate['kanban_column'], $cardid, $wiplimit, $toinsert);
+                self::check_wiplimit($card['kanban_column'], $cardid, $wiplimit, $toinsert);
             }
     
             foreach ($toinsert as $assignee) {
