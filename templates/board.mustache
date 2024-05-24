@@ -44,6 +44,14 @@
             {{>mod_kanban/actionmenuboard}}
         </div>
     </div>
+    <div class="row mod_kanban_update_error hidden">
+        <div class="col">
+            <div class="alert alert-danger" role="alert">
+                {{#pix}} i/caution, core, {{#str}} connectionlost, mod_kanban {{/str}} {{/pix}}
+                {{#str}} connectionlostmessage, mod_kanban {{/str}}
+            </div>
+        </div>
+    </div>
     <div class="row mod_kanban_scroll mod_kanban_scroll_left">
         <button class="mod_kanban_scroll_button">&lt;</button>
     </div>
