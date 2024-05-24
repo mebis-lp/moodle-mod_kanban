@@ -546,7 +546,9 @@ class boardmanager {
             // If target column has autoclose option set, update card to be completed.
             $options = json_decode($targetcolumn->options);
             if (!empty($options->autoclose)) {
-                $updatecard['completed'] = 1;
+                if ($card['completed']) {
+                    self::set_card_complete($cardid, 1);
+                }
             }
             $DB->update_record('kanban_card', $updatecard);
             // When inplace editing the title and moving the card happens quite fast in a row,
