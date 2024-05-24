@@ -2,11 +2,15 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
+
 /**
  * Mutations library for mod_kanban.
  * The functions are just used to forward data to the webservice.
  */
 export default class {
+    // Attribute for counting update fails.
+    updateFails = 0;
+
     async saveAsTemplate(stateManager) {
         await this._sendChange('save_as_template', stateManager);
     }
@@ -228,9 +232,31 @@ export default class {
                     boardid: state.board.id,
                     timestamp: state.common.timestamp,
                 },
+                fail: () => {
+                    this.processUpdateFail();
+                },
             }])[0];
 
             this.processUpdates(stateManager, result);
+            this.resetUpdateFails();
+        }
+    }
+
+    /**
+     * Reset update fails.
+     */
+    resetUpdateFails() {
+        this.updateFails = 0;
+        document.querySelector('.mod_kanban_update_error').classList.add('hidden');
+    }
+
+    /**
+     * Notify user about an error.
+     */
+    processUpdateFail() {
+        this.updateFails++;
+        if (this.updateFails > 2) {
+            document.querySelector('.mod_kanban_update_error').classList.remove('hidden');
         }
     }
 
@@ -257,6 +283,9 @@ export default class {
                 boardid: state.board.id,
                 cardid: cardId,
                 timestamp: timestamp,
+            },
+            fail: () => {
+                this.processUpdateFail();
             },
         }])[0];
 
@@ -287,6 +316,9 @@ export default class {
                 cardid: cardId,
                 timestamp: timestamp,
             },
+            fail: () => {
+                this.processUpdateFail();
+            },
         }])[0];
 
         this.processUpdates(stateManager, result);
@@ -301,5 +333,6 @@ export default class {
     async processUpdates(stateManager, result) {
         let updates = JSON.parse(result.update);
         stateManager.processUpdates(updates);
+        this.resetUpdateFails();
     }
 }
