@@ -84,12 +84,12 @@ export default class extends KanbanComponent {
                 'click',
                 this._deleteTemplateConfirm
             );
+            this.addEventListener(
+                this.getElement(selectors.DELETEBOARD),
+                'click',
+                this._deleteConfirm
+            );
         }
-        this.addEventListener(
-            this.getElement(selectors.DELETEBOARD),
-            'click',
-            this._deleteConfirm
-        );
         this.addEventListener(
             this.getElement(selectors.SCROLLLEFT),
             'click',
