@@ -55,7 +55,9 @@ echo $OUTPUT->header();
 $groupselector = '';
 $groupid = 0;
 
-if (!empty($cm->groupmode) && $group != 0) {
+$groupmode = groups_get_activity_groupmode($cm, $course);
+
+if (!empty($groupmode) && $group != 0) {
     $groupid = groups_get_activity_group($cm, true);
 }
 

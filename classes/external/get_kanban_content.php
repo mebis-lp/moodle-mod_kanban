@@ -372,9 +372,10 @@ class get_kanban_content extends external_api {
 
         $kanbanboard->heading = get_string('courseboard', 'mod_kanban');
         $groupselector = null;
+        $groupmode = groups_get_activity_groupmode($cminfo, $course);
 
         if (!$asupdate) {
-            if (!empty($cminfo->groupmode)) {
+            if (!empty($groupmode)) {
                 $groupselector = groups_print_activity_menu(
                     $cminfo,
                     new \moodle_url('/mod/kanban/view.php', ['id' => $cminfo->id]),
@@ -432,11 +433,11 @@ class get_kanban_content extends external_api {
                     return intval($v->id);
                 }, $members);
                 $ismember = in_array($USER->id, $members);
-                if ($cminfo->groupmode == SEPARATEGROUPS && !$ismember) {
+                if ($groupmode == SEPARATEGROUPS && !$ismember) {
                     require_capability('mod/kanban:viewallboards', $context);
                     $restrictcaps = true;
                 }
-                if ($cminfo->groupmode == VISIBLEGROUPS && !$ismember) {
+                if ($groupmode == VISIBLEGROUPS && !$ismember) {
                     $restrictcaps = true;
                 }
             }
@@ -457,7 +458,7 @@ class get_kanban_content extends external_api {
         $common->lang = str_replace('_', '-', $common->lang);
         $common->liveupdate = get_config('mod_kanban', 'liveupdatetime');
         $common->userboards = $kanban->userboards;
-        $common->groupmode = $cminfo->groupmode;
+        $common->groupmode = $groupmode;
         $common->groupselector = $groupselector;
         $common->history = $kanban->history;
 

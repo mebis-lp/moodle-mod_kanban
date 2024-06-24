@@ -152,10 +152,11 @@ class helper {
                     return intval($v->id);
                 }, $members);
                 $ismember = in_array($USER->id, $members);
-                if ($cminfo->groupmode == SEPARATEGROUPS && !$ismember) {
+                $groupmode = groups_get_activity_groupmode($cminfo, $cminfo->course);
+                if ($groupmode == SEPARATEGROUPS && !$ismember) {
                     require_capability(constants::MOD_KANBAN_CAPABILITY[$type], $context);
                 }
-                if ($cminfo->groupmode == VISIBLEGROUPS && !$ismember && $type == constants::MOD_KANBAN_EDIT) {
+                if ($groupmode == VISIBLEGROUPS && !$ismember && $type == constants::MOD_KANBAN_EDIT) {
                     require_capability(constants::MOD_KANBAN_CAPABILITY[$type], $context);
                 }
             }
