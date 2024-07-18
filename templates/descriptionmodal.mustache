@@ -26,27 +26,36 @@
         "duedate": 123456789
     }
 }}
-<div class="mod_kanban_description_modal modal fade" id="mod_kanban_description_modal_{{id}}" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{title}}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                {{{description}}}
-                {{#duedate}}
-                    <br/>
-                    {{#str}} due, mod_kanban {{/str}}: {{#userdate}} {{duedate}}, {{#str}} strftimedate, core_langconfig {{/str}} {{/userdate}}
-                {{/duedate}}
-            </div>
-            <div class="modal-footer list-group">
-                {{#hasattachment}}
-                    {{>mod_kanban/attachmentitems}}
-                {{/hasattachment}}
-            </div>
-        </div>
+<div class="mod_kanban_description_modal" id="mod_kanban_description_{{uniqid}}">
+    <div>
+        {{{description}}}
     </div>
+
+    {{#duedate}}
+    <hr>
+        {{#str}} due, mod_kanban {{/str}}: {{#userdate}} {{duedate}}, {{#str}} strftimedatetime, core_langconfig {{/str}} {{/userdate}}
+    {{/duedate}}
+
+    {{#hasassignees}}
+    <hr>
+    {{#str}} assignees, mod_kanban {{/str}}:
+    <div class="mod_kanban_assignees" data-id="{{id}}">
+        {{#assignees}}
+            {{>mod_kanban/user}}
+        {{/assignees}}
+    </div>
+    {{/hasassignees}}
+
+
+    {{#hasattachment}}
+    <hr>
+        <p>{{#str}} attachments, mod_kanban {{/str}}:</p>
+        {{>mod_kanban/attachmentitems}}
+    {{/hasattachment}}
 </div>
+
+{{#js}}
+require(['mod_kanban/cardnumber'], function(cardnumber) {
+    cardnumber.init('mod_kanban_description_{{uniqid}}');
+});
+{{/js}}

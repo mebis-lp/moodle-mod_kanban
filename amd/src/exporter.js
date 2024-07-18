@@ -43,6 +43,7 @@ export default class {
             userboardsonly: state.common.userboards == 2,
             iscourseboard: state.board.userid == 0 && state.board.groupid == 0 && state.board.template == 0,
             users: JSON.parse(JSON.stringify(state.users)),
+            usenumbers: state.common.usenumbers,
         }, this.exportCapabilities(state));
     }
 
@@ -79,7 +80,8 @@ export default class {
             title: '-',
             assignees: [],
             options: '{}',
-            canedit: false
+            canedit: false,
+            number: 0,
         };
         if (state.cards.get(cardid) !== undefined) {
             card = JSON.parse(JSON.stringify(state.cards.get(cardid)));
