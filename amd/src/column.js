@@ -297,10 +297,21 @@ export default class extends KanbanComponent {
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', doc.documentElement.textContent);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
         }
-        // Only autohide option is relevant for the frontend for now. autoclose option is handled by the backend.
+        // Only autohide and backgroundcolor option is relevant for the frontend for now.
+        // Autoclose option is handled by the backend.
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
-            this.toggleClass(options.autohide, 'mod_kanban_autohide');
+            if (options.autohide === undefined) {
+                this.toggleClass(false, 'mod_kanban_autohide');
+            } else {
+                this.toggleClass(true, 'mod_kanban_autohide');
+            }
+
+            if (options.colbackground === undefined) {
+                this.getElement().removeAttribute('style');
+            } else {
+                this.getElement().setAttribute('style', 'background-color: ' + options.colbackground);
+            }
         }
         // Enable/disable dragging (e.g. if column is locked).
         this.checkDragging();
