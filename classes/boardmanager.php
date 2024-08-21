@@ -907,7 +907,11 @@ class boardmanager {
         }
         $cardupdate['attachments'] = helper::get_attachments($context->id, $cardid);
         $cardupdate['hasattachment'] = count($cardupdate['attachments']) > 0;
-        $cardupdate['hasdescription'] = !empty(trim($cardupdate['description'])) || $cardupdate['hasattachment'];
+        $trimdescription = null;
+        if (!empty($cardupdate['description'])){
+            $trimdescription = trim($cardupdate['description']);
+        }       
+        $cardupdate['hasdescription'] = !empty($trimdescription) || $cardupdate['hasattachment'];
         if (!empty($cardupdate['description'])) {
             $cardupdate['description'] = file_rewrite_pluginfile_urls(
                 $cardupdate['description'],
