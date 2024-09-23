@@ -36,9 +36,6 @@
         <li class="nav-item mod_kanban_move_card">
             <a class="dropdown-item" href="#" data-action="move_card" data-id="{{id}}">{{#pix}} i/move_2d, core, {{#str}} move, core {{/str}} {{/pix}}{{#str}} move, core {{/str}}</a>
         </li>
-        <li class="nav-item mod_kanban_delete_card">
-            <a class="dropdown-item" href="#" data-action="delete_card" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}{{#str}} delete, core {{/str}}</a>
-        </li>
         <li class="nav-item mod_kanban_complete_card">
             <a class="dropdown-item" href="#" data-action="complete_card" data-id="{{id}}">{{#pix}} t/check, core, {{#str}} complete, core {{/str}} {{/pix}}{{#str}} complete, core {{/str}}</a>
         </li>
@@ -56,6 +53,9 @@
         </li>
         <li class="nav-item mod_kanban_push_card">
             <a class="dropdown-item" href="#" data-action="push_card" data-id="{{id}}">{{#pix}} t/copy, core, {{#str}} pushcard, mod_kanban {{/str}} {{/pix}}{{#str}} pushcard, mod_kanban {{/str}}</a>
+        </li>
+        <li class="nav-item mod_kanban_delete_card">
+            <a class="dropdown-item text-danger" href="#" data-action="delete_card" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, core {{/str}} {{/pix}}{{#str}} delete, core {{/str}}</a>
         </li>
     </ul>
 </div>
