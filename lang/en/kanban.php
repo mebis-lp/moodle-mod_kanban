@@ -133,6 +133,7 @@ $string['name_help'] = 'This name will be visible in course overview and as a ti
 $string['newcard'] = 'New card';
 $string['newcolumn'] = 'New column';
 $string['nogroupavailable'] = 'No group available';
+$string['nokanbaninstances'] = 'There are no kanban boards in this course';
 $string['nouser'] = 'No user';
 $string['nouserboards'] = 'No personal boards';
 $string['pluginadministration'] = 'Kanban administration';

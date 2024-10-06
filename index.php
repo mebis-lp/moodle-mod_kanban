@@ -43,10 +43,12 @@ echo $OUTPUT->header();
 $modulenameplural = get_string('modulenameplural', 'mod_kanban');
 echo $OUTPUT->heading($modulenameplural);
 
+require_capability('mod/kanban:view', $coursecontext);
+
 $kanbans = get_all_instances_in_course('kanban', $course);
 
 if (empty($kanbans)) {
-     notice(get_string('no$kanbaninstances', 'mod_kanban'), new moodle_url('/course/view.php', ['id' => $course->id]));
+     notice(get_string('nokanbaninstances', 'mod_kanban'), new moodle_url('/course/view.php', ['id' => $course->id]));
 }
 
 $usesections = course_format_uses_sections($course->format);
@@ -62,16 +64,21 @@ if ($usesections) {
 }
 
 foreach ($kanbans as $kanban) {
+    $context = context_module::instance($kanban->coursemodule);
     $linkcss = null;
-    if (!$kanban->visible) {
-        $linkcss = ['class' => 'dimmed'];
-    }
-    $link = html_writer::link(new moodle_url('/mod/kanban/view.php', ['id' => $kanban->coursemodule]), $kanban->name, $linkcss);
 
-    if ($usesections) {
-        $table->data[] = [get_section_name($course, $kanban->section), $link];
-    } else {
-        $table->data[] = [$link];
+    if ($kanban->visible && has_capability('mod/kanban:view', $context)) {
+        if (!$kanban->visible) {
+            $linkcss = ['class' => 'dimmed'];
+        }
+
+        $link = html_writer::link(new moodle_url('/mod/kanban/view.php', ['id' => $kanban->coursemodule]), $kanban->name, $linkcss);
+
+        if ($usesections) {
+            $table->data[] = [get_section_name($course, $kanban->section), $link];
+        } else {
+            $table->data[] = [$link];
+        }
     }
 }
 
