@@ -61,7 +61,7 @@ $kanbanfound = false;
 
 foreach ($kanbans as $kanban) {
     $context = context_module::instance($kanban->coursemodule, IGNORE_MISSING);
-    if (!$context || !$kanban->visible || !has_capability('mod/kanban:view', $context)) {
+    if (!$context || !has_capability('mod/kanban:view', $context)) {
         continue;
     }
 
