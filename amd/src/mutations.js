@@ -1,10 +1,15 @@
 import Ajax from 'core/ajax';
+import Notification from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 /**
  * Mutations library for mod_kanban.
  * The functions are just used to forward data to the webservice.
  */
 export default class {
+    // Attribute for counting update fails.
+    updateFails = 0;
+
     async saveAsTemplate(stateManager) {
         await this._sendChange('save_as_template', stateManager);
     }
@@ -183,14 +188,17 @@ export default class {
      */
     async _sendChange(method, stateManager, data) {
         const state = stateManager.state;
-        const result = await Ajax.call([{
+        const request = {
             methodname: 'mod_kanban_' + method,
             args: {
                 cmid: state.common.id,
                 boardid: state.board.id,
                 data: data
             },
-        }])[0];
+            fail: this.displayError,
+        };
+
+        const result = await Ajax.call([request])[0];
 
         this.processUpdates(stateManager, result);
     }
@@ -217,9 +225,34 @@ export default class {
                     boardid: state.board.id,
                     timestamp: state.common.timestamp,
                 },
+                fail: () => {
+                    this.processUpdateFail(stateManager);
+                },
             }])[0];
 
             this.processUpdates(stateManager, result);
+        }
+    }
+
+    /**
+     * Count update fails.
+     * @param {*} stateManager
+     */
+    processUpdateFail(stateManager) {
+        const state = stateManager.state;
+        stateManager.setReadOnly(false);
+        state.common.updatefails++;
+        stateManager.setReadOnly(true);
+    }
+
+    /**
+     * Show a modal to display an error message
+     * @param {*} data
+     */
+    async displayError(data) {
+        if (data.message) {
+            // Can switch to direct call of getString when dropping support for Moodle 4.1.
+            Notification.alert(getString('error'), data.message, getString('cancel'));
         }
     }
 
@@ -246,6 +279,9 @@ export default class {
                 boardid: state.board.id,
                 cardid: cardId,
                 timestamp: timestamp,
+            },
+            fail: () => {
+                this.processUpdateFail();
             },
         }])[0];
 
@@ -275,6 +311,9 @@ export default class {
                 boardid: state.board.id,
                 cardid: cardId,
                 timestamp: timestamp,
+            },
+            fail: () => {
+                this.processUpdateFail();
             },
         }])[0];
 
