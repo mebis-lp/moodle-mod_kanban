@@ -2,7 +2,6 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
 
-
 /**
  * Mutations library for mod_kanban.
  * The functions are just used to forward data to the webservice.
@@ -189,25 +188,19 @@ export default class {
      */
     async _sendChange(method, stateManager, data) {
         const state = stateManager.state;
-        const result = await Ajax.call([{
+        const request = {
             methodname: 'mod_kanban_' + method,
             args: {
                 cmid: state.common.id,
                 boardid: state.board.id,
                 data: data
             },
-            fail: this.processFail,
-        }])[0];
+            fail: this.displayError,
+        };
+
+        const result = await Ajax.call([request])[0];
 
         this.processUpdates(stateManager, result);
-    }
-
-    /**
-     * Notify user about an error.
-     * @param {*} ex
-     */
-    processFail(ex) {
-        Notification.alert(getString('error'), ex.message, getString('cancel'));
     }
 
     /**
@@ -233,30 +226,33 @@ export default class {
                     timestamp: state.common.timestamp,
                 },
                 fail: () => {
-                    this.processUpdateFail();
+                    this.processUpdateFail(stateManager);
                 },
             }])[0];
 
             this.processUpdates(stateManager, result);
-            this.resetUpdateFails();
         }
     }
 
     /**
-     * Reset update fails.
+     * Count update fails.
+     * @param {*} stateManager
      */
-    resetUpdateFails() {
-        this.updateFails = 0;
-        document.querySelector('.mod_kanban_update_error').classList.add('hidden');
+    processUpdateFail(stateManager) {
+        const state = stateManager.state;
+        stateManager.setReadOnly(false);
+        state.common.updatefails++;
+        stateManager.setReadOnly(true);
     }
 
     /**
-     * Notify user about an error.
+     * Show a modal to display an error message
+     * @param {*} data
      */
-    processUpdateFail() {
-        this.updateFails++;
-        if (this.updateFails > 2) {
-            document.querySelector('.mod_kanban_update_error').classList.remove('hidden');
+    async displayError(data) {
+        if (data.message) {
+            // Can switch to direct call of getString when dropping support for Moodle 4.1.
+            Notification.alert(getString('error'), data.message, getString('cancel'));
         }
     }
 
@@ -333,6 +329,5 @@ export default class {
     async processUpdates(stateManager, result) {
         let updates = JSON.parse(result.update);
         stateManager.processUpdates(updates);
-        this.resetUpdateFails();
     }
 }

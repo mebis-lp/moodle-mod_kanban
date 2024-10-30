@@ -148,8 +148,9 @@ export default class extends KanbanComponent {
      * Called when common data was updated
      * @param {*} param0
      */
-    _commonUpdated({element}) {
+    async _commonUpdated({element}) {
         this.toggleClass(element.template != 0, 'mod_kanban_hastemplate');
+        this.toggleClass(element.updatefails > 0, 'mod_kanban_updatefails');
     }
 
     /**
