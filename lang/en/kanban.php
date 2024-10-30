@@ -123,6 +123,15 @@ $string['messageprovider:discussion'] = 'Card discussion';
 $string['messageprovider:due'] = 'Card due';
 $string['messageprovider:moved'] = 'Card moved';
 $string['modulename'] = 'Kanban board';
+$string['modulename_help'] = 'This activity supports using the Kanban method for managing projects or learning processes.
+Kanban is an agile project management method that organizes tasks through a visual board to optimize workflow. Tasks are categorized into columns such as "To Do," "In Progress," and "Done" to make progress transparent. The goal is to identify bottlenecks in the workflow and continuously improve efficiency.
+<br>Depending on the settings, there can be several types of boards within a Kanban activity:
+<ul>
+    <li>The course board: Accessible to everyone who has access to the activity</li>
+    <li>Personal boards: For each user</li>
+    <li>Group boards</li>
+    <li>Template boards: Anyone who can manage boards can copy an existing board as a template.</li>
+</ul>';
 $string['modulenameplural'] = 'Kanban boards';
 $string['moveaftercard'] = 'Move after';
 $string['movecard'] = 'Move card';
