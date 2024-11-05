@@ -28,6 +28,63 @@ require_once('lib.php');
 
 $id = required_param('id', PARAM_INT);
 
-require_login();
+$course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
+require_course_login($course);
 
-redirect($CFG->wwwroot . '/mod/kanban/view.php?id=' . $id);
+$coursecontext = context_course::instance($course->id);
+
+$PAGE->set_url('/mod/kanban/index.php', ['id' => $id]);
+$PAGE->set_title(format_string($course->fullname));
+$PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_context($coursecontext);
+
+echo $OUTPUT->header();
+
+$modulenameplural = get_string('modulenameplural', 'mod_kanban');
+echo $OUTPUT->heading($modulenameplural);
+
+$kanbans = get_all_instances_in_course('kanban', $course);
+$usesections = course_format_uses_sections($course->format);
+
+$table = new html_table();
+$table->attributes['class'] = 'generaltable mod_index';
+
+if ($usesections) {
+    $table->head = [get_string('sectionname', 'format_' . $course->format), get_string('name')];
+    $table->align = ['left', 'left'];
+} else {
+    $table->head  = [get_string('name')];
+    $table->align = ['left'];
+}
+
+$kanbanfound = false;
+
+foreach ($kanbans as $kanban) {
+    $context = context_module::instance($kanban->coursemodule, IGNORE_MISSING);
+    if (!$context || !has_capability('mod/kanban:view', $context)) {
+        continue;
+    }
+
+    $kanbanfound = true;
+    $linkcss = null;
+
+    if (!$kanban->visible) {
+        $linkcss = ['class' => 'dimmed'];
+    }
+
+    $link = html_writer::link(new moodle_url('/mod/kanban/view.php', ['id' => $kanban->coursemodule]), $kanban->name, $linkcss);
+
+    if ($usesections) {
+        $table->data[] = [get_section_name($course, $kanban->section), $link];
+    } else {
+        $table->data[] = [$link];
+    }
+}
+
+if (!$kanbanfound) {
+    notice(get_string('nokanbaninstances', 'mod_kanban'), new moodle_url('/course/view.php', ['id' => $course->id]));
+} else {
+    echo html_writer::table($table);
+}
+
+echo $OUTPUT->footer();
