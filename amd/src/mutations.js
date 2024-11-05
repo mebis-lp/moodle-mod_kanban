@@ -252,7 +252,7 @@ export default class {
     async displayError(data) {
         if (data.message) {
             // Can switch to direct call of getString when dropping support for Moodle 4.1.
-            Notification.alert(getString('error'), data.message, getString('cancel'));
+            await Notification.alert(getString('error'), data.message, getString('cancel'));
         }
     }
 
