@@ -26,7 +26,8 @@ namespace mod_kanban;
  */
 class numberfilter {
     /**
-     * Adds custom tags to card numbers in the text.
+     * Adds custom tags to card numbers in the text. This is used to allow handling a click on
+     * the number by JavaScript (to open the detail modal of the card).
      *
      * @param string $text
      * @return string

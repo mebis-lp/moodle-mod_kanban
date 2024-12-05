@@ -921,7 +921,6 @@ class boardmanager {
             );
         }
         $cardupdate['canedit'] = $this->can_user_manage_specific_card($cardupdate['id']);
-        $this->formatter->put('cards', $cardupdate);
 
         $this->write_history(
             'updated',
@@ -931,6 +930,12 @@ class boardmanager {
             $card['id']
         );
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $cardupdate['timemodified']);
+
+        if ($this->board->usenumbers) {
+            $cardupdate['description'] = numberfilter::filter($cardupdate['description']);
+        }
+        
+        $this->formatter->put('cards', $cardupdate);
     }
 
     /**

@@ -31,7 +31,7 @@ export default {
     DESCRIPTIONMODALFOOTER: `.mod_kanban_description_modal .modal-footer`,
     DESCRIPTIONMODALTITLE: `.mod_kanban_description_modal .modal-title`,
     DESCRIPTIONTOGGLE: `.mod_kanban_description`,
-    DETAILBUTTON: `.mod_kanban_description_trigger`,
+    DETAILBUTTON: `.mod_kanban_detail_trigger`,
     DISCUSSION: `.mod_kanban_discussion`,
     DISCUSSIONINPUT: `.mod_kanban_discussion_input`,
     DISCUSSIONMESSAGES: `.mod_kanban_discussion_messages`,
