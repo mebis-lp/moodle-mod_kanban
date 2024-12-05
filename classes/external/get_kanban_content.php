@@ -548,7 +548,7 @@ class get_kanban_content extends external_api {
                     'attachments',
                     $card->id
                 );
-                if ($common->usenumbers) {
+                if ($common->usenumbers && $common->linknumbers) {
                     $card->description = numberfilter::filter($card->description);
                 }
                 $card->attachments = helper::get_attachments($context->id, $card->id);
@@ -642,7 +642,8 @@ class get_kanban_content extends external_api {
         self::validate_context($context);
         require_capability('mod/kanban:view', $context);
 
-        $kanbanboard = helper::get_cached_board($boardid);
+        $boardmanager = new boardmanager($cmid, $boardid);
+        $kanbanboard = $boardmanager->get_board();
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, constants::MOD_KANBAN_VIEW);
 
@@ -657,7 +658,10 @@ class get_kanban_content extends external_api {
             $discussion->content = format_text($discussion->content, FORMAT_HTML);
             $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->userid));
-            $formatter->put('discussions', (array) $discussion);
+            if (!empty($boardmanager->kanban->usenumbers) && !empty($boardmanager->kanban->linknumbers)) {
+                $discussion->content = numberfilter::filter($discussion->content);
+            }
+            $formatter->put('discussions', (array) $discussion, false);
         }
         return [
             'update' => $formatter->get_formatted_updates(),

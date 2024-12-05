@@ -40,7 +40,7 @@ class numberfilter {
         $pattern = '/#(\d+)/';
         $text = preg_replace_callback($pattern, function ($matches) {
             $number = (int)$matches[1];
-            return '<span class="mod_kanban_card_number" data-id="' . $number . '">#' . $number . '</span>';
+            return '<a class="mod_kanban_card_number" data-id="' . $number . '">#' . $number . '</a>';
         }, $text);
         return $text;
     }

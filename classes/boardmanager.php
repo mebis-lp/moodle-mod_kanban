@@ -931,13 +931,13 @@ class boardmanager {
         );
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $cardupdate['timemodified']);
 
-        if (!empty($this->kanban->usenumbers)) {
+        if (!empty($this->kanban->usenumbers) && !empty($this->kanban->linknumbers)) {
             if (isset($cardupdate['description'])) {
                 $cardupdate['description'] = numberfilter::filter($cardupdate['description']);
             }
         }
         
-        $this->formatter->put('cards', $cardupdate);
+        $this->formatter->put('cards', $cardupdate, false);
     }
 
     /**

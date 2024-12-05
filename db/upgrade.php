@@ -32,8 +32,8 @@ function xmldb_kanban_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2024032701) {
-        // Define field usenumbers to be added to kanban.
+    if ($oldversion < 2024120501) {
+        // Define field usenumbers to be added to table kanban.
         $table = new xmldb_table('kanban');
         $field = new xmldb_field('usenumbers', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'history');
 
@@ -42,7 +42,15 @@ function xmldb_kanban_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Define field number to be added to kanban_card.
+        // Define field linknumbers to be added to table kanban.
+        $field = new xmldb_field('linknumbers', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'usenumbers');
+
+        // Conditionally launch add field linknumbers.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field number to be added to table kanban_card.
         $table = new xmldb_table('kanban_card');
         $field = new xmldb_field('number', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'timemodified');
 
@@ -64,9 +72,10 @@ function xmldb_kanban_upgrade($oldversion) {
             }
             $DB->set_field('kanban_card', 'number', $nextnumber, ['id' => $card->id]);
         }
+        $cards->close();
 
         // Kanban savepoint reached.
-        upgrade_mod_savepoint(true, 2024032701, 'kanban');
+        upgrade_mod_savepoint(true, 2024120501, 'kanban');
     }
     return true;
 }

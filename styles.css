@@ -308,7 +308,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_uncomplete_card,
 .mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_move_card,
 .mod_kanban_board:not(.mod_kanban_history) .mod_kanban_card_view_history,
-.mod_kanban_board:not(.mod_kanban_usenumbers) .mod_kanban_number,
+.mod_kanban_board:not(.mod_kanban_usenumbers) .mod_kanban_card_number,
 .mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
 .mod_kanban_complete_card,
 .mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
@@ -442,15 +442,7 @@ a.mod_kanban_attachment_item {
     display: none;
 }
 
-.mod_kanban_number {
-    font-weight: bold;
-}
-
 .mod_kanban_card_number {
     cursor: pointer;
     font-weight: bold;
-}
-
-.mod_kanban_card_number::before {
-    background-image: url([[pix:i/show]]);
 }
