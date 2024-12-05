@@ -21,13 +21,20 @@
  * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+import {alert as displayAlert} from 'core/notification';
+import {get_string as getString} from 'core/str';
 
 export const init = (element) => {
     document.querySelectorAll('#' + element + ' .mod_kanban_card_number').forEach((el) => {
         el.addEventListener('click', (event) => {
-            document.querySelector(
+            let card = document.querySelector(
                 `.mod_kanban_card[data-number="${event.target.dataset.id}"] .mod_kanban_detail_trigger`
-            ).click();
+            );
+            if (card) {
+                card.click();
+            } else {
+                displayAlert(getString('cardnotfound', 'mod_kanban'));
+            }
         });
     });
 };
