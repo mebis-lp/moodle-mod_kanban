@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -13,21 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_kanban;
+
 /**
- * Add event listener to card number to open card detail.
+ * Tests for Kanban board number filter
  *
- * @module     mod_kanban/cardnumber
+ * @package    mod_kanban
+ * @category   test
  * @copyright  2024 ISB Bayern
- * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+final class numberfilter_test extends \advanced_testcase {
+    /**
+     * Test number filter
+     */
+    public function test_filter() {
+        $text = 'This is a test #1234 and #5678';
+        $expected = 'This is a test <span class="mod_kanban_card_number" data-id="1234">#1234</span> and <span class="mod_kanban_card_number" data-id="5678">#5678</span>';
+        $this->assertEquals($expected, numberfilter::filter($text));
+    }
 
-export const init = (element) => {
-    document.querySelectorAll('#' + element + ' .mod_kanban_card_number').forEach((el) => {
-        el.addEventListener('click', (event) => {
-            document.querySelector(
-                `.mod_kanban_card[data-number="${event.target.dataset.id}"] .mod_kanban_detail_trigger`
-            ).click();
-        });
-    });
-};
+    /**
+     * Test number filter without numbers
+     */
+    public function test_filter_without_numbers() {
+        $text = 'This is a test without numbers';
+        $this->assertEquals($text, numberfilter::filter($text));
+    }
+}
