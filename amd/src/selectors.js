@@ -65,4 +65,5 @@ export default {
     UNCOMPLETE: `[data-action="uncomplete_card"]`,
     UNLOCKCOLUMN: `[data-action="unlock_column"]`,
     UNLOCKBOARDCOLUMNS: `[data-action="unlock_board_columns"]`,
+    WIPNUMBER: `.mod_kanban_wipnumber`,
 };
