@@ -66,6 +66,7 @@ class mod_kanban_mod_form extends moodleform_mod {
         $mform->addHelpButton('linknumbers', 'linknumbers', 'mod_kanban');
         $mform->hideIf('linknumbers', 'usenumbers', 'notchecked');
         $mform->setDefault('linknumbers', 1);
+        $mform->setType('linknumbers', PARAM_INT);
 
         $this->standard_coursemodule_elements();
 

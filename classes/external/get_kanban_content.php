@@ -469,6 +469,7 @@ class get_kanban_content extends external_api {
         $common->history = $kanban->history;
         $common->updatefails = 0;
         $common->usenumbers = $kanban->usenumbers;
+        $common->linknumbers = $kanban->linknumbers;
 
         if (!$asupdate) {
             $common->template = $DB->get_field_sql(
