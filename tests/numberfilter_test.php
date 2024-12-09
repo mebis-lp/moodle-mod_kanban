@@ -30,7 +30,7 @@ final class numberfilter_test extends \advanced_testcase {
      */
     public function test_filter() {
         $text = 'This is a test #1234 and #5678';
-        $expected = 'This is a test <span class="mod_kanban_card_number" data-id="1234">#1234</span> and <span class="mod_kanban_card_number" data-id="5678">#5678</span>';
+        $expected = 'This is a test <a class="mod_kanban_card_number" data-id="1234">#1234</a> and <a class="mod_kanban_card_number" data-id="5678">#5678</a>';
         $this->assertEquals($expected, numberfilter::filter($text));
     }
 
