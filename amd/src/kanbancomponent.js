@@ -20,4 +20,16 @@ export default class extends BaseComponent {
             }
         }
     }
+
+    /**
+     * Helper function to add an event listener to an element if it exists.
+     * @param {*} element
+     * @param {*} event
+     * @param {*} listener
+     */
+    addEventListener(element, event, listener) {
+        if (element) {
+            super.addEventListener(element, event, listener);
+        }
+    }
 }
