@@ -429,3 +429,11 @@ a.mod_kanban_attachment_item {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
+
+.mod_kanban_updatefails .row.mod_kanban_update_error {
+    display: flex;
+}
+
+.row.mod_kanban_update_error {
+    display: none;
+}

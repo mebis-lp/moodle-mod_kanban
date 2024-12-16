@@ -115,6 +115,7 @@ class get_kanban_content extends external_api {
                         'groupselector' => new external_value(PARAM_RAW, 'group selector'),
                         'userboards' => new external_value(PARAM_INT, 'userboards'),
                         'history' => new external_value(PARAM_INT, 'history'),
+                        'updatefails' => new external_value(PARAM_INT, 'updatefails', VALUE_OPTIONAL, 0),
                     ]),
                     'board' => new external_single_structure([
                         'id' => new external_value(PARAM_INT, 'board id'),
@@ -461,6 +462,7 @@ class get_kanban_content extends external_api {
         $common->groupmode = $groupmode;
         $common->groupselector = $groupselector;
         $common->history = $kanban->history;
+        $common->updatefails = 0;
 
         if (!$asupdate) {
             $common->template = $DB->get_field_sql(
