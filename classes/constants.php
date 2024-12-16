@@ -91,4 +91,46 @@ class constants {
         self::MOD_KANBAN_DISCUSSION => 'discussion',
         self::MOD_KANBAN_HISTORY => 'history',
     ];
+    /**
+     * Repeat interval type: hours
+     */
+    public const MOD_KANBAN_REPEAT_HOURS = 2;
+    /**
+     * Repeat interval type: days
+     */
+    public const MOD_KANBAN_REPEAT_DAYS = 3;
+    /**
+     * Repeat interval type: weeks
+     */
+    public const MOD_KANBAN_REPEAT_WEEKS = 4;
+    /**
+     * Repeat interval type: months
+     */
+    public const MOD_KANBAN_REPEAT_MONTHS = 5;
+    /**
+     * Repeat interval type: years
+     */
+    public const MOD_KANBAN_REPEAT_YEARS = 6;
+    /**
+     * Mapping of repeat interval types to strings
+     */
+    public const MOD_KANBAN_REPEAT_INTERVAL_TYPE = [
+        self::MOD_KANBAN_REPEAT_HOURS => 'hour',
+        self::MOD_KANBAN_REPEAT_DAYS => 'day',
+        self::MOD_KANBAN_REPEAT_WEEKS => 'week',
+        self::MOD_KANBAN_REPEAT_MONTHS => 'month',
+        self::MOD_KANBAN_REPEAT_YEARS => 'year',
+    ];
+    /**
+     * Repeat new due date: no new due date
+     */
+    public const MOD_KANBAN_REPEAT_NONEWDUEDATE = 0;
+    /**
+     * Repeat new due date: after due date
+     */
+    public const MOD_KANBAN_REPEAT_NEWDUEDATE_AFTERDUE = 1;
+    /**
+     * Repeat new due date: after completion
+     */
+    public const MOD_KANBAN_REPEAT_NEWDUEDATE_AFTERCOMPLETION = 2;
 }
