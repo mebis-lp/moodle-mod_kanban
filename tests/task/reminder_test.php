@@ -27,7 +27,7 @@ use mod_kanban\boardmanager;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers      \mod_kanban\task\reminder
  */
-class reminder_test extends \advanced_testcase {
+final class reminder_test extends \advanced_testcase {
     /** @var \stdClass The course used for testing */
     private $course;
     /** @var \stdClass The kanban used for testing */
@@ -40,6 +40,9 @@ class reminder_test extends \advanced_testcase {
      */
     public function setUp(): void {
         global $DB;
+
+        parent::setUp();
+
         $this->course = $this->getDataGenerator()->create_course();
         $this->kanban = $this->getDataGenerator()->create_module('kanban', ['course' => $this->course]);
 
