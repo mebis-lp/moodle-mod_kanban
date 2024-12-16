@@ -18,7 +18,7 @@
  * mod_kanban db upgrades.
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,6 +29,53 @@
  * @param int $oldversion Version number the plugin is being upgraded from.
  */
 function xmldb_kanban_upgrade($oldversion) {
-    // No upgrade steps until now.
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2024121603) {
+        // Define field usenumbers to be added to kanban.
+        $table = new xmldb_table('kanban');
+        $field = new xmldb_field('usenumbers', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'history');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field linknumbers to be added to table kanban.
+        $field = new xmldb_field('linknumbers', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'usenumbers');
+
+        // Conditionally launch add field linknumbers.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field number to be added to table kanban_card.
+        $table = new xmldb_table('kanban_card');
+        $field = new xmldb_field('number', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'timemodified');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Set numbers for all cards.
+        $board = 0;
+        $nextnumber = 0;
+        $cards = $DB->get_recordset('kanban_card', ['number' => 0], 'kanban_board ASC, timecreated ASC');
+        foreach ($cards as $card) {
+            if ($card->kanban_board != $board) {
+                $board = $card->kanban_board;
+                $nextnumber = $DB->get_field('kanban_card', 'MAX(number)', ['kanban_board' => $board]) + 1;
+            } else {
+                $nextnumber++;
+            }
+            $DB->set_field('kanban_card', 'number', $nextnumber, ['id' => $card->id]);
+        }
+        $cards->close();
+
+        // Kanban savepoint reached.
+        upgrade_mod_savepoint(true, 2024121603, 'kanban');
+    }
     return true;
 }
