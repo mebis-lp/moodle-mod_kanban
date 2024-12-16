@@ -21,13 +21,14 @@ use context_module;
 use core_form\dynamic_form;
 use mod_kanban\boardmanager;
 use mod_kanban\helper;
+use mod_kanban\constants;
 use moodle_url;
 
 /**
  * From for editing a card.
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -79,6 +80,32 @@ class edit_card_form extends dynamic_form {
         $mform->addElement('date_time_selector', 'duedate', get_string('duedate', 'kanban'), ['optional' => true]);
 
         $mform->addElement('date_time_selector', 'reminderdate', get_string('reminderdate', 'kanban'), ['optional' => true]);
+
+        $repeatgroup = [];
+        $repeatgroup[] = $mform->createElement('advcheckbox', 'repeat_enable', get_string('enable'));
+        $repeatgroup[] = $mform->createElement('text', 'repeat_interval', get_string('repeat_interval', 'kanban'), ['size' => 3]);
+        $repeatgroup[] = $mform->createElement('select', 'repeat_interval_type', get_string('repeat_interval_type', 'kanban'), [
+            constants::MOD_KANBAN_REPEAT_HOURS => get_string('hours'),
+            constants::MOD_KANBAN_REPEAT_DAYS => get_string('days'),
+            constants::MOD_KANBAN_REPEAT_WEEKS => get_string('weeks'),
+            constants::MOD_KANBAN_REPEAT_MONTHS => get_string('months'),
+            constants::MOD_KANBAN_REPEAT_YEARS => get_string('years'),
+        ]);
+        $repeatgroup[] = $mform->createElement('select', 'repeat_newduedate', get_string('repeat_newduedate', 'kanban'), [
+            constants::MOD_KANBAN_REPEAT_NONEWDUEDATE => get_string('nonewduedate', 'kanban'),
+            constants::MOD_KANBAN_REPEAT_NEWDUEDATE_AFTERDUE => get_string('afterdue', 'kanban'),
+            constants::MOD_KANBAN_REPEAT_NEWDUEDATE_AFTERCOMPLETION => get_string('aftercompletion', 'kanban'),
+        ]);
+
+        $mform->addElement('group', 'repeatgroup', get_string('repeat', 'kanban'), $repeatgroup, ' ', false);
+
+        $mform->setType('repeat_interval', PARAM_INT);
+        $mform->setType('repeat_interval_type', PARAM_INT);
+        $mform->setDefault('repeat_interval', 1);
+        $mform->disabledIf('repeatgroup', 'repeat_enable', 'notchecked');
+        $mform->disabledIf('repeat_interval', 'repeat_newduedate', 'eq', constants::MOD_KANBAN_REPEAT_NONEWDUEDATE);
+        $mform->disabledIf('repeat_interval_type', 'repeat_newduedate', 'eq', constants::MOD_KANBAN_REPEAT_NONEWDUEDATE);
+        $mform->addHelpButton('repeatgroup', 'repeat', 'kanban');
 
         $mform->addElement('filemanager', 'attachments', get_string('attachments', 'kanban'));
 
