@@ -936,7 +936,7 @@ class boardmanager {
                 $cardupdate['description'] = numberfilter::filter($cardupdate['description']);
             }
         }
-        
+
         $this->formatter->put('cards', $cardupdate, false);
     }
 

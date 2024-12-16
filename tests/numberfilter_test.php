@@ -23,21 +23,23 @@ namespace mod_kanban;
  * @category   test
  * @copyright  2024 ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers    \mod_kanban\numberfilter
  */
 final class numberfilter_test extends \advanced_testcase {
     /**
      * Test number filter
      */
-    public function test_filter() {
+    public function test_filter(): void {
         $text = 'This is a test #1234 and #5678';
-        $expected = 'This is a test <a class="mod_kanban_card_number" data-id="1234">#1234</a> and <a class="mod_kanban_card_number" data-id="5678">#5678</a>';
+        $expected = 'This is a test <a class="mod_kanban_card_number" data-id="1234">#1234</a>' .
+            ' and <a class="mod_kanban_card_number" data-id="5678">#5678</a>';
         $this->assertEquals($expected, numberfilter::filter($text));
     }
 
     /**
      * Test number filter without numbers
      */
-    public function test_filter_without_numbers() {
+    public function test_filter_without_numbers(): void {
         $text = 'This is a test without numbers';
         $this->assertEquals($text, numberfilter::filter($text));
     }
