@@ -679,7 +679,7 @@ class boardmanager {
     public function set_card_complete(int $cardid, int $state): void {
         global $DB, $USER;
         $card = $this->get_card($cardid);
-        $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
+        $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time(), 'repeat_enable' => 0];
         $this->formatter->put('cards', $update);
         $DB->update_record('kanban_card', $update);
         $assignees = $this->get_card_assignees($cardid);
@@ -706,9 +706,6 @@ class boardmanager {
                     );
                     $newcard->reminder = $newcard->duedate - $timedifference;
                 }
-                $card->repeat_enable = 0;
-                $this->update_card($cardid, (array) $card);
-                $newcard->isrepeated = 1;
                 $this->add_card($this->get_leftmost_column($card->kanban_board), 0, (array)$newcard);
             }
         } else {

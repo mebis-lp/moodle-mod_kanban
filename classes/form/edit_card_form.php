@@ -101,8 +101,9 @@ class edit_card_form extends dynamic_form {
 
         $mform->setType('repeat_interval', PARAM_INT);
         $mform->setType('repeat_interval_type', PARAM_INT);
+        $mform->setDefault('repeat_enable', 0);
         $mform->setDefault('repeat_interval', 1);
-        $mform->disabledIf('repeatgroup', 'repeat_enable', 'notchecked');
+        $mform->disabledIf('repeatgroup', 'repeat_enable');
         $mform->disabledIf('repeat_interval', 'repeat_newduedate', 'eq', constants::MOD_KANBAN_REPEAT_NONEWDUEDATE);
         $mform->disabledIf('repeat_interval_type', 'repeat_newduedate', 'eq', constants::MOD_KANBAN_REPEAT_NONEWDUEDATE);
         $mform->addHelpButton('repeatgroup', 'repeat', 'kanban');
