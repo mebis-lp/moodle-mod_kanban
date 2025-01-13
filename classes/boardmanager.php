@@ -706,6 +706,8 @@ class boardmanager {
                     );
                     $newcard->reminder = $newcard->duedate - $timedifference;
                 }
+                $card->repeat_enable = 0;
+                $this->update_card($cardid, (array) $card);
                 $newcard->isrepeated = 1;
                 $this->add_card($this->get_leftmost_column($card->kanban_board), 0, (array)$newcard);
             }
