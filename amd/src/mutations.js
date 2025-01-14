@@ -1,6 +1,7 @@
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import {get_string as getString} from 'core/str';
+import Log from 'core/log';
 
 /**
  * Mutations library for mod_kanban.
@@ -218,17 +219,25 @@ export default class {
             });
             stateManager.setReadOnly(true);
         } else {
-            const result = await Ajax.call([{
-                methodname: 'mod_kanban_get_kanban_content_update',
-                args: {
-                    cmid: state.common.id,
-                    boardid: state.board.id,
-                    timestamp: state.common.timestamp,
-                },
-                fail: () => {
-                    this.processUpdateFail(stateManager);
-                },
-            }])[0];
+            let result = null;
+            try {
+                result = await Ajax.call([{
+                    methodname: 'mod_kanban_get_kanban_content_update',
+                    args: {
+                        cmid: state.common.id,
+                        boardid: state.board.id,
+                        timestamp: state.common.timestamp,
+                    },
+                    fail: () => {
+                        this.processUpdateFail(stateManager);
+                    },
+                }])[0];
+            } catch (e) {
+                // If the request cannot be performed (connection loss for example) we need to catch this error here.
+                Log.warn('Retrieving the updated state of the kanban board failed, probably due to connection loss.');
+                this.processUpdateFail(stateManager);
+                return;
+            }
 
             this.processUpdates(stateManager, result);
         }
