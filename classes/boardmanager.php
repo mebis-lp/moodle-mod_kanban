@@ -18,7 +18,7 @@
  * Class to handle updating the board
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,7 +34,7 @@ use stdClass;
  * Class to handle updating the board. It also sends notifications, but does not check permissions.
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -477,7 +477,6 @@ class boardmanager {
 
         // Users can always edit cards they created.
         $data['canedit'] = $this->can_user_manage_specific_card($data['id']);
-        ;
         $data['columnname'] = clean_param($column->title, PARAM_TEXT);
 
         $this->formatter->put('cards', $data);
@@ -547,7 +546,9 @@ class boardmanager {
             // If target column has autoclose option set, update card to be completed.
             $options = json_decode($targetcolumn->options);
             if (!empty($options->autoclose)) {
-                $updatecard['completed'] = 1;
+                if ($card->completed) {
+                    self::set_card_complete($cardid, 1);
+                }
             }
             $DB->update_record('kanban_card', $updatecard);
             // When inplace editing the title and moving the card happens quite fast in a row,
@@ -581,11 +582,7 @@ class boardmanager {
             $assignees = $this->get_card_assignees($cardid);
             helper::send_notification($this->cminfo, 'moved', $assignees, (object) $data);
             if (!empty($options->autoclose) && $card->completed == 0) {
-                $data['title'] = clean_param($card->title, PARAM_TEXT);
-                helper::send_notification($this->cminfo, 'closed', $assignees, (object) $data);
-                helper::remove_calendar_event($this->kanban, $card);
-                $this->write_history('completed', constants::MOD_KANBAN_CARD, [], $columnid, $cardid);
-                $this->update_completion($assignees);
+                self::set_card_complete($cardid, 1);
             }
             $this->write_history(
                 'moved',
@@ -682,12 +679,35 @@ class boardmanager {
     public function set_card_complete(int $cardid, int $state): void {
         global $DB, $USER;
         $card = $this->get_card($cardid);
-        $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time()];
+        $update = ['id' => $cardid, 'completed' => $state, 'timemodified' => time(), 'repeat_enable' => 0];
         $this->formatter->put('cards', $update);
         $DB->update_record('kanban_card', $update);
         $assignees = $this->get_card_assignees($cardid);
         if ($state) {
             helper::remove_calendar_event($this->kanban, $card, $assignees);
+            if (!empty($card->repeat_enable)) {
+                $newcard = clone $card;
+                if ($card->repeat_newduedate == constants::MOD_KANBAN_REPEAT_NONEWDUEDATE) {
+                    $newcard->duedate = 0;
+                    $newcard->reminder = 0;
+                } else {
+                    $timedifference = $newcard->duedate - $newcard->reminder;
+                    $timebase = (
+                        $card->repeat_newduedate == constants::MOD_KANBAN_REPEAT_NEWDUEDATE_AFTERDUE && !empty($newcard->duedate) ?
+                        $newcard->duedate :
+                        time()
+                    );
+                    $newcard->duedate = strtotime(
+                        '+' .
+                        $card->repeat_interval .
+                        ' ' .
+                        constants::MOD_KANBAN_REPEAT_INTERVAL_TYPE[$card->repeat_interval_type],
+                        $timebase
+                    );
+                    $newcard->reminder = $newcard->duedate - $timedifference;
+                }
+                $this->add_card($this->get_leftmost_column($card->kanban_board), 0, (array)$newcard);
+            }
         } else {
             helper::add_or_update_calendar_event($this->kanban, $card, $assignees);
         }
@@ -813,6 +833,10 @@ class boardmanager {
             'kanban_column',
             'kanban_board',
             'completed',
+            'repeat_enable',
+            'repeat_interval',
+            'repeat_interval_type',
+            'repeat_newduedate',
         ];
         // Do some extra sanitizing.
         if (isset($data['title'])) {
@@ -1229,5 +1253,25 @@ class boardmanager {
         }
 
         return false;
+    }
+
+    /**
+     * Returns the leftmost column of a board, 0 if none is found.
+     *
+     * @param int $boardid Id of the board, defaults to 0 (current board)
+     * @return int
+     */
+    public function get_leftmost_column(int $boardid = 0): int {
+        global $DB;
+        if (empty($boardid) || $this->board->id == $boardid) {
+            $sequence = $this->board->sequence;
+        } else {
+            $sequence = $DB->get_field('kanban_board', 'sequence', ['id' => $boardid]);
+        }
+        if (empty($sequence)) {
+            return 0;
+        }
+        $columnids = explode(',', $sequence, 2);
+        return $columnids[0];
     }
 }

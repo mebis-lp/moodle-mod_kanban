@@ -18,7 +18,7 @@
  * mod_kanban db upgrades.
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,6 +29,60 @@
  * @param int $oldversion Version number the plugin is being upgraded from.
  */
 function xmldb_kanban_upgrade($oldversion) {
-    // No upgrade steps until now.
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2024121602) {
+        // Define field repeat_enable to be added to kanban_card.
+        $table = new xmldb_table('kanban_card');
+        $field = new xmldb_field('repeat_enable', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+
+        // Conditionally launch add field repeat_enable.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('repeat_interval', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '1', 'repeat_enable');
+
+        // Conditionally launch add field repeat_interval.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field(
+            'repeat_interval_type',
+            XMLDB_TYPE_INTEGER,
+            '11',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'repeat_interval'
+        );
+
+        // Conditionally launch add field repeat_interval_type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field(
+            'repeat_newduedate',
+            XMLDB_TYPE_INTEGER,
+            '5',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'repeat_interval_type'
+        );
+
+        // Conditionally launch add field repeat_newduedate.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Kanban savepoint reached.
+        upgrade_mod_savepoint(true, 2024121602, 'kanban');
+    }
     return true;
 }
