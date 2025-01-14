@@ -281,7 +281,7 @@ export default class {
                 timestamp: timestamp,
             },
             fail: () => {
-                this.processUpdateFail();
+                this.processUpdateFail(stateManager);
             },
         }])[0];
 
@@ -313,7 +313,7 @@ export default class {
                 timestamp: timestamp,
             },
             fail: () => {
-                this.processUpdateFail();
+                this.processUpdateFail(stateManager);
             },
         }])[0];
 
