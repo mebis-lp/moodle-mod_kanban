@@ -1,8 +1,9 @@
 import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
-import {exception as displayException, saveCancel} from 'core/notification';
+import {alert, exception as displayException, saveCancel} from 'core/notification';
 import ModalForm from 'core_form/modalform';
+import ModalEvents from 'core/modal_events';
 import * as Str from 'core/str';
 import {get_string as getString} from 'core/str';
 import Templates from 'core/templates';
@@ -152,6 +153,11 @@ export default class extends KanbanComponent {
             'click',
             this._duplicateCard
         );
+        this.addEventListener(
+            this.getElement(selectors.DETAILBUTTON),
+            'click',
+            this._showDetailsModal
+        );
 
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
@@ -185,6 +191,44 @@ export default class extends KanbanComponent {
                 }
             );
         }).catch((error) => Log.debug(error));
+    }
+
+    /**
+     * Show modal with card details.
+     * @param {*} event
+     */
+    _showDetailsModal(event) {
+        let id = this.id;
+        if (event.target.dataset.id !== undefined) {
+            id = event.target.dataset.id;
+        }
+
+        let data = exporter.exportCard(this.reactive.state, id);
+        let title = this.reactive.state.common.usenumbers ? '#' + data.number + ' ' + data.title : data.title;
+
+        alert(
+            title,
+            Templates.render('mod_kanban/descriptionmodal', data),
+            getString('close', 'form')
+        ).then((modal) => {
+            modal.modal[0].addEventListener(ModalEvents.bodyRendered, () => {
+                document.querySelectorAll(selectors.CARDNUMBER).forEach((el) => {
+                    this.removeEventListener(el, 'click', this._clickDetailsButton);
+                    this.addEventListener(el, 'click', this._clickDetailsButton);
+                });
+            });
+            return true;
+        }).catch((error) => Log.debug(error));
+    }
+
+    /**
+     * Simulate click on details button.
+     * @param {*} event
+     */
+    _clickDetailsButton(event) {
+        document.querySelector(
+            selectors.CARD + `[data-number="${event.target.dataset.id}"]` + ' ' + selectors.DETAILBUTTON
+        ).click();
     }
 
     /**
@@ -392,19 +436,7 @@ export default class extends KanbanComponent {
             let doc = new DOMParser().parseFromString(element.title, 'text/html');
             this.getElement(selectors.INPLACEEDITABLE).setAttribute('data-value', doc.documentElement.textContent);
             this.getElement(selectors.INPLACEEDITABLE).querySelector('a').innerHTML = element.title;
-            this.getElement(selectors.DESCRIPTIONMODALTITLE).innerHTML = element.title;
             this.getElement(selectors.DISCUSSIONMODALTITLE).innerHTML = element.title;
-        }
-        // Update description.
-        if (element.description !== undefined) {
-            this.getElement(selectors.DESCRIPTIONMODALBODY).innerHTML = element.description;
-        }
-        // Render attachments in description modal.
-        if (element.attachments !== undefined) {
-            Templates.renderForPromise('mod_kanban/attachmentitems', {attachments: element.attachments}).then(({html}) => {
-                this.getElement(selectors.DESCRIPTIONMODALFOOTER).innerHTML = html;
-                return true;
-            }).catch((error) => displayException(error));
         }
         this.toggleClass(element.hasdescription, 'mod_kanban_hasdescription');
         this.toggleClass(element.hasattachment, 'mod_kanban_hasattachment');

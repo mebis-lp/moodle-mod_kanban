@@ -461,6 +461,8 @@ class boardmanager {
         ];
         $data = array_merge($defaults, $data, $defaultsfixed);
 
+        $data['number'] = self::get_next_card_number();
+
         $data['id'] = $DB->insert_record('kanban_card', $data);
         $data['assignees'] = [];
         // Sanitize title to be extra safe.
@@ -943,7 +945,6 @@ class boardmanager {
             );
         }
         $cardupdate['canedit'] = $this->can_user_manage_specific_card($cardupdate['id']);
-        $this->formatter->put('cards', $cardupdate);
 
         $this->write_history(
             'updated',
@@ -953,6 +954,14 @@ class boardmanager {
             $card['id']
         );
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $cardupdate['timemodified']);
+
+        if (!empty($this->kanban->usenumbers) && !empty($this->kanban->linknumbers)) {
+            if (isset($cardupdate['description'])) {
+                $cardupdate['description'] = numberfilter::filter($cardupdate['description']);
+            }
+        }
+
+        $this->formatter->put('cards', $cardupdate, false);
     }
 
     /**
@@ -1288,5 +1297,20 @@ class boardmanager {
         $newcardid = $this->add_card($card->kanban_column, $card->id, (array) $card);
         $this->copy_attachment_files($this->cminfo->context->id, $cardid, $newcardid);
         return $newcardid;
+    }
+
+    /**
+     * Returns the next card number for a board.
+     *
+     * @param int $boardid Id of the board
+     * @return int Next card number
+     */
+    public function get_next_card_number(int $boardid = 0): int {
+        global $DB;
+        if (empty($boardid)) {
+            $boardid = $this->board->id;
+        }
+        $nextnumber = $DB->get_field('kanban_card', 'MAX(number)+1', ['kanban_board' => $boardid]);
+        return empty($nextnumber) ? 1 : $nextnumber;
     }
 }
