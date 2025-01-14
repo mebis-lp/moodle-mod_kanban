@@ -28,7 +28,6 @@ namespace mod_kanban;
 use cm_info;
 use context_module;
 use context_system;
-use core_h5p\core;
 use core_user;
 use moodle_exception;
 use stdClass;
