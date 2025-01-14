@@ -199,7 +199,15 @@ export default class {
             fail: this.displayError,
         };
 
-        const result = await Ajax.call([request])[0];
+        let result = null;
+        try {
+            result = await Ajax.call([request])[0];
+        } catch (e) {
+            // If the request cannot be performed (connection loss for example) we need to catch this error here.
+            Log.warn('Sending a change request to the kanban backend failed, probably due to connection loss.');
+            this.processUpdateFail(stateManager);
+            return;
+        }
 
         this.processUpdates(stateManager, result);
     }
