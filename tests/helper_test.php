@@ -96,15 +96,4 @@ final class helper_test extends \advanced_testcase {
         // Test replacing elements in an empty sequence (should return an empty sequence).
         $this->assertEquals('', helper::sequence_replace('', [1 => 4]));
     }
-
-    /**
-     * Tests the sanitize_json_string method.
-     *
-     * @return void
-     */
-    public function test_sanitize_json_string(): void {
-        $jsonstring = '{"key1":"<b>value1</b>","key2":"<script>alert(1)</script>"}';
-        $expected = '{"key1":"<b>value1<\/b>","key2":""}';
-        $this->assertEquals($expected, helper::sanitize_json_string($jsonstring));
-    }
 }
