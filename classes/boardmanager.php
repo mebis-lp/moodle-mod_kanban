@@ -1274,4 +1274,19 @@ class boardmanager {
         $columnids = explode(',', $sequence, 2);
         return $columnids[0];
     }
+
+    /**
+     * Duplicates a card.
+     *
+     * @param int $cardid
+     * @return int Id of the new card
+     */
+    public function duplicate_card(int $cardid): int {
+        global $USER;
+        $card = $this->get_card($cardid);
+        $card->createdby = $USER->id;
+        $newcardid = $this->add_card($card->kanban_column, $card->id, (array) $card);
+        $this->copy_attachment_files($this->cminfo->context->id, $cardid, $newcardid);
+        return $newcardid;
+    }
 }

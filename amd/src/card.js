@@ -147,6 +147,11 @@ export default class extends KanbanComponent {
             'click',
             this._pushCardConfirm
         );
+        this.addEventListener(
+            this.getElement(selectors.DUPLICATE),
+            'click',
+            this._duplicateCard
+        );
 
         this.draggable = false;
         this.dragdrop = new DragDrop(this);
@@ -617,5 +622,15 @@ export default class extends KanbanComponent {
         } else {
             this.getElement(selectors.DUEDATE).innerHTML = '';
         }
+    }
+
+    /**
+     * Dispatch event to duplicate this card.
+     * @param {*} event
+     */
+    _duplicateCard(event) {
+        let target = event.target.closest(selectors.DUPLICATE);
+        let data = Object.assign({}, target.dataset);
+        this.reactive.dispatch('duplicateCard', data.id);
     }
 }

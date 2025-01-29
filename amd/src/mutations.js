@@ -347,4 +347,13 @@ export default class {
         let updates = JSON.parse(result.update);
         stateManager.processUpdates(updates);
     }
+
+    /**
+     * Duplicate a card.
+     * @param {*} stateManager
+     * @param {*} cardId
+     */
+    async duplicateCard(stateManager, cardId) {
+        await this._sendChange('duplicate_card', stateManager, {cardid: cardId});
+    }
 }
