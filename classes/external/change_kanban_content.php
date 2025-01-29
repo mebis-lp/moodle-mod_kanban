@@ -1113,8 +1113,8 @@ class change_kanban_content extends external_api {
     /**
      * Duplicate a card on the board.
      *
-     * @param integer $cmid
-     * @param integer $boardid
+     * @param int $cmid
+     * @param int $boardid
      * @param array $data containing 'cardid'
      * @return array
      */
