@@ -1319,7 +1319,7 @@ class boardmanager {
     }
 
     /**
-     * 
+     *
      */
     public function get_instance(): stdClass {
         return $this->kanban;
