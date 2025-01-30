@@ -332,6 +332,10 @@ export default class extends KanbanComponent {
                     this.addEventListener(this.getElement(selectors.DELETEMESSAGE, d.id), 'click', this._removeMessageConfirm);
                 }
             });
+            this.getElement(selectors.DISCUSSION).querySelectorAll(selectors.CARDNUMBER).forEach((el) => {
+                this.removeEventListener(el, 'click', this._clickDetailsButton);
+                this.addEventListener(el, 'click', this._clickDetailsButton);
+            });
             return true;
         }).catch((error) => displayException(error));
     }

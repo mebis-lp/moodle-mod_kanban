@@ -774,7 +774,11 @@ class boardmanager {
         $update['id'] = $DB->insert_record('kanban_discussion_comment', $update);
         $update['candelete'] = true;
         $update['username'] = fullname($USER);
-        $this->formatter->put('discussions', $update);
+        if (!empty($this->kanban->usenumbers) && !empty($this->kanban->linknumbers)) {
+            $update['content'] = numberfilter::filter($update['content']);
+        }
+        $this->formatter->put('discussions', $update, false);
+        $update['content'] = $message;
 
         if (empty($card->discussion)) {
             $updatecard = ['id' => $cardid, 'discussion' => 1, 'timemodified' => time()];
@@ -1312,5 +1316,12 @@ class boardmanager {
         }
         $nextnumber = $DB->get_field('kanban_card', 'MAX(number)+1', ['kanban_board' => $boardid]);
         return empty($nextnumber) ? 1 : $nextnumber;
+    }
+
+    /**
+     * 
+     */
+    public function get_instance(): stdClass {
+        return $this->kanban;
     }
 }

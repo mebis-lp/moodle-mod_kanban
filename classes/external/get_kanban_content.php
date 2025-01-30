@@ -660,7 +660,7 @@ class get_kanban_content extends external_api {
             $discussion->content = format_text($discussion->content, FORMAT_HTML);
             $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->userid));
-            if (!empty($boardmanager->kanban->usenumbers) && !empty($boardmanager->kanban->linknumbers)) {
+            if (!empty($boardmanager->get_instance()->usenumbers) && !empty($boardmanager->get_instance()->linknumbers)) {
                 $discussion->content = numberfilter::filter($discussion->content);
             }
             $formatter->put('discussions', (array) $discussion, false);
