@@ -39,6 +39,7 @@ export default {
     DISCUSSIONSEND: `[data-action="send_discussion_message"]`,
     DISCUSSIONSHOW: `[data-action="show_discussion"]`,
     DUEDATE: `.mod_kanban_duedate`,
+    DUPLICATE: `[data-action="duplicate_card"]`,
     EDITDETAILS: `[data-action="edit_details"]`,
     HIDEHIDDEN: `[data-action="hide_hidden"]`,
     HISTORY: `.mod_kanban_history`,

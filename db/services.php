@@ -186,4 +186,12 @@ $functions = [
         'ajax'        => true,
         'capabilities' => 'mod/kanban:manageboard',
     ],
+    'mod_kanban_duplicate_card' => [
+        'classname'   => 'mod_kanban\external\change_kanban_content',
+        'methodname'  => 'duplicate_card',
+        'description' => 'Duplicates a card within the board',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities' => 'mod/kanban:addcard',
+    ],
 ];

@@ -1109,4 +1109,62 @@ class change_kanban_content extends external_api {
                 ]
             );
     }
+
+    /**
+     * Duplicate a card on the board.
+     *
+     * @param int $cmid The course module id of the kanban board.
+     * @param int $boardid The id of the kanban board.
+     * @param array $data containing 'cardid'
+     * @return array The updated data formatted as update message.
+     */
+    public static function duplicate_card(int $cmid, int $boardid, array $data): array {
+        $params = self::validate_parameters(self::duplicate_card_parameters(), [
+            'cmid' => $cmid,
+            'boardid' => $boardid,
+            'data' => $data,
+        ]);
+        $cmid = $params['cmid'];
+        $boardid = $params['boardid'];
+        $cardid = $params['data']['cardid'];
+        [$course, $cminfo] = get_course_and_cm_from_cmid($cmid);
+        $context = context_module::instance($cmid);
+        self::validate_context($context);
+
+        require_capability('mod/kanban:addcard', $context);
+
+        $boardmanager = new boardmanager($cmid, $boardid);
+
+        helper::check_permissions_for_user_or_group($boardmanager->get_board(), $context, $cminfo);
+
+        $boardmanager->duplicate_card($cardid);
+
+        return [
+            'update' => $boardmanager->get_formatted_updates(),
+        ];
+    }
+
+    /**
+     * Returns description of method parameters for the duplicate_card function.
+     *
+     * @return external_function_parameters
+     */
+    public static function duplicate_card_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'cmid' => new external_value(PARAM_INT, 'course module id', VALUE_REQUIRED),
+            'boardid' => new external_value(PARAM_INT, 'board id', VALUE_REQUIRED),
+            'data' => new external_single_structure([
+                'cardid' => new external_value(PARAM_INT, 'id of the card to duplicate', VALUE_REQUIRED),
+            ]),
+        ]);
+    }
+
+    /**
+     * Definition of return values of the duplicate_card function.
+     *
+     * @return external_single_structure
+     */
+    public static function duplicate_card_returns(): external_single_structure {
+        return self::default_returns();
+    }
 }
