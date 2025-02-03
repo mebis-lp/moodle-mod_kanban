@@ -85,7 +85,7 @@ function xmldb_kanban_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2024121602, 'kanban');
     }
 
-    if ($oldversion < 2024121603) {
+    if ($oldversion < 2025020301) {
         // Define field usenumbers to be added to kanban.
         $table = new xmldb_table('kanban');
         $field = new xmldb_field('usenumbers', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'history');
@@ -128,7 +128,7 @@ function xmldb_kanban_upgrade($oldversion) {
         $cards->close();
 
         // Kanban savepoint reached.
-        upgrade_mod_savepoint(true, 2024121603, 'kanban');
+        upgrade_mod_savepoint(true, 2025020301, 'kanban');
     }
     return true;
 }
