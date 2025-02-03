@@ -195,7 +195,7 @@ export default class extends KanbanComponent {
 
     /**
      * Show modal with card details.
-     * @param {*} event
+     * @param {*} event Click event.
      */
     _showDetailsModal(event) {
         let id = this.id;
