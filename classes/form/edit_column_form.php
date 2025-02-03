@@ -58,6 +58,10 @@ class edit_column_form extends dynamic_form {
 
         $mform->addElement('advcheckbox', 'autohide', get_string('autohide', 'kanban'));
         $mform->setType('autohide', PARAM_BOOL);
+        
+        $mform->addElement('color', 'color', get_string('color', 'mod_kanban'), ['size' => 5]);
+        $mform->setType('color', PARAM_TEXT);
+        $mform->setDefault('color', '#ffffff');
     }
 
     /**
@@ -121,9 +125,18 @@ class edit_column_form extends dynamic_form {
         $column->cmid = $this->optional_param('cmid', null, PARAM_INT);
         $column->title = html_entity_decode($column->title, ENT_COMPAT, 'UTF-8');
         $column->boardid = $column->kanban_board;
-        $options = json_decode($column->options);
-        $column->autoclose = $options->autoclose;
-        $column->autohide = $options->autohide;
+        if (!empty($column->options)){
+            $options = json_decode($column->options);
+            if (property_exists($options, 'autoclose')){
+                $column->autoclose = $options->autoclose;
+            }
+            if (property_exists($options, 'autohide')){
+                $column->autohide = $options->autohide;
+            }
+            if (property_exists($options, 'colbackground')){
+                $column->color = $options->colbackground;
+            }
+        }
         $this->set_data($column);
     }
 

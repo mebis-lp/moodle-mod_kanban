@@ -192,12 +192,14 @@ class edit_card_form extends dynamic_form {
         $context = $this->get_context_for_dynamic_submission();
         $id = $this->optional_param('id', null, PARAM_INT);
         $card = $DB->get_record('kanban_card', ['id' => $id]);
-        $options = json_decode($card->options);
         $card->title = html_entity_decode($card->title, ENT_COMPAT, 'UTF-8');
         $card->cmid = $this->optional_param('cmid', null, PARAM_INT);
         $card->boardid = $card->kanban_board;
         $card->assignees = $DB->get_fieldset_select('kanban_assignee', 'userid', 'kanban_card = :cardid', ['cardid' => $id]);
-        $card->color = $options->background;
+        $options = json_decode($card->options);
+        if (property_exists($options, 'background')){
+            $card->color = $options->background;
+        }
         $draftitemid = file_get_submitted_draft_itemid('attachments');
         $card->description = file_prepare_draft_area(
             $draftitemid,
