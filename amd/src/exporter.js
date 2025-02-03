@@ -58,6 +58,7 @@ export default class {
         col.hascards = col.sequence != '';
         col.autoclose = options.autoclose;
         col.autohide = options.autohide;
+        col.colbackground = options.colbackground;
         if (col.hascards) {
             let cardOrder = col.sequence.split(',');
             col.cards = cardOrder.map((value) => {

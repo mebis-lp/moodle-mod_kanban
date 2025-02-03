@@ -58,6 +58,10 @@ class edit_column_form extends dynamic_form {
 
         $mform->addElement('advcheckbox', 'autohide', get_string('autohide', 'kanban'));
         $mform->setType('autohide', PARAM_BOOL);
+        
+        $mform->addElement('color', 'color', get_string('color', 'mod_kanban'), ['size' => 5]);
+        $mform->setType('color', PARAM_TEXT);
+        $mform->setDefault('color', '#ffffff');
     }
 
     /**
@@ -124,6 +128,7 @@ class edit_column_form extends dynamic_form {
         $options = json_decode($column->options);
         $column->autoclose = $options->autoclose;
         $column->autohide = $options->autohide;
+        $column->color = $options->colbackground;
         $this->set_data($column);
     }
 

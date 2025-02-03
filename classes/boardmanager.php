@@ -967,8 +967,16 @@ class boardmanager {
         $column = $this->get_column($columnid);
         $options = [
             'autoclose' => $data['autoclose'],
-            'autohide' => $data['autohide'],
         ];
+
+        if (!empty($data['autohide'])) {
+            $options['autohide'] = $data['autohide'];
+        }
+
+        if (!empty($data['color'])) {
+            $options['colbackground'] = $data['color'];
+        }
+
         if (isset($data['title'])) {
             $data['title'] = s($data['title']);
         }

@@ -390,7 +390,7 @@ a.mod_kanban_attachment_item {
 }
 
 .mod_kanban_board .btn {
-    background-color: white;
+    background-color: transparent;
 }
 
 .mod_kanban_column_container.row {
