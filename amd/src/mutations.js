@@ -350,8 +350,8 @@ export default class {
 
     /**
      * Duplicate a card.
-     * @param {*} stateManager
-     * @param {*} cardId
+     * @param {*} stateManager StateManager instance.
+     * @param {number} cardId Id of the card to duplicate.
      */
     async duplicateCard(stateManager, cardId) {
         await this._sendChange('duplicate_card', stateManager, {cardid: cardId});

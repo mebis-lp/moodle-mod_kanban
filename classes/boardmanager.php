@@ -1278,7 +1278,7 @@ class boardmanager {
     /**
      * Duplicates a card.
      *
-     * @param int $cardid
+     * @param int $cardid Id of the card to duplicate
      * @return int Id of the new card
      */
     public function duplicate_card(int $cardid): int {

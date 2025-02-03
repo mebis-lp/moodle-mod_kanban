@@ -1113,10 +1113,10 @@ class change_kanban_content extends external_api {
     /**
      * Duplicate a card on the board.
      *
-     * @param int $cmid
-     * @param int $boardid
+     * @param int $cmid The course module id of the kanban board.
+     * @param int $boardid The id of the kanban board.
      * @param array $data containing 'cardid'
-     * @return array
+     * @return array The updated data formatted as update message.
      */
     public static function duplicate_card(int $cmid, int $boardid, array $data): array {
         $params = self::validate_parameters(self::duplicate_card_parameters(), [

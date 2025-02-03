@@ -626,7 +626,7 @@ export default class extends KanbanComponent {
 
     /**
      * Dispatch event to duplicate this card.
-     * @param {*} event
+     * @param {*} event Click event.
      */
     _duplicateCard(event) {
         let target = event.target.closest(selectors.DUPLICATE);
