@@ -1,3 +1,26 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see http://www.gnu.org/licenses/.
+
+/**
+ * Exporter for use in mustache template.
+ * @module mod_kanban/exporter
+ * @copyright 2024 ISB Bayern
+ * @author Stefan Hanauska stefan.hanauska@csg-in.de
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import capabilities from 'mod_kanban/capabilities';
 
 /**
@@ -43,6 +66,7 @@ export default class {
             userboardsonly: state.common.userboards == 2,
             iscourseboard: state.board.userid == 0 && state.board.groupid == 0 && state.board.template == 0,
             users: JSON.parse(JSON.stringify(state.users)),
+            usenumbers: state.common.usenumbers,
         }, this.exportCapabilities(state));
     }
 
@@ -79,7 +103,8 @@ export default class {
             title: '-',
             assignees: [],
             options: '{}',
-            canedit: false
+            canedit: false,
+            number: 0,
         };
         if (state.cards.get(cardid) !== undefined) {
             card = JSON.parse(JSON.stringify(state.cards.get(cardid)));

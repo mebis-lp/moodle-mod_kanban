@@ -187,11 +187,14 @@
     max-width: 80%;
 }
 
-.mod_kanban_assignees {
+:not(.mod_kanban_description_modal) > .mod_kanban_assignees {
     position: absolute;
     bottom: 10px;
     left: 12px;
     max-width: 14rem;
+}
+
+.mod_kanban_assignees {
     overflow: hidden;
     max-height: 2.5rem;
 }
@@ -296,15 +299,19 @@ a.mod_kanban_attachment_item {
 
 .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_delete_card,
 .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_card_edit_details,
-.mod_kanban_card:not(.mod_kanban_hasdescription):not(.mod_kanban_hasattachment) .mod_kanban_description_trigger,
+.mod_kanban_card:not(.mod_kanban_hasdescription):not(.mod_kanban_hasattachment) .mod_kanban_detail_trigger,
 .mod_kanban_card:not(.mod_kanban_hasdiscussion) .mod_kanban_discussion_trigger,
 .mod_kanban_card.mod_kanban_hasdiscussion .mod_kanban_start_discussion,
 .mod_kanban_card.mod_kanban_selfassigned .mod_kanban_assign_self,
 .mod_kanban_card:not(.mod_kanban_selfassigned) .mod_kanban_unassign_self,
-.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_complete_card,
-.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_uncomplete_card,
-.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) .mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_move_card,
+.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) 
+.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_complete_card,
+.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) 
+.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_uncomplete_card,
+.mod_kanban_board:not(.mod_kanban_manageallcards):not(.mod_kanban_manageassignedcards) 
+.mod_kanban_card:not(.mod_kanban_canedit) .mod_kanban_move_card,
 .mod_kanban_board:not(.mod_kanban_history) .mod_kanban_card_view_history,
+.mod_kanban_board:not(.mod_kanban_usenumbers) .mod_kanban_card_number,
 .mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
 .mod_kanban_complete_card,
 .mod_kanban_board.mod_kanban_manageassignedcards:not(.mod_kanban_manageallcards) .mod_kanban_card:not(.mod_kanban_selfassigned)
@@ -382,7 +389,7 @@ a.mod_kanban_attachment_item {
 .mod_kanban_history_modal,
 .mod_kanban_discussion_modal,
 .mod_kanban_description_modal {
-    cursor: pointer;
+    cursor: default;
 }
 
 .mod_kanban_addcard {
@@ -437,4 +444,9 @@ a.mod_kanban_attachment_item {
 
 .row.mod_kanban_update_error {
     display: none;
+}
+
+.mod_kanban_card_number {
+    cursor: pointer;
+    font-weight: bold;
 }

@@ -18,7 +18,7 @@
  * Class for delivering kanban content
  *
  * @package    mod_kanban
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,6 +42,7 @@ use invalid_parameter_exception;
 use mod_kanban\boardmanager;
 use mod_kanban\constants;
 use mod_kanban\helper;
+use mod_kanban\numberfilter;
 use mod_kanban\updateformatter;
 use moodle_exception;
 use required_capability_exception;
@@ -51,7 +52,7 @@ use stdClass;
 /**
  * Class for delivering kanban content
  *
- * @copyright   2023-2024 ISB Bayern
+ * @copyright  2023-2024 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -116,6 +117,7 @@ class get_kanban_content extends external_api {
                         'userboards' => new external_value(PARAM_INT, 'userboards'),
                         'history' => new external_value(PARAM_INT, 'history'),
                         'updatefails' => new external_value(PARAM_INT, 'updatefails', VALUE_OPTIONAL, 0),
+                        'usenumbers' => new external_value(PARAM_INT, 'use numbers for the cards'),
                     ]),
                     'board' => new external_single_structure([
                         'id' => new external_value(PARAM_INT, 'board id'),
@@ -208,6 +210,10 @@ class get_kanban_content extends external_api {
                                     'current user can edit this card?',
                                     VALUE_OPTIONAL,
                                     false
+                                ),
+                                'number' => new external_value(
+                                    PARAM_INT,
+                                    'number of the card',
                                 ),
                             ],
                             '',
@@ -463,6 +469,8 @@ class get_kanban_content extends external_api {
         $common->groupselector = $groupselector;
         $common->history = $kanban->history;
         $common->updatefails = 0;
+        $common->usenumbers = $kanban->usenumbers;
+        $common->linknumbers = $kanban->linknumbers;
 
         if (!$asupdate) {
             $common->template = $DB->get_field_sql(
@@ -542,6 +550,9 @@ class get_kanban_content extends external_api {
                     'attachments',
                     $card->id
                 );
+                if ($common->usenumbers && $common->linknumbers) {
+                    $card->description = numberfilter::filter($card->description);
+                }
                 $card->attachments = helper::get_attachments($context->id, $card->id);
                 $card->hasattachment = count($card->attachments) > 0;
             }
@@ -633,7 +644,8 @@ class get_kanban_content extends external_api {
         self::validate_context($context);
         require_capability('mod/kanban:view', $context);
 
-        $kanbanboard = helper::get_cached_board($boardid);
+        $boardmanager = new boardmanager($cmid, $boardid);
+        $kanbanboard = $boardmanager->get_board();
 
         helper::check_permissions_for_user_or_group($kanbanboard, $context, $cminfo, constants::MOD_KANBAN_VIEW);
 
@@ -648,7 +660,10 @@ class get_kanban_content extends external_api {
             $discussion->content = format_text($discussion->content, FORMAT_HTML);
             $discussion->candelete = $discussion->userid == $USER->id || has_capability('mod/kanban:manageboard', $context);
             $discussion->username = fullname(\core_user::get_user($discussion->userid));
-            $formatter->put('discussions', (array) $discussion);
+            if (!empty($boardmanager->get_instance()->usenumbers) && !empty($boardmanager->get_instance()->linknumbers)) {
+                $discussion->content = numberfilter::filter($discussion->content);
+            }
+            $formatter->put('discussions', (array) $discussion, false);
         }
         return [
             'update' => $formatter->get_formatted_updates(),
