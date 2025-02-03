@@ -223,7 +223,7 @@ export default class extends KanbanComponent {
 
     /**
      * Simulate click on details button.
-     * @param {*} event
+     * @param {*} event Click event.
      */
     _clickDetailsButton(event) {
         document.querySelector(
