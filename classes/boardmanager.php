@@ -1319,7 +1319,8 @@ class boardmanager {
     }
 
     /**
-     *
+     * Returns the current kanban instance.
+     * @return stdClass Kanban instance
      */
     public function get_instance(): stdClass {
         return $this->kanban;
