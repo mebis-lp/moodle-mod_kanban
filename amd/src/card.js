@@ -21,7 +21,6 @@
  * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
 import {DragDrop} from 'core/reactive';
 import selectors from 'mod_kanban/selectors';
 import exporter from 'mod_kanban/exporter';
