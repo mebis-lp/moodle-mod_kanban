@@ -213,4 +213,5 @@ $string['userboardsenabled'] = 'Personal boards enabled';
 $string['userboardsonly'] = 'Personal boards only';
 $string['wiplimit'] = 'WIP limit per person';
 $string['wiplimitenable'] = 'Enable WIP limit';
+$string['wiplimitgreaterzero'] = 'WIP limit needs to be greater than zero';
 $string['wiplimitreached'] = 'WIP limit is reached for {$a->users}.';

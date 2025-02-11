@@ -152,4 +152,21 @@ class edit_column_form extends dynamic_form {
         ];
         return new moodle_url('/mod/kanban/view.php', $params);
     }
+
+    /**
+     * Validate the form data
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if (!empty($data['wiplimitenable']) && $data['wiplimit'] <= 0) {
+            $errors['wipgroup'] = get_string('wiplimitgreaterzero', 'kanban');
+        }
+
+        return $errors;
+    }
 }
