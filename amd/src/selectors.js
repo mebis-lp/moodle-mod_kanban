@@ -87,4 +87,5 @@ export default {
     UNCOMPLETE: `[data-action="uncomplete_card"]`,
     UNLOCKCOLUMN: `[data-action="unlock_column"]`,
     UNLOCKBOARDCOLUMNS: `[data-action="unlock_board_columns"]`,
+    WIPLIMIT: `.mod_kanban_wiplimit`,
 };
