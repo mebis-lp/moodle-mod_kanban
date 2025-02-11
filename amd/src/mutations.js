@@ -204,7 +204,7 @@ export default class {
             result = await Ajax.call([request])[0];
         } catch (e) {
             if (!(e instanceof Object)) {
-                // If we do not receive a proper object, there has an issue with requesting the webservice.
+                // There is a problem with requesting the webservice if we do not obtain a correct object.
                 // This for example could be due to a connection loss. We therefore need to catch this error separately.
                 Log.warn('Sending a change request to the kanban backend failed, probably due to connection loss.');
                 this.processUpdateFail(stateManager);
@@ -245,7 +245,7 @@ export default class {
                 }])[0];
             } catch (e) {
                 if (!(e instanceof Object)) {
-                    // If we do not receive a proper object, there has an issue with requesting the webservice.
+                    // There is a problem with requesting the webservice if we do not obtain a correct object.
                     // This for example could be due to a connection loss. We therefore need to catch this error separately.
                     Log.warn('Sending a change request to the kanban backend failed, probably due to connection loss.');
                     this.processUpdateFail(stateManager);
