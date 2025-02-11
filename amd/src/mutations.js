@@ -203,9 +203,12 @@ export default class {
         try {
             result = await Ajax.call([request])[0];
         } catch (e) {
-            // If the request cannot be performed (connection loss for example) we need to catch this error here.
-            Log.warn('Sending a change request to the kanban backend failed, probably due to connection loss.');
-            this.processUpdateFail(stateManager);
+            if (!(e instanceof Object)) {
+                // There is a problem with requesting the webservice if we do not obtain a correct object.
+                // This for example could be due to a connection loss. We therefore need to catch this error separately.
+                Log.warn('Sending a change request to the kanban backend failed, probably due to connection loss.');
+                this.processUpdateFail(stateManager);
+            }
             return;
         }
 
@@ -241,9 +244,12 @@ export default class {
                     },
                 }])[0];
             } catch (e) {
-                // If the request cannot be performed (connection loss for example) we need to catch this error here.
-                Log.warn('Retrieving the updated state of the kanban board failed, probably due to connection loss.');
-                this.processUpdateFail(stateManager);
+                if (!(e instanceof Object)) {
+                    // There is a problem with requesting the webservice if we do not obtain a correct object.
+                    // This for example could be due to a connection loss. We therefore need to catch this error separately.
+                    Log.warn('Sending a change request to the kanban backend failed, probably due to connection loss.');
+                    this.processUpdateFail(stateManager);
+                }
                 return;
             }
 

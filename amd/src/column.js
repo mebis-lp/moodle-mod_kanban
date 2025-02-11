@@ -301,7 +301,10 @@ export default class extends KanbanComponent {
         if (element.options !== undefined) {
             let options = JSON.parse(element.options);
             this.toggleClass(options.autohide, 'mod_kanban_autohide');
+            this.toggleClass(options.wiplimit > 0, 'mod_kanban_column_wiplimit');
+            this.getElement(selectors.WIPLIMIT).innerHTML = options.wiplimit;
         }
+        this.getElement(selectors.CARDCOUNT).innerHTML = this.getElements(selectors.CARD).length;
         // Enable/disable dragging (e.g. if column is locked).
         this.checkDragging();
     }
