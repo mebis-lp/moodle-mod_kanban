@@ -325,13 +325,13 @@ final class boardmanager_test extends \advanced_testcase {
      * Tests the json sanitization function.
      *
      * @dataProvider sanitize_json_string_provider
-     * @param string $jsonstring the json string to sanitize
-     * @param string $sanitized the expected sanitized json string
+     * @param string $json the json string to sanitize
+     * @param string $expected the expected sanitized json string
      * @return void
      */
-    public function test_sanitize_json_string(string $jsonstring, string $sanitized): void {
-        $output = helper::sanitize_json_string($jsonstring);
-        $this->assertEquals($sanitized, $output);
+    public function test_sanitize_json_string(string $json, string $expected): void {
+        $output = helper::sanitize_json_string($json);
+        $this->assertEquals($expected, $output);
     }
 
     /**
