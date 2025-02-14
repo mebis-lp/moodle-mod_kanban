@@ -115,7 +115,7 @@ function kanban_supports($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;
         case FEATURE_MOD_PURPOSE:
-            return MOD_PURPOSE_COMMUNICATION;
+            return MOD_PURPOSE_COLLABORATION;
         default:
             return null;
     }
