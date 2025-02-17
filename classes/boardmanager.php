@@ -18,7 +18,7 @@
  * Class to handle updating the board
  *
  * @package    mod_kanban
- * @copyright  2023-2024 ISB Bayern
+ * @copyright  2023-2025 ISB Bayern
  * @author     Stefan Hanauska
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -313,14 +313,20 @@ class boardmanager {
      */
     public function delete_board(int $id) {
         global $DB;
-        // Cards need to be read to identify files, assignees and discussions.
-        $cardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_board = :id', ['id' => $id]);
-        $this->delete_cards($cardids);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            // Cards need to be read to identify files, assignees and discussions.
+            $cardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_board = :id', ['id' => $id]);
+            $this->delete_cards($cardids);
 
-        $DB->delete_records('kanban_history', ['kanban_board' => $id]);
-        $DB->delete_records('kanban_column', ['kanban_board' => $id]);
-        $DB->delete_records('kanban_card', ['kanban_board' => $id]);
-        $DB->delete_records('kanban_board', ['id' => $id]);
+            $DB->delete_records('kanban_history', ['kanban_board' => $id]);
+            $DB->delete_records('kanban_column', ['kanban_board' => $id]);
+            $DB->delete_records('kanban_card', ['kanban_board' => $id]);
+            $DB->delete_records('kanban_board', ['id' => $id]);
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
+        }
         // The rest of the elements is skipped in the update message.
         $this->load_board($id);
         $this->formatter->delete('board', ['id' => $id]);
@@ -350,28 +356,34 @@ class boardmanager {
     public function delete_card(int $cardid, bool $updatecolumn = true): void {
         global $DB;
         $fs = get_file_storage();
-        $DB->delete_records('kanban_discussion_comment', ['kanban_card' => $cardid]);
-        $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
-        $context = context_module::instance($this->cmid, IGNORE_MISSING);
-        $fs->delete_area_files($context->id, 'mod_kanban', 'attachments', $cardid);
-        $card = $this->get_card($cardid);
-        if ($updatecolumn) {
-            $column = $DB->get_record('kanban_column', ['id' => $card->kanban_column]);
-            $update = [
-                'id' => $column->id,
-                'timemodified' => time(),
-                'sequence' => helper::sequence_remove($column->sequence, $cardid),
-            ];
-            $DB->update_record('kanban_column', $update);
-            $this->formatter->put('columns', $update);
-            helper::update_cached_timestamp($card->kanban_board, constants::MOD_KANBAN_COLUMN);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $DB->delete_records('kanban_discussion_comment', ['kanban_card' => $cardid]);
+            $DB->delete_records('kanban_assignee', ['kanban_card' => $cardid]);
+            $context = context_module::instance($this->cmid, IGNORE_MISSING);
+            $fs->delete_area_files($context->id, 'mod_kanban', 'attachments', $cardid);
+            $card = $this->get_card($cardid);
+            if ($updatecolumn) {
+                $column = $DB->get_record('kanban_column', ['id' => $card->kanban_column]);
+                $update = [
+                    'id' => $column->id,
+                    'timemodified' => time(),
+                    'sequence' => helper::sequence_remove($column->sequence, $cardid),
+                ];
+                $DB->update_record('kanban_column', $update);
+                $this->formatter->put('columns', $update);
+                helper::update_cached_timestamp($card->kanban_board, constants::MOD_KANBAN_COLUMN);
+            }
+            $DB->delete_records('kanban_card', ['id' => $cardid]);
+            helper::remove_calendar_event($this->kanban, (object) ['id' => $cardid]);
+            // As long as history is only attached to cards, it will be deleted here.
+            // ToDo if this will be changed: Replace the following line with history writer (deletion of card).
+            $DB->delete_records('kanban_history', ['kanban_card' => $cardid]);
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
         }
-        $DB->delete_records('kanban_card', ['id' => $cardid]);
-        helper::remove_calendar_event($this->kanban, (object) ['id' => $cardid]);
         $this->formatter->delete('cards', ['id' => $cardid]);
-        // As long as history is only attached to cards, it will be deleted here.
-        // ToDo if this will be changed: Replace the following line with history writer (deletion of card).
-        $DB->delete_records('kanban_history', ['kanban_card' => $cardid]);
     }
 
     /**
@@ -384,15 +396,21 @@ class boardmanager {
     public function delete_column(int $id, bool $updateboard = true): void {
         global $DB;
         $cardids = $DB->get_fieldset_select('kanban_card', 'id', 'kanban_column = :id', ['id' => $id]);
-        $this->delete_cards($cardids, false);
-        $DB->delete_records('kanban_column', ['id' => $id]);
-        $this->formatter->delete('columns', ['id' => $id]);
-        if ($updateboard) {
-            $this->board->sequence = helper::sequence_remove($this->board->sequence, $id);
-            $update = ['id' => $this->board->id, 'sequence' => $this->board->sequence, 'timemodified' => time()];
-            $DB->update_record('kanban_board', $update);
-            helper::update_cached_board($update['id']);
-            $this->formatter->put('board', $update);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $this->delete_cards($cardids, false);
+            $DB->delete_records('kanban_column', ['id' => $id]);
+            $this->formatter->delete('columns', ['id' => $id]);
+            if ($updateboard) {
+                $this->board->sequence = helper::sequence_remove($this->board->sequence, $id);
+                $update = ['id' => $this->board->id, 'sequence' => $this->board->sequence, 'timemodified' => time()];
+                $DB->update_record('kanban_board', $update);
+                helper::update_cached_board($update['id']);
+                $this->formatter->put('board', $update);
+            }
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
         }
     }
 
@@ -421,14 +439,21 @@ class boardmanager {
 
             // Sanitize title to be extra safe.
             $data['title'] = clean_param($data['title'], PARAM_TEXT);
-            $data['id'] = $DB->insert_record('kanban_column', $data);
+            try {
+                $transaction = $DB->start_delegated_transaction();
+                $data['id'] = $DB->insert_record('kanban_column', $data);
 
-            $update = [
-                'id' => $this->board->id,
-                'sequence' => helper::sequence_add_after($this->board->sequence, $aftercol, $data['id']),
-                'timemodified' => time(),
-            ];
-            $DB->update_record('kanban_board', $update);
+                helper::update_cached_board($this->board->id);
+                $update = [
+                    'id' => $this->board->id,
+                    'sequence' => helper::sequence_add_after($this->board->sequence, $aftercol, $data['id']),
+                    'timemodified' => time(),
+                ];
+                $DB->update_record('kanban_board', $update);
+                $transaction->allow_commit();
+            } catch (\Exception $e) {
+                $transaction->rollback($e);
+            }
             helper::update_cached_board($update['id']);
 
             $this->formatter->put('board', $update);
@@ -470,14 +495,20 @@ class boardmanager {
         // Sanitize title to be extra safe.
         $data['title'] = clean_param($data['title'], PARAM_TEXT);
 
-        $column = $DB->get_record('kanban_column', ['id' => $columnid]);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $column = $DB->get_record('kanban_column', ['id' => $columnid]);
 
-        $update = [
-            'id' => $columnid,
-            'sequence' => helper::sequence_add_after($column->sequence, $aftercard, $data['id']),
-            'timemodified' => time(),
-        ];
-        $DB->update_record('kanban_column', $update);
+            $update = [
+                'id' => $columnid,
+                'sequence' => helper::sequence_add_after($column->sequence, $aftercard, $data['id']),
+                'timemodified' => time(),
+            ];
+            $DB->update_record('kanban_column', $update);
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
+        }
 
         // Users can always edit cards they created.
         $data['canedit'] = $this->can_user_manage_specific_card($data['id']);
@@ -503,16 +534,22 @@ class boardmanager {
      */
     public function move_column(int $columnid, int $aftercol): void {
         global $DB;
-        $column = $DB->get_record('kanban_column', ['id' => $columnid]);
-        if (!$this->board->locked && !$column->locked) {
-            $update = [
-                'id' => $this->board->id,
-                'sequence' => helper::sequence_move_after($this->board->sequence, $aftercol, $columnid),
-                'timemodified' => time(),
-            ];
-            $DB->update_record('kanban_board', $update);
-            helper::update_cached_board($update['id']);
-            $this->formatter->put('board', $update);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $column = $DB->get_record('kanban_column', ['id' => $columnid]);
+            if (!$this->board->locked && !$column->locked) {
+                $update = [
+                    'id' => $this->board->id,
+                    'sequence' => helper::sequence_move_after($this->board->sequence, $aftercol, $columnid),
+                    'timemodified' => time(),
+                ];
+                $DB->update_record('kanban_board', $update);
+                helper::update_cached_board($update['id']);
+                $this->formatter->put('board', $update);
+            }
+            $transaction->allow_commit();
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
         }
     }
 
@@ -531,78 +568,85 @@ class boardmanager {
             $columnid = $card->kanban_column;
         }
 
-        $sourcecolumn = $DB->get_record('kanban_column', ['id' => $card->kanban_column]);
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $sourcecolumn = $DB->get_record('kanban_column', ['id' => $card->kanban_column]);
 
-        if ($card->kanban_column == $columnid) {
-            $update = [
-                'id' => $columnid,
-                'sequence' => helper::sequence_move_after($sourcecolumn->sequence, $aftercard, $cardid),
-                'timemodified' => time(),
-            ];
-            $DB->update_record('kanban_column', $update);
-            $this->formatter->put('columns', $update);
-        } else {
-            $targetcolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
+            if ($card->kanban_column == $columnid) {
+                $update = [
+                    'id' => $columnid,
+                    'sequence' => helper::sequence_move_after($sourcecolumn->sequence, $aftercard, $cardid),
+                    'timemodified' => time(),
+                ];
+                $DB->update_record('kanban_column', $update);
+                $transaction->allow_commit();
+                $this->formatter->put('columns', $update);
+            } else {
+                $targetcolumn = $DB->get_record('kanban_column', ['id' => $columnid]);
 
-            $options = json_decode($targetcolumn->options);
-            $wiplimit = $options->wiplimit ?? 0;
+                $options = json_decode($targetcolumn->options);
+                $wiplimit = $options->wiplimit ?? 0;
 
-            if ($wiplimit > 0) {
-                self::check_wiplimit($columnid, $cardid, $wiplimit);
-            }
+                if ($wiplimit > 0) {
+                    self::check_wiplimit($columnid, $cardid, $wiplimit);
+                }
 
-            // Card needs to be processed first, because column sorting in frontend will only
-            // work if card is already moved in the right position.
-            $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
-            // If target column has autoclose option set, update card to be completed.
-            $options = json_decode($targetcolumn->options);
-            if (!empty($options->autoclose)) {
-                if ($card->completed) {
+                // Card needs to be processed first, because column sorting in frontend will only
+                // work if card is already moved in the right position.
+                $updatecard = ['id' => $cardid, 'kanban_column' => $columnid, 'timemodified' => time()];
+                // If target column has autoclose option set, update card to be completed.
+                $options = json_decode($targetcolumn->options);
+                if (!empty($options->autoclose)) {
+                    if ($card->completed) {
+                        self::set_card_complete($cardid, 1);
+                    }
+                }
+                $DB->update_record('kanban_card', $updatecard);
+                // When inplace editing the title and moving the card happens quite fast in a row,
+                // it might happen that the "old" title is shown in the ui since inplace editing does
+                // change the DOM directly and does not trigger the update function.
+                // So we add the current title here to avoid this.
+                $this->formatter->put('cards', array_merge($updatecard, ['title' => clean_param($card->title, PARAM_TEXT)]));
+
+                // Remove from current column.
+                $update = [
+                    'id' => $sourcecolumn->id,
+                    'sequence' => helper::sequence_remove($sourcecolumn->sequence, $cardid),
+                    'timemodified' => time(),
+                ];
+                $DB->update_record('kanban_column', $update);
+                $this->formatter->put('columns', $update);
+
+                // Add to target column.
+                $update = [
+                    'id' => $columnid,
+                    'sequence' => helper::sequence_add_after($targetcolumn->sequence, $aftercard, $cardid),
+                    'timemodified' => time(),
+                ];
+                $DB->update_record('kanban_column', $update);
+                $transaction->allow_commit();
+                $this->formatter->put('columns', $update);
+
+                $data = array_merge((array) $card, $updatecard);
+                $data['username'] = fullname($USER);
+                $data['boardname'] = $this->kanban->name;
+                $data['columnname'] = clean_param($targetcolumn->title, PARAM_TEXT);
+                $assignees = $this->get_card_assignees($cardid);
+                helper::send_notification($this->cminfo, 'moved', $assignees, (object) $data);
+                if (!empty($options->autoclose) && $card->completed == 0) {
                     self::set_card_complete($cardid, 1);
                 }
+                $this->write_history(
+                    'moved',
+                    constants::MOD_KANBAN_CARD,
+                    ['columnname' => clean_param($targetcolumn->title, PARAM_TEXT)],
+                    $card->kanban_column,
+                    $cardid
+                );
+                helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
             }
-            $DB->update_record('kanban_card', $updatecard);
-            // When inplace editing the title and moving the card happens quite fast in a row,
-            // it might happen that the "old" title is shown in the ui since inplace editing does
-            // change the DOM directly and does not trigger the update function.
-            // So we add the current title here to avoid this.
-            $this->formatter->put('cards', array_merge($updatecard, ['title' => clean_param($card->title, PARAM_TEXT)]));
-
-            // Remove from current column.
-            $update = [
-                'id' => $sourcecolumn->id,
-                'sequence' => helper::sequence_remove($sourcecolumn->sequence, $cardid),
-                'timemodified' => time(),
-            ];
-            $DB->update_record('kanban_column', $update);
-            $this->formatter->put('columns', $update);
-
-            // Add to target column.
-            $update = [
-                'id' => $columnid,
-                'sequence' => helper::sequence_add_after($targetcolumn->sequence, $aftercard, $cardid),
-                'timemodified' => time(),
-            ];
-            $DB->update_record('kanban_column', $update);
-            $this->formatter->put('columns', $update);
-
-            $data = array_merge((array) $card, $updatecard);
-            $data['username'] = fullname($USER);
-            $data['boardname'] = $this->kanban->name;
-            $data['columnname'] = clean_param($targetcolumn->title, PARAM_TEXT);
-            $assignees = $this->get_card_assignees($cardid);
-            helper::send_notification($this->cminfo, 'moved', $assignees, (object) $data);
-            if (!empty($options->autoclose) && $card->completed == 0) {
-                self::set_card_complete($cardid, 1);
-            }
-            $this->write_history(
-                'moved',
-                constants::MOD_KANBAN_CARD,
-                ['columnname' => clean_param($targetcolumn->title, PARAM_TEXT)],
-                $card->kanban_column,
-                $cardid
-            );
-            helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_CARD, $update['timemodified']);
+        } catch (\Exception $e) {
+            $transaction->rollback($e);
         }
         helper::update_cached_timestamp($this->board->id, constants::MOD_KANBAN_COLUMN, $update['timemodified']);
     }
