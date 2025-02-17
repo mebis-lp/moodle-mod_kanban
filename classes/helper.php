@@ -467,4 +467,19 @@ class helper {
         }
         return json_encode($json);
     }
+
+    /**
+     * Heals the sequence of columns by adding/removing missing columns.
+     *
+     * @param string $sequence
+     * @param array $columnids
+     * @return string
+     */
+    public static function heal_missing_columns(string $sequence, array $columnids): string {
+        $sequence = explode(',', $sequence);
+        $columnsmissinginsequence = array_diff($columnids, $sequence);
+        $columnsindatabase = array_intersect($sequence, $columnids);
+        $updatedboardsequence = array_merge($columnsindatabase, $columnsmissinginsequence);
+        return implode(',', $updatedboardsequence);
+    }
 }

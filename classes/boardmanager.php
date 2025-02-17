@@ -441,7 +441,10 @@ class boardmanager {
             $data['title'] = clean_param($data['title'], PARAM_TEXT);
             try {
                 $transaction = $DB->start_delegated_transaction();
+                $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $this->board->id]);
                 $data['id'] = $DB->insert_record('kanban_column', $data);
+
+                $this->board->sequence = helper::heal_missing_columns($this->board->sequence, $columnids);
 
                 helper::update_cached_board($this->board->id);
                 $update = [
@@ -538,6 +541,8 @@ class boardmanager {
             $transaction = $DB->start_delegated_transaction();
             $column = $DB->get_record('kanban_column', ['id' => $columnid]);
             if (!$this->board->locked && !$column->locked) {
+                $columnids = $DB->get_fieldset_select('kanban_column', 'id', 'kanban_board = :id', ['id' => $this->board->id]);
+                $this->board->sequence = helper::heal_missing_columns($this->board->sequence, $columnids);
                 $update = [
                     'id' => $this->board->id,
                     'sequence' => helper::sequence_move_after($this->board->sequence, $aftercol, $columnid),
