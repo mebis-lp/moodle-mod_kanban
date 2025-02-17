@@ -564,6 +564,13 @@ class get_kanban_content extends external_api {
             $caps[] = ['id' => $k, 'value' => $v];
         }
 
+        $columnids = array_map(fn($column) => $column->id, $kanbancolumns);
+        $boardsequence = explode(',', $kanbanboard->sequence);
+        $columnsmissinginsequence = array_diff($columnids, $boardsequence);
+        $columnsindatabase = array_intersect($boardsequence, $columnids);
+        $updatedboardsequence = array_merge($columnsindatabase, $columnsmissinginsequence);
+        $kanbanboard->sequence = implode(',', $updatedboardsequence);
+
         if ($asupdate) {
             $formatter = new updateformatter();
             $formatter->put('common', (array) $common);
