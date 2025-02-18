@@ -473,7 +473,7 @@ class helper {
      *
      * @param string $sequence The sequence of columns in the board itself.
      * @param array $columnids
-     * @return string
+     * @return string New sequence of columns.
      */
     public static function heal_missing_columns(string $sequence, array $columnids): string {
         $sequence = explode(',', $sequence);
