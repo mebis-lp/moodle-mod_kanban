@@ -24,7 +24,7 @@ namespace mod_kanban;
  * @copyright  2023-2025 ISB Bayern
  * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_kanban\helper
+ * @coversDefaultClass     \mod_kanban\helper
  */
 final class helper_test extends \advanced_testcase {
     /**
