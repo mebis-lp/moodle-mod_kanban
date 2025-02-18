@@ -48,6 +48,8 @@ final class helper_test extends \advanced_testcase {
     /**
      * Tests the sequence_remove method.
      *
+     * @covers ::sequence_remove
+     *
      * @return void
      */
     public function test_sequence_remove(): void {
