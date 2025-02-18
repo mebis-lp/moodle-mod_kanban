@@ -40,6 +40,9 @@ export default class {
             columns = columnOrder.map((value) => {
                 return this.exportCardsForColumn(state, value);
             });
+            columns = columns.filter((value) => {
+                return value.id !== undefined;
+            });
         }
 
         let showactionmenu = state.common.userboards == 1 || state.common.groupselector != '' ||
@@ -77,7 +80,12 @@ export default class {
      * @returns {object}
      */
     static exportCardsForColumn(state, columnid) {
-        let col = JSON.parse(JSON.stringify(state.columns.get(columnid)));
+        let column = state.columns.get(columnid);
+        // This handles a column that is not present in the state.
+        if (column === undefined) {
+            return {};
+        }
+        let col = JSON.parse(JSON.stringify(column));
         let options = JSON.parse(col.options);
         col.hascards = col.sequence != '';
         col.autoclose = options.autoclose;

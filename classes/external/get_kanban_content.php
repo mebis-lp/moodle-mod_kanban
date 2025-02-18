@@ -584,6 +584,10 @@ class get_kanban_content extends external_api {
             ];
         }
 
+        // This shouldn't be done for content updates as it would make it necessary to query all columns everytime.
+        $columnids = array_map(fn($column) => $column->id, $kanbancolumns);
+        $kanbanboard->sequence = helper::heal_missing_columns($kanbanboard->sequence, $columnids);
+
         return [
             'common' => $common,
             'board' => $kanbanboard,

@@ -77,6 +77,11 @@ class helper {
         $seq = explode(',', $sequence);
 
         $posold = array_search($item, $seq);
+
+        if ($posold === false) {
+            return $sequence;
+        }
+
         if ($posold >= 0) {
             unset($seq[$posold]);
         }
@@ -93,6 +98,9 @@ class helper {
      * @return string The new sequence
      */
     public static function sequence_move_after(string $sequence, int $afteritem, int $item): string {
+        if ($afteritem == $item) {
+            return $sequence;
+        }
         $seq = self::sequence_remove($sequence, $item);
         return self::sequence_add_after($seq, $afteritem, $item);
     }
@@ -114,6 +122,10 @@ class helper {
         $newseq = [];
 
         foreach ($seq as $value) {
+            if (!array_key_exists($value, $replace)) {
+                $newseq[] = $value;
+                continue;
+            }
             if (is_object($replace[$value])) {
                 $newseq[] = $replace[$value]->id;
             } else {
@@ -445,10 +457,29 @@ class helper {
         foreach ($json as $key => $value) {
             unset($json[$key]);
             $key = clean_param(clean_param($key, PARAM_CLEANHTML), PARAM_NOTAGS);
-            $json[$key] = is_array($value)
-                ? clean_param_array($value, PARAM_CLEANHTML, true)
-                : clean_param($value, PARAM_CLEANHTML);
+            if (is_bool($value) || is_integer($value)) {
+                $json[$key] = $value;
+            } else {
+                $json[$key] = is_array($value)
+                    ? clean_param_array($value, PARAM_CLEANHTML, true)
+                    : clean_param($value, PARAM_CLEANHTML);
+            }
         }
         return json_encode($json);
+    }
+
+    /**
+     * Heals the sequence of columns by adding/removing missing columns.
+     *
+     * @param string $sequence The sequence of columns in the board itself.
+     * @param array $columnids
+     * @return string New sequence of columns.
+     */
+    public static function heal_missing_columns(string $sequence, array $columnids): string {
+        $sequence = explode(',', $sequence);
+        $columnsmissinginsequence = array_diff($columnids, $sequence);
+        $columnsindatabase = array_intersect($sequence, $columnids);
+        $updatedboardsequence = array_merge($columnsindatabase, $columnsmissinginsequence);
+        return implode(',', $updatedboardsequence);
     }
 }
