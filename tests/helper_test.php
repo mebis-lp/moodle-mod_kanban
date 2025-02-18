@@ -79,8 +79,10 @@ final class helper_test extends \advanced_testcase {
         $this->assertEquals('3,1,2', helper::sequence_move_after('1,2,3', 0, 3));
         // Test moving an element after itself (should not change the sequence).
         $this->assertEquals('1,2,3', helper::sequence_move_after('1,2,3', 2, 2));
-        // Test moving an element after a non existing element (should not change the sequence).
-        $this->assertEquals('1,2,3', helper::sequence_move_after('1,2,3', 4, 3));
+        // Test moving an element after a non existing element (should move it at the end).
+        $this->assertEquals('1,3,2', helper::sequence_move_after('1,2,3', 4, 2));
+        // Test moving an element in an empty sequence (should insert it at the end).
+        $this->assertEquals('4', helper::sequence_move_after('', 1, 4));
     }
 
     /**
