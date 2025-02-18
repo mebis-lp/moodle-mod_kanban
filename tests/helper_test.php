@@ -86,6 +86,8 @@ final class helper_test extends \advanced_testcase {
     /**
      * Tests the sequence_replace method.
      *
+     * @covers ::sequence_replace
+     *
      * @return void
      */
     public function test_sequence_replace(): void {
