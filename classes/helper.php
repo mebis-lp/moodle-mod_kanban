@@ -471,7 +471,7 @@ class helper {
     /**
      * Heals the sequence of columns by adding/removing missing columns.
      *
-     * @param string $sequence
+     * @param string $sequence The sequence of columns in the board itself.
      * @param array $columnids
      * @return string
      */
