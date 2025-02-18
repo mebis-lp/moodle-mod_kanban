@@ -68,6 +68,8 @@ final class helper_test extends \advanced_testcase {
     /**
      * Tests the sequence_move_after method.
      *
+     * @covers ::sequence_move_after
+     *
      * @return void
      */
     public function test_sequence_move_after(): void {
