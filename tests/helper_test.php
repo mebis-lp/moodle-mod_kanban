@@ -30,6 +30,7 @@ final class helper_test extends \advanced_testcase {
     /**
      * Tests the sequence_add_after method.
      *
+     * @covers ::sequence_add_after
      * @return void
      */
     public function test_sequence_add_after(): void {
