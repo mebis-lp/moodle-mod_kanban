@@ -801,6 +801,7 @@ class boardmanager {
             helper::remove_calendar_event($this->kanban, $card, $assignees);
             if (!empty($card->repeat_enable)) {
                 $newcard = clone $card;
+                $newcard->discussion = 0;
                 if ($card->repeat_newduedate == constants::MOD_KANBAN_REPEAT_NONEWDUEDATE) {
                     $newcard->duedate = 0;
                     $newcard->reminder = 0;
