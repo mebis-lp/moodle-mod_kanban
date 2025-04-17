@@ -1423,6 +1423,7 @@ class boardmanager {
         global $USER;
         $card = $this->get_card($cardid);
         $card->createdby = $USER->id;
+        $card->discussion = 0;
         $newcardid = $this->add_card($card->kanban_column, $card->id, (array) $card);
         $this->copy_attachment_files($this->cminfo->context->id, $cardid, $newcardid);
         return $newcardid;
