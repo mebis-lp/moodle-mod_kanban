@@ -1,0 +1,7 @@
+name: Moodle Plugin CI
+on: [push, pull_request]
+jobs:
+  ci:
+    uses: bycs-lp/moodle-ci-workflows/.github/workflows/moodle-plugin-ci.yml@main
+    with:
+      mustache-continue-on-error: true
